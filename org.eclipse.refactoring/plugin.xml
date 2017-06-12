@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ltk.core.refactoring.refactoringContributions">
+      <contribution
+            class="org.eclipse.refactoring.IntroduceIndirectionRefactoringContribution"
+            id="org.eclipse.introduce.indirection"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            description="Action set containing Eclipse Articles actions"
+            id="org.eclipse.refactoring.actionSet"
+            label="Eclipse Articles"
+            visible="true">
+         <menu
+               id="org.eclipse.refactoring.menu"
+               label="Eclipse &amp;Articles"
+               path="edit">
+            <separator name="introduceIndirection"/>
+         </menu>
+         <action
+               class="org.eclipse.refactoring.IntroduceIndirectionAction"
+               definitionId="org.eclipse.introduce.indirection"
+               enablesFor="1"
+               helpContextId="org.eclipse.refactoring.IntroduceIndirection"
+               id="org.eclipse.refactoring.IntroduceIndirection"
+               label="Introduce Indirection..."
+               menubarPath="org.eclipse.refactoring.menu/introduceIndirection"
+               style="push"
+               tooltip="Introduce Indirection"/>
+      </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            description="Eclipse Articles Refactoring Actions"
+            id="org.eclipse.refactoring.category"
+            name="Refactor - Eclipse Articles"/>
+      <command
+            categoryId="org.eclipse.refactoring.category"
+            description="Introduces an indirection"
+            id="org.eclipse.introduce.indirection"
+            name="Introduce Indirection"/>
+   </extension>
+
+</plugin>
