@@ -25,6 +25,7 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
+import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
@@ -64,8 +65,9 @@ public class Utilities {
 		ASTRewrite astRewrite = ASTRewrite.create(ast);
 		TypeDeclaration typeDeclaration = createTypeDeclaration(method, astNode, astRewrite);
 		ASTNode declaringTypeNode = NodeFinder.perform(astNode, declaringType.getSourceRange());
-		astRewrite.getListRewrite(declaringTypeNode, TypeDeclaration.BODY_DECLARATIONS_PROPERTY)
-				.insertLast(typeDeclaration, null);
+		ListRewrite listRewrite = astRewrite.getListRewrite(declaringTypeNode, TypeDeclaration.BODY_DECLARATIONS_PROPERTY);
+		listRewrite.insertLast(typeDeclaration, null);
+		listRewrite.insertLast(createMethodDeclaration(method, astNode, astRewrite), null);
 		TextEdit edit = astRewrite.rewriteAST();
 		ICompilationUnit unit = method.getCompilationUnit();
 		TextFileChange change = new TextFileChange(unit.getElementName(), (IFile) unit.getResource());
@@ -74,14 +76,29 @@ public class Utilities {
 		return change;
 	}
 
-	private static TypeDeclaration createTypeDeclaration(IMethod method, ASTNode astNode, ASTRewrite astRewrite) throws JavaModelException {
+	private static MethodDeclaration createMethodDeclaration(IMethod method, ASTNode astNode, ASTRewrite astRewrite)
+			throws JavaModelException {
+		MethodDeclaration oldMethod = extractMethodDeclaration(method, astNode);
+		AST ast = astNode.getAST();
+		MethodDeclaration newMethod = (MethodDeclaration) ASTNode.copySubtree(ast, oldMethod);
+		newMethod.setName(ast.newSimpleName(newMethod.getName().getFullyQualifiedName() + "Iteratively"));
+		return newMethod;
+	}
+	
+	private static MethodDeclaration extractMethodDeclaration(IMethod method, ASTNode astNode)
+			throws JavaModelException {
+		return (MethodDeclaration) NodeFinder.perform(astNode, method.getSourceRange());
+	}
+
+	private static TypeDeclaration createTypeDeclaration(IMethod method, ASTNode astNode, ASTRewrite astRewrite)
+			throws JavaModelException {
 		AST ast = astNode.getAST();
 		TypeDeclaration typeDeclaration = ast.newTypeDeclaration();
 		typeDeclaration.setName(ast.newSimpleName(method.getElementName() + "Context"));
 		List<Modifier> modifiers = typeDeclaration.modifiers();
 		modifiers.add(ast.newModifier(ModifierKeyword.PRIVATE_KEYWORD));
 		modifiers.add(ast.newModifier(ModifierKeyword.STATIC_KEYWORD));
-		MethodDeclaration methodDeclaration = (MethodDeclaration) NodeFinder.perform(astNode, method.getSourceRange());
+		MethodDeclaration methodDeclaration = extractMethodDeclaration(method, astNode);
 		List<SingleVariableDeclaration> parameters = methodDeclaration.parameters();
 		addFieldsFromParameters(ast, typeDeclaration, parameters, astRewrite);
 		return typeDeclaration;
@@ -89,14 +106,14 @@ public class Utilities {
 
 	private static void addFieldsFromParameters(AST ast, TypeDeclaration typeDeclaration,
 			List<SingleVariableDeclaration> parameters, ASTRewrite astRewrite) {
-		for (SingleVariableDeclaration parameter: parameters) {
+		for (SingleVariableDeclaration parameter : parameters) {
 			VariableDeclarationFragment fragment = ast.newVariableDeclarationFragment();
 			fragment.setName((SimpleName) astRewrite.createCopyTarget(parameter.getName()));
-			
+
 			FieldDeclaration fieldDeclaration = ast.newFieldDeclaration(fragment);
 			fieldDeclaration.setType((Type) astRewrite.createCopyTarget(parameter.getType()));
 			fieldDeclaration.modifiers().add(ast.newModifier(ModifierKeyword.PUBLIC_KEYWORD));
-			
+
 			typeDeclaration.bodyDeclarations().add(fieldDeclaration);
 		}
 	}
