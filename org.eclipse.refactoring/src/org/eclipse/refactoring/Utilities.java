@@ -1,11 +1,24 @@
 package org.eclipse.refactoring;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.Modifier;
+import org.eclipse.jdt.core.dom.NodeFinder;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
+import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
@@ -13,6 +26,9 @@ import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
+import org.eclipse.ltk.core.refactoring.Change;
+import org.eclipse.ltk.core.refactoring.TextFileChange;
+import org.eclipse.text.edits.TextEdit;
 
 public class Utilities {
 	public static boolean isRecursive(IMethod method) throws CoreException {
@@ -32,5 +48,40 @@ public class Utilities {
 					}
 				}, null);
 		return !invocations.isEmpty();
+	}
+
+	public static Change createContextClass(IMethod method) throws JavaModelException {
+		IType declaringType = method.getDeclaringType();
+		ASTParser parser = createParser(method);
+		ASTNode astNode = parser.createAST(null);
+		AST ast = astNode.getAST();
+		ASTRewrite astRewrite = ASTRewrite.create(ast);
+		TypeDeclaration typeDeclaration = createTypeDeclaration(method, ast);
+		ASTNode declaringTypeNode = NodeFinder.perform(astNode, declaringType.getSourceRange());
+		astRewrite.getListRewrite(declaringTypeNode, TypeDeclaration.BODY_DECLARATIONS_PROPERTY)
+				.insertLast(typeDeclaration, null);
+		TextEdit edit = astRewrite.rewriteAST();
+		ICompilationUnit unit = method.getCompilationUnit();
+		TextFileChange change = new TextFileChange(unit.getElementName(), (IFile) unit.getResource());
+		change.setTextType("java");
+		change.setEdit(edit);
+		return change;
+	}
+
+	private static TypeDeclaration createTypeDeclaration(IMethod method, AST ast) {
+		TypeDeclaration typeDeclaration = ast.newTypeDeclaration();
+		typeDeclaration.setName(ast.newSimpleName(method.getElementName() + "Context"));
+		List<Modifier> modifiers = typeDeclaration.modifiers();
+		modifiers.add(ast.newModifier(ModifierKeyword.PRIVATE_KEYWORD));
+		modifiers.add(ast.newModifier(ModifierKeyword.STATIC_KEYWORD));
+		return typeDeclaration;
+	}
+
+	private static ASTParser createParser(IMethod method) {
+		ASTParser parser = ASTParser.newParser(AST.JLS8);
+		parser.setProject(method.getJavaProject());
+		parser.setSource(method.getCompilationUnit());
+		parser.setResolveBindings(true);
+		return parser;
 	}
 }

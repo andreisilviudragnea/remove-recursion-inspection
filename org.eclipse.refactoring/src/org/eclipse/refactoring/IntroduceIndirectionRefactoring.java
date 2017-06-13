@@ -86,36 +86,36 @@ import org.eclipse.ltk.core.refactoring.TextFileChange;
 
 public class IntroduceIndirectionRefactoring extends Refactoring {
 
-	private static final String METHOD= "method";
+	private static final String METHOD = "method";
 
-	private static final String NAME= "name";
+	private static final String NAME = "name";
 
-	private static final String REFERENCES= "references";
+	private static final String REFERENCES = "references";
 
-	private static final String TYPE= "type";
+	private static final String TYPE = "type";
 
-	private Map<ICompilationUnit, TextFileChange> fChanges= null;
+	private Map<ICompilationUnit, TextFileChange> fChanges = null;
 
-	IMethod fMethod= null;
+	IMethod fMethod = null;
 
-	String fName= null;
+	String fName = null;
 
-	IType fType= null;
+	IType fType = null;
 
-	boolean fUpdateReferences= true;
+	boolean fUpdateReferences = true;
 
 	@SuppressWarnings("unchecked")
 	private void addTypeParameters(ImportRewrite rewrite, List<TypeParameter> list, ITypeBinding type, AST ast) {
 
-		ITypeBinding enclosing= type.getDeclaringClass();
+		ITypeBinding enclosing = type.getDeclaringClass();
 		if (enclosing != null)
 			addTypeParameters(rewrite, list, enclosing, ast);
 
-		ITypeBinding[] typeParameters= type.getTypeParameters();
+		ITypeBinding[] typeParameters = type.getTypeParameters();
 		for (ITypeBinding element : typeParameters) {
-			TypeParameter parameter= ast.newTypeParameter();
+			TypeParameter parameter = ast.newTypeParameter();
 			parameter.setName(ast.newSimpleName(element.getName()));
-			ITypeBinding[] bounds= element.getTypeBounds();
+			ITypeBinding[] bounds = element.getTypeBounds();
 			for (ITypeBinding element0 : bounds)
 				if (!"java.lang.Object".equals(element0.getQualifiedName())) //$NON-NLS-1$
 					parameter.typeBounds().add(rewrite.addImport(element0, ast));
@@ -124,40 +124,43 @@ public class IntroduceIndirectionRefactoring extends Refactoring {
 	}
 
 	@Override
-	public RefactoringStatus checkFinalConditions(IProgressMonitor monitor) throws CoreException, OperationCanceledException {
-		final RefactoringStatus status= new RefactoringStatus();
+	public RefactoringStatus checkFinalConditions(IProgressMonitor monitor)
+			throws CoreException, OperationCanceledException {
+		final RefactoringStatus status = new RefactoringStatus();
 		try {
 			monitor.beginTask("Checking preconditions...", 2);
-			fChanges= new LinkedHashMap<ICompilationUnit, TextFileChange>();
-			final Set<SearchMatch> invocations= new HashSet<SearchMatch>();
+			fChanges = new LinkedHashMap<ICompilationUnit, TextFileChange>();
+			final Set<SearchMatch> invocations = new HashSet<SearchMatch>();
 
 			if (fUpdateReferences) {
-				IJavaSearchScope scope= SearchEngine.createWorkspaceScope();
-				SearchPattern pattern= SearchPattern.createPattern(fMethod, IJavaSearchConstants.REFERENCES, SearchPattern.R_EXACT_MATCH);
-				SearchEngine engine= new SearchEngine();
-				engine.search(pattern, new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant()}, scope, new SearchRequestor() {
+				IJavaSearchScope scope = SearchEngine.createWorkspaceScope();
+				SearchPattern pattern = SearchPattern.createPattern(fMethod, IJavaSearchConstants.REFERENCES,
+						SearchPattern.R_EXACT_MATCH);
+				SearchEngine engine = new SearchEngine();
+				engine.search(pattern, new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() }, scope,
+						new SearchRequestor() {
 
-					@Override
-					public void acceptSearchMatch(SearchMatch match) throws CoreException {
-						if (match.getAccuracy() == SearchMatch.A_ACCURATE && !match.isInsideDocComment())
-							invocations.add(match);
-					}
-				}, new SubProgressMonitor(monitor, 1, SubProgressMonitor.SUPPRESS_SUBTASK_LABEL));
+							@Override
+							public void acceptSearchMatch(SearchMatch match) throws CoreException {
+								if (match.getAccuracy() == SearchMatch.A_ACCURATE && !match.isInsideDocComment())
+									invocations.add(match);
+							}
+						}, new SubProgressMonitor(monitor, 1, SubProgressMonitor.SUPPRESS_SUBTASK_LABEL));
 			}
 
-			final Map<ICompilationUnit, Collection<SearchMatch>> units= new HashMap<ICompilationUnit, Collection<SearchMatch>>();
+			final Map<ICompilationUnit, Collection<SearchMatch>> units = new HashMap<ICompilationUnit, Collection<SearchMatch>>();
 			units.put(fMethod.getCompilationUnit(), new ArrayList<SearchMatch>());
 			units.put(fType.getCompilationUnit(), new ArrayList<SearchMatch>());
 
 			if (fUpdateReferences) {
 				for (SearchMatch match : invocations) {
-					Object element= match.getElement();
+					Object element = match.getElement();
 					if (element instanceof IMember) {
-						ICompilationUnit unit= ((IMember) element).getCompilationUnit();
+						ICompilationUnit unit = ((IMember) element).getCompilationUnit();
 						if (unit != null) {
-							Collection<SearchMatch> collection= units.get(unit);
+							Collection<SearchMatch> collection = units.get(unit);
 							if (collection == null) {
-								collection= new ArrayList<SearchMatch>();
+								collection = new ArrayList<SearchMatch>();
 								units.put(unit, collection);
 							}
 							collection.add(match);
@@ -166,20 +169,20 @@ public class IntroduceIndirectionRefactoring extends Refactoring {
 				}
 			}
 
-			final Map<IJavaProject, Collection<ICompilationUnit>> projects= new HashMap<IJavaProject, Collection<ICompilationUnit>>();
+			final Map<IJavaProject, Collection<ICompilationUnit>> projects = new HashMap<IJavaProject, Collection<ICompilationUnit>>();
 			for (ICompilationUnit unit : units.keySet()) {
-				IJavaProject project= unit.getJavaProject();
+				IJavaProject project = unit.getJavaProject();
 				if (project != null) {
-					Collection<ICompilationUnit> collection= projects.get(project);
+					Collection<ICompilationUnit> collection = projects.get(project);
 					if (collection == null) {
-						collection= new ArrayList<ICompilationUnit>();
+						collection = new ArrayList<ICompilationUnit>();
 						projects.put(project, collection);
 					}
 					collection.add(unit);
 				}
 			}
 
-			ASTRequestor requestors= new ASTRequestor() {
+			ASTRequestor requestors = new ASTRequestor() {
 
 				@Override
 				public void acceptAST(ICompilationUnit source, CompilationUnit ast) {
@@ -191,17 +194,18 @@ public class IntroduceIndirectionRefactoring extends Refactoring {
 				}
 			};
 
-			IProgressMonitor subMonitor= new SubProgressMonitor(monitor, 1);
+			IProgressMonitor subMonitor = new SubProgressMonitor(monitor, 1);
 			try {
-				final Set<IJavaProject> set= projects.keySet();
+				final Set<IJavaProject> set = projects.keySet();
 				subMonitor.beginTask("Compiling source...", set.size());
 
 				for (IJavaProject project : set) {
-					ASTParser parser= ASTParser.newParser(AST.JLS3);
+					ASTParser parser = ASTParser.newParser(AST.JLS3);
 					parser.setProject(project);
 					parser.setResolveBindings(true);
-					Collection<ICompilationUnit> collection= projects.get(project);
-					parser.createASTs(collection.toArray(new ICompilationUnit[collection.size()]), new String[0], requestors, new SubProgressMonitor(subMonitor, 1));
+					Collection<ICompilationUnit> collection = projects.get(project);
+					parser.createASTs(collection.toArray(new ICompilationUnit[collection.size()]), new String[0],
+							requestors, new SubProgressMonitor(subMonitor, 1));
 				}
 
 			} finally {
@@ -215,17 +219,21 @@ public class IntroduceIndirectionRefactoring extends Refactoring {
 	}
 
 	@Override
-	public RefactoringStatus checkInitialConditions(IProgressMonitor monitor) throws CoreException, OperationCanceledException {
-		RefactoringStatus status= new RefactoringStatus();
+	public RefactoringStatus checkInitialConditions(IProgressMonitor monitor)
+			throws CoreException, OperationCanceledException {
+		RefactoringStatus status = new RefactoringStatus();
 		try {
 			monitor.beginTask("Checking preconditions...", 1);
 			if (fMethod == null)
 				status.merge(RefactoringStatus.createFatalErrorStatus("Method has not been specified."));
 			else if (!fMethod.exists())
-				status.merge(RefactoringStatus.createFatalErrorStatus(MessageFormat.format("Method ''{0}'' does not exist.", new Object[] { fMethod.getElementName()})));
+				status.merge(RefactoringStatus.createFatalErrorStatus(MessageFormat
+						.format("Method ''{0}'' does not exist.", new Object[] { fMethod.getElementName() })));
 			else {
 				if (!fMethod.isBinary() && !fMethod.getCompilationUnit().isStructureKnown())
-					status.merge(RefactoringStatus.createFatalErrorStatus(MessageFormat.format("Compilation unit ''{0}'' contains compile errors.", new Object[] { fMethod.getCompilationUnit().getElementName()})));
+					status.merge(RefactoringStatus.createFatalErrorStatus(
+							MessageFormat.format("Compilation unit ''{0}'' contains compile errors.",
+									new Object[] { fMethod.getCompilationUnit().getElementName() })));
 			}
 		} finally {
 			monitor.done();
@@ -234,7 +242,7 @@ public class IntroduceIndirectionRefactoring extends Refactoring {
 	}
 
 	private RefactoringStatus checkMethodName(String name, IStatus status) {
-		RefactoringStatus result= new RefactoringStatus();
+		RefactoringStatus result = new RefactoringStatus();
 		if ("".equals(name)) //$NON-NLS-1$
 			return RefactoringStatus.createFatalErrorStatus("Choose a name.");
 
@@ -242,24 +250,25 @@ public class IntroduceIndirectionRefactoring extends Refactoring {
 			return result;
 
 		switch (status.getSeverity()) {
-			case IStatus.ERROR:
-				return RefactoringStatus.createFatalErrorStatus(status.getMessage());
-			case IStatus.WARNING:
-				return RefactoringStatus.createWarningStatus(status.getMessage());
-			case IStatus.INFO:
-				return RefactoringStatus.createInfoStatus(status.getMessage());
-			default: // no nothing
-				return new RefactoringStatus();
+		case IStatus.ERROR:
+			return RefactoringStatus.createFatalErrorStatus(status.getMessage());
+		case IStatus.WARNING:
+			return RefactoringStatus.createWarningStatus(status.getMessage());
+		case IStatus.INFO:
+			return RefactoringStatus.createInfoStatus(status.getMessage());
+		default: // no nothing
+			return new RefactoringStatus();
 		}
 	}
 
 	private RefactoringStatus checkOverloading() {
 		try {
 			if (fType != null) {
-				IMethod[] methods= fType.getMethods();
+				IMethod[] methods = fType.getMethods();
 				for (IMethod method : methods) {
 					if (method.getElementName().equals(fName))
-						return RefactoringStatus.createWarningStatus(MessageFormat.format("A method with the same name already exists.", fName));
+						return RefactoringStatus.createWarningStatus(
+								MessageFormat.format("A method with the same name already exists.", fName));
 				}
 			}
 		} catch (JavaModelException exception) {
@@ -269,18 +278,19 @@ public class IntroduceIndirectionRefactoring extends Refactoring {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void copyArguments(ImportRewrite rewrite, IMethodBinding binding, MethodDeclaration declaration, AST ast) throws JavaModelException {
-		String[] names= fMethod.getParameterNames();
-		ITypeBinding[] types= binding.getParameterTypes();
-		for (int index= 0; index < names.length; index++) {
-			ITypeBinding type= types[index];
-			SingleVariableDeclaration variable= ast.newSingleVariableDeclaration();
+	private void copyArguments(ImportRewrite rewrite, IMethodBinding binding, MethodDeclaration declaration, AST ast)
+			throws JavaModelException {
+		String[] names = fMethod.getParameterNames();
+		ITypeBinding[] types = binding.getParameterTypes();
+		for (int index = 0; index < names.length; index++) {
+			ITypeBinding type = types[index];
+			SingleVariableDeclaration variable = ast.newSingleVariableDeclaration();
 			variable.setName(ast.newSimpleName(names[index]));
 
 			if (index == (names.length - 1) && binding.isVarargs()) {
 				variable.setVarargs(true);
 				if (type.isArray())
-					type= type.getComponentType();
+					type = type.getComponentType();
 			}
 
 			variable.setType(rewrite.addImport(type, ast));
@@ -290,7 +300,7 @@ public class IntroduceIndirectionRefactoring extends Refactoring {
 
 	@SuppressWarnings("unchecked")
 	private void copyExceptions(ImportRewrite rewrite, IMethodBinding binding, MethodDeclaration declaration, AST ast) {
-		ITypeBinding[] types= binding.getExceptionTypes();
+		ITypeBinding[] types = binding.getExceptionTypes();
 		for (ITypeBinding element : types) {
 			declaration.thrownExceptions().add(ast.newName(rewrite.addImport(element)));
 		}
@@ -298,18 +308,19 @@ public class IntroduceIndirectionRefactoring extends Refactoring {
 
 	@SuppressWarnings("unchecked")
 	private void copyInvocationParameters(MethodInvocation invocation, AST ast) throws JavaModelException {
-		String[] names= fMethod.getParameterNames();
+		String[] names = fMethod.getParameterNames();
 		for (String element : names)
 			invocation.arguments().add(ast.newSimpleName(element));
 	}
 
 	@SuppressWarnings("unchecked")
-	private void copyTypeParameters(ImportRewrite rewrite, IMethodBinding binding, MethodDeclaration declaration, AST ast) {
-		ITypeBinding[] types= binding.getTypeParameters();
+	private void copyTypeParameters(ImportRewrite rewrite, IMethodBinding binding, MethodDeclaration declaration,
+			AST ast) {
+		ITypeBinding[] types = binding.getTypeParameters();
 		for (ITypeBinding element : types) {
-			TypeParameter parameter= ast.newTypeParameter();
+			TypeParameter parameter = ast.newTypeParameter();
 			parameter.setName(ast.newSimpleName(element.getName()));
-			ITypeBinding[] bounds= element.getTypeBounds();
+			ITypeBinding[] bounds = element.getTypeBounds();
 			for (ITypeBinding element0 : bounds)
 				if (!"java.lang.Object".equals(element0.getQualifiedName())) //$NON-NLS-1$
 					parameter.typeBounds().add(rewrite.addImport(element0, ast));
@@ -322,54 +333,58 @@ public class IntroduceIndirectionRefactoring extends Refactoring {
 	public Change createChange(IProgressMonitor monitor) throws CoreException, OperationCanceledException {
 		try {
 			monitor.beginTask("Creating change...", 1);
-			final Collection<TextFileChange> changes= fChanges.values();
-			CompositeChange change= new CompositeChange(getName(), changes.toArray(new Change[changes.size()])) {
-
-				@Override
-				public ChangeDescriptor getDescriptor() {
-					String project= fMethod.getJavaProject().getElementName();
-					String description= MessageFormat.format("Introduce indirection for ''{0}''", new Object[] { fMethod.getElementName()});
-					String methodLabel= JavaElementLabels.getTextLabel(fMethod, JavaElementLabels.ALL_FULLY_QUALIFIED);
-					String typeLabel= JavaElementLabels.getTextLabel(fType, JavaElementLabels.ALL_FULLY_QUALIFIED);
-					String comment= MessageFormat.format("Introduce indirection for ''{0}'' in ''{1}''", new Object[] { methodLabel, typeLabel});
-					Map<String, String> arguments= new HashMap<String, String>();
-					arguments.put(METHOD, fMethod.getHandleIdentifier());
-					arguments.put(TYPE, fType.getHandleIdentifier());
-					arguments.put(NAME, fName);
-					arguments.put(REFERENCES, Boolean.valueOf(fUpdateReferences).toString());
-					return new RefactoringChangeDescriptor(new IntroduceIndirectionDescriptor(project, description, comment, arguments));
-				}
-			};
-			return change;
+			final Collection<TextFileChange> changes = fChanges.values();
+//			CompositeChange change = new CompositeChange(getName(), changes.toArray(new Change[changes.size()])) {
+//
+//				@Override
+//				public ChangeDescriptor getDescriptor() {
+//					String project = fMethod.getJavaProject().getElementName();
+//					String description = MessageFormat.format("Introduce indirection for ''{0}''",
+//							new Object[] { fMethod.getElementName() });
+//					String methodLabel = JavaElementLabels.getTextLabel(fMethod, JavaElementLabels.ALL_FULLY_QUALIFIED);
+//					String typeLabel = JavaElementLabels.getTextLabel(fType, JavaElementLabels.ALL_FULLY_QUALIFIED);
+//					String comment = MessageFormat.format("Introduce indirection for ''{0}'' in ''{1}''",
+//							new Object[] { methodLabel, typeLabel });
+//					Map<String, String> arguments = new HashMap<String, String>();
+//					arguments.put(METHOD, fMethod.getHandleIdentifier());
+//					arguments.put(TYPE, fType.getHandleIdentifier());
+//					arguments.put(NAME, fName);
+//					arguments.put(REFERENCES, Boolean.valueOf(fUpdateReferences).toString());
+//					return new RefactoringChangeDescriptor(
+//							new IntroduceIndirectionDescriptor(project, description, comment, arguments));
+//				}
+//			};
+			return Utilities.createContextClass(fMethod);
 		} finally {
 			monitor.done();
 		}
 	}
 
 	private Statement createInvocationStatement(MethodDeclaration declaration, MethodInvocation invocation) {
-		final Type type= declaration.getReturnType2();
+		final Type type = declaration.getReturnType2();
 
-		if (type == null || (type instanceof PrimitiveType && PrimitiveType.VOID.equals(((PrimitiveType) type).getPrimitiveTypeCode())))
+		if (type == null || (type instanceof PrimitiveType
+				&& PrimitiveType.VOID.equals(((PrimitiveType) type).getPrimitiveTypeCode())))
 			return invocation.getAST().newExpressionStatement(invocation);
 
-		ReturnStatement statement= invocation.getAST().newReturnStatement();
+		ReturnStatement statement = invocation.getAST().newReturnStatement();
 		statement.setExpression(invocation);
 		return statement;
 	}
 
 	private IMethodBinding findMethodInHierarchy(ITypeBinding type, IMethodBinding binding) {
-		IMethodBinding method= findMethodInType(type, binding);
+		IMethodBinding method = findMethodInType(type, binding);
 		if (method != null)
 			return method;
-		ITypeBinding superClass= type.getSuperclass();
+		ITypeBinding superClass = type.getSuperclass();
 		if (superClass != null) {
-			method= findMethodInHierarchy(superClass, binding);
+			method = findMethodInHierarchy(superClass, binding);
 			if (method != null)
 				return method;
 		}
-		ITypeBinding[] interfaces= type.getInterfaces();
+		ITypeBinding[] interfaces = type.getInterfaces();
 		for (ITypeBinding element : interfaces) {
-			method= findMethodInHierarchy(element, binding);
+			method = findMethodInHierarchy(element, binding);
 			if (method != null)
 				return method;
 		}
@@ -380,7 +395,7 @@ public class IntroduceIndirectionRefactoring extends Refactoring {
 		if (type.isPrimitive())
 			return null;
 
-		IMethodBinding[] methods= type.getDeclaredMethods();
+		IMethodBinding[] methods = type.getDeclaredMethods();
 		for (IMethodBinding element : methods) {
 			if (element.isSubsignature(binding))
 				return element;
@@ -399,7 +414,7 @@ public class IntroduceIndirectionRefactoring extends Refactoring {
 			} else if (node instanceof AnonymousClassDeclaration) {
 				return ((AnonymousClassDeclaration) node).resolveBinding();
 			}
-			node= node.getParent();
+			node = node.getParent();
 		}
 		return null;
 	}
@@ -411,7 +426,7 @@ public class IntroduceIndirectionRefactoring extends Refactoring {
 			} else if (node instanceof AnonymousClassDeclaration) {
 				return node;
 			}
-			node= node.getParent();
+			node = node.getParent();
 		}
 		return null;
 	}
@@ -431,30 +446,30 @@ public class IntroduceIndirectionRefactoring extends Refactoring {
 
 	private ASTNode getParent(ASTNode node, Class parentClass) {
 		do {
-			node= node.getParent();
+			node = node.getParent();
 		} while (node != null && !parentClass.isInstance(node));
 		return node;
 	}
 
 	private ITypeBinding getTypeBinding(Name node) {
-		IBinding binding= node.resolveBinding();
+		IBinding binding = node.resolveBinding();
 		if (binding instanceof ITypeBinding)
 			return (ITypeBinding) binding;
 		return null;
 	}
 
 	public RefactoringStatus initialize(Map arguments) {
-		RefactoringStatus status= new RefactoringStatus();
-		String value= (String) arguments.get(METHOD);
+		RefactoringStatus status = new RefactoringStatus();
+		String value = (String) arguments.get(METHOD);
 		if (value != null)
 			setMethod((IMethod) JavaCore.create(value));
-		value= (String) arguments.get(TYPE);
+		value = (String) arguments.get(TYPE);
 		if (value != null)
 			setDeclaringType((IType) JavaCore.create(value));
-		value= (String) arguments.get(NAME);
+		value = (String) arguments.get(NAME);
 		if (value != null)
 			setMethodName(value);
-		value= (String) arguments.get(REFERENCES);
+		value = (String) arguments.get(REFERENCES);
 		if (value != null)
 			setUpdateReferences(Boolean.valueOf(value).booleanValue());
 		return status;
@@ -467,7 +482,7 @@ public class IntroduceIndirectionRefactoring extends Refactoring {
 	private boolean isParentNode(ASTNode node, ASTNode parent) {
 		Assert.isNotNull(parent);
 		do {
-			node= node.getParent();
+			node = node.getParent();
 			if (node == parent)
 				return true;
 		} while (node != null);
@@ -476,20 +491,20 @@ public class IntroduceIndirectionRefactoring extends Refactoring {
 
 	private void rewriteAST(ICompilationUnit unit, ASTRewrite astRewrite, ImportRewrite importRewrite) {
 		try {
-			MultiTextEdit edit= new MultiTextEdit();
-			TextEdit astEdit= astRewrite.rewriteAST();
+			MultiTextEdit edit = new MultiTextEdit();
+			TextEdit astEdit = astRewrite.rewriteAST();
 
 			if (!isEmptyEdit(astEdit))
 				edit.addChild(astEdit);
-			TextEdit importEdit= importRewrite.rewriteImports(new NullProgressMonitor());
+			TextEdit importEdit = importRewrite.rewriteImports(new NullProgressMonitor());
 			if (!isEmptyEdit(importEdit))
 				edit.addChild(importEdit);
 			if (isEmptyEdit(edit))
 				return;
 
-			TextFileChange change= fChanges.get(unit);
+			TextFileChange change = fChanges.get(unit);
 			if (change == null) {
-				change= new TextFileChange(unit.getElementName(), (IFile) unit.getResource());
+				change = new TextFileChange(unit.getElementName(), (IFile) unit.getResource());
 				change.setTextType("java");
 				change.setEdit(edit);
 			} else
@@ -505,51 +520,54 @@ public class IntroduceIndirectionRefactoring extends Refactoring {
 		}
 	}
 
-	protected void rewriteCompilationUnit(ASTRequestor requestor, ICompilationUnit unit, Collection matches, CompilationUnit node, RefactoringStatus status) throws CoreException {
-		ASTRewrite astRewrite= ASTRewrite.create(node.getAST());
-		ImportRewrite importRewrite= ImportRewrite.create(node, true);
+	protected void rewriteCompilationUnit(ASTRequestor requestor, ICompilationUnit unit, Collection matches,
+			CompilationUnit node, RefactoringStatus status) throws CoreException {
+		ASTRewrite astRewrite = ASTRewrite.create(node.getAST());
+		ImportRewrite importRewrite = ImportRewrite.create(node, true);
 		if (unit.equals(fType.getCompilationUnit()))
 			rewriteDeclaringType(requestor, astRewrite, importRewrite, unit, node);
 		if (!fUpdateReferences) {
 			rewriteAST(unit, astRewrite, importRewrite);
 			return;
 		}
-		for (final Iterator iterator= matches.iterator(); iterator.hasNext();) {
-			SearchMatch match= (SearchMatch) iterator.next();
+		for (final Iterator iterator = matches.iterator(); iterator.hasNext();) {
+			SearchMatch match = (SearchMatch) iterator.next();
 			if (match.getAccuracy() == SearchMatch.A_ACCURATE) {
-				ASTNode result= NodeFinder.perform(node, match.getOffset(), match.getLength());
+				ASTNode result = NodeFinder.perform(node, match.getOffset(), match.getLength());
 				if (result instanceof MethodInvocation)
-					status.merge(rewriteMethodInvocation(requestor, astRewrite, importRewrite, (MethodInvocation) result));
+					status.merge(
+							rewriteMethodInvocation(requestor, astRewrite, importRewrite, (MethodInvocation) result));
 			}
 		}
 		rewriteAST(unit, astRewrite, importRewrite);
 	}
 
 	@SuppressWarnings("unchecked")
-	private void rewriteDeclaringType(ASTRequestor requestor, ASTRewrite astRewrite, ImportRewrite importRewrite, ICompilationUnit unit, CompilationUnit node) throws CoreException {
+	private void rewriteDeclaringType(ASTRequestor requestor, ASTRewrite astRewrite, ImportRewrite importRewrite,
+			ICompilationUnit unit, CompilationUnit node) throws CoreException {
 
-		IMethodBinding methodBinding= null;
-		ITypeBinding firstParameterType= null;
-		IBinding[] bindings= requestor.createBindings(new String[] { fMethod.getKey()});
+		IMethodBinding methodBinding = null;
+		ITypeBinding firstParameterType = null;
+		IBinding[] bindings = requestor.createBindings(new String[] { fMethod.getKey() });
 		if (bindings[0] instanceof IMethodBinding) {
-			methodBinding= (IMethodBinding) bindings[0];
+			methodBinding = (IMethodBinding) bindings[0];
 			if (methodBinding != null)
-				firstParameterType= methodBinding.getDeclaringClass();
+				firstParameterType = methodBinding.getDeclaringClass();
 		}
 
 		if (methodBinding == null || firstParameterType == null)
 			return;
 
-		AST ast= node.getAST();
+		AST ast = node.getAST();
 
 		// Method declaration
-		MethodDeclaration methodDeclaration= ast.newMethodDeclaration();
+		MethodDeclaration methodDeclaration = ast.newMethodDeclaration();
 
 		// Name
 		methodDeclaration.setName(ast.newSimpleName(fName));
 
 		// Flags
-		List<Modifier> modifiers= methodDeclaration.modifiers();
+		List<Modifier> modifiers = methodDeclaration.modifiers();
 		modifiers.add(ast.newModifier(ModifierKeyword.PUBLIC_KEYWORD));
 		modifiers.add(ast.newModifier(ModifierKeyword.STATIC_KEYWORD));
 
@@ -557,14 +575,14 @@ public class IntroduceIndirectionRefactoring extends Refactoring {
 		if (!Flags.isStatic(fMethod.getFlags())) {
 
 			// Add first parameter
-			SingleVariableDeclaration variable= ast.newSingleVariableDeclaration();
-			Type type= importRewrite.addImport(firstParameterType, ast);
+			SingleVariableDeclaration variable = ast.newSingleVariableDeclaration();
+			Type type = importRewrite.addImport(firstParameterType, ast);
 			if (firstParameterType.isGenericType()) {
-				ParameterizedType parameterized= ast.newParameterizedType(type);
-				ITypeBinding[] typeParameters= firstParameterType.getTypeParameters();
+				ParameterizedType parameterized = ast.newParameterizedType(type);
+				ITypeBinding[] typeParameters = firstParameterType.getTypeParameters();
 				for (ITypeBinding element : typeParameters)
 					parameterized.typeArguments().add(importRewrite.addImport(element, ast));
-				type= parameterized;
+				type = parameterized;
 			}
 			variable.setType(type);
 			variable.setName(ast.newSimpleName("target"));
@@ -587,71 +605,77 @@ public class IntroduceIndirectionRefactoring extends Refactoring {
 		copyExceptions(importRewrite, methodBinding, methodDeclaration, ast);
 
 		// Body
-		MethodInvocation invocation= ast.newMethodInvocation();
+		MethodInvocation invocation = ast.newMethodInvocation();
 		invocation.setName(ast.newSimpleName(fMethod.getElementName()));
 		if (Flags.isStatic(fMethod.getFlags())) {
-			Type type= importRewrite.addImport(methodBinding.getDeclaringClass(), ast);
+			Type type = importRewrite.addImport(methodBinding.getDeclaringClass(), ast);
 			invocation.setExpression(ast.newName(type.toString()));
 		} else {
 			invocation.setExpression(ast.newSimpleName("target"));
 		}
 		copyInvocationParameters(invocation, ast);
 
-		final Block body= ast.newBlock();
+		final Block body = ast.newBlock();
 		body.statements().add(createInvocationStatement(methodDeclaration, invocation));
 		methodDeclaration.setBody(body);
 
 		// Comment
-		if (Boolean.valueOf(PreferenceConstants.getPreference(PreferenceConstants.CODEGEN_ADD_COMMENTS, unit.getJavaProject())).booleanValue()) {
-			String comment= CodeGeneration.getMethodComment(unit, fType.getFullyQualifiedName('.'), methodDeclaration, null, "\n");
+		if (Boolean.valueOf(
+				PreferenceConstants.getPreference(PreferenceConstants.CODEGEN_ADD_COMMENTS, unit.getJavaProject()))
+				.booleanValue()) {
+			String comment = CodeGeneration.getMethodComment(unit, fType.getFullyQualifiedName('.'), methodDeclaration,
+					null, "\n");
 			if (comment != null) {
-				Javadoc javadoc= (Javadoc) astRewrite.createStringPlaceholder(comment, ASTNode.JAVADOC);
+				Javadoc javadoc = (Javadoc) astRewrite.createStringPlaceholder(comment, ASTNode.JAVADOC);
 				methodDeclaration.setJavadoc(javadoc);
 			}
 		}
 
-		AbstractTypeDeclaration declaration= (AbstractTypeDeclaration) typeToDeclaration(fType, node);
-		ChildListPropertyDescriptor descriptor= typeToBodyDeclarationProperty(fType, node);
+		AbstractTypeDeclaration declaration = (AbstractTypeDeclaration) typeToDeclaration(fType, node);
+		ChildListPropertyDescriptor descriptor = typeToBodyDeclarationProperty(fType, node);
 
 		astRewrite.getListRewrite(declaration, descriptor).insertLast(methodDeclaration, null);
 	}
 
 	@SuppressWarnings("unchecked")
-	private RefactoringStatus rewriteMethodInvocation(ASTRequestor requestor, ASTRewrite astRewrite, ImportRewrite importRewrite, MethodInvocation oldInvocation) throws JavaModelException {
-		RefactoringStatus status= new RefactoringStatus();
+	private RefactoringStatus rewriteMethodInvocation(ASTRequestor requestor, ASTRewrite astRewrite,
+			ImportRewrite importRewrite, MethodInvocation oldInvocation) throws JavaModelException {
+		RefactoringStatus status = new RefactoringStatus();
 
-		ITypeBinding declaringBinding= null;
-		IBinding[] bindings= requestor.createBindings(new String[] {fType.getKey()});
+		ITypeBinding declaringBinding = null;
+		IBinding[] bindings = requestor.createBindings(new String[] { fType.getKey() });
 		if (bindings[0] instanceof ITypeBinding) {
-			declaringBinding= (ITypeBinding) bindings[0];
+			declaringBinding = (ITypeBinding) bindings[0];
 		}
 
 		if (declaringBinding == null)
 			return status;
 
-		AST ast= oldInvocation.getAST();
+		AST ast = oldInvocation.getAST();
 
 		// If the method invocation uses type arguments, skip this call as the
 		// new target method may have additional parameters
 		if (oldInvocation.typeArguments().size() > 0)
-			return RefactoringStatus.createWarningStatus(MessageFormat.format("The method invocation ''{0}'' uses type arguments. This occurrence will not be updated.", oldInvocation.toString()));
+			return RefactoringStatus.createWarningStatus(MessageFormat.format(
+					"The method invocation ''{0}'' uses type arguments. This occurrence will not be updated.",
+					oldInvocation.toString()));
 
-		MethodInvocation newInvocation= ast.newMethodInvocation();
-		List<ASTNode> newArguments= newInvocation.arguments();
-		List<ASTNode> oldArguments= oldInvocation.arguments();
+		MethodInvocation newInvocation = ast.newMethodInvocation();
+		List<ASTNode> newArguments = newInvocation.arguments();
+		List<ASTNode> oldArguments = oldInvocation.arguments();
 
 		newInvocation.setExpression(ast.newName(importRewrite.addImport(declaringBinding)));
 		newInvocation.setName(ast.newSimpleName(getMethodName()));
 
-		Expression expression= oldInvocation.getExpression();
+		Expression expression = oldInvocation.getExpression();
 
 		if (!Flags.isStatic(fMethod.getFlags())) {
 			// Add the expression as the first parameter
 			if (expression == null) {
 				// There is no expression for this call.
 				// Use a (possibly qualified) "this" expression.
-				ThisExpression thisExpression= ast.newThisExpression();
-				RefactoringStatus result= rewriteThisExpression(thisExpression, oldInvocation);
+				ThisExpression thisExpression = ast.newThisExpression();
+				RefactoringStatus result = rewriteThisExpression(thisExpression, oldInvocation);
 				status.merge(result);
 				if (result.hasEntries())
 					// warning means don't include this invocation
@@ -665,11 +689,13 @@ public class IntroduceIndirectionRefactoring extends Refactoring {
 				// Check if expression is the class name.
 				// If not, there may be side effects (e.g. inside methods)
 				if (!(expression instanceof Name) || getTypeBinding((Name) expression) == null)
-					return RefactoringStatus.createWarningStatus(MessageFormat.format("The target method is static, but the method invocation ''{0}'' is based on an expression rather than the class itself. This occurrence will not be updated.", oldInvocation.toString()));
+					return RefactoringStatus.createWarningStatus(MessageFormat.format(
+							"The target method is static, but the method invocation ''{0}'' is based on an expression rather than the class itself. This occurrence will not be updated.",
+							oldInvocation.toString()));
 			}
 		}
 
-		for (int index= 0; index < oldArguments.size(); index++)
+		for (int index = 0; index < oldArguments.size(); index++)
 			newArguments.add(astRewrite.createMoveTarget(oldArguments.get(index)));
 
 		astRewrite.replace(oldInvocation, newInvocation, null);
@@ -678,41 +704,46 @@ public class IntroduceIndirectionRefactoring extends Refactoring {
 	}
 
 	private RefactoringStatus rewriteThisExpression(ThisExpression expression, MethodInvocation invocation) {
-		RefactoringStatus status= new RefactoringStatus();
+		RefactoringStatus status = new RefactoringStatus();
 
-		AST ast= invocation.getAST();
+		AST ast = invocation.getAST();
 
-		IMethodBinding binding= invocation.resolveMethodBinding();
-		MethodDeclaration declaration= (MethodDeclaration) ((CompilationUnit) invocation.getRoot()).findDeclaringNode(binding);
+		IMethodBinding binding = invocation.resolveMethodBinding();
+		MethodDeclaration declaration = (MethodDeclaration) ((CompilationUnit) invocation.getRoot())
+				.findDeclaringNode(binding);
 
-		ITypeBinding declaringBinding= null;
+		ITypeBinding declaringBinding = null;
 		if (declaration != null) {
 			// Declaring class is inside this compilation unit => use its name
 			// if it's declared in an enclosing type
 			if (isParentNode(invocation, declaration.getParent()))
-				declaringBinding= binding.getDeclaringClass();
+				declaringBinding = binding.getDeclaringClass();
 			else
-				declaringBinding= getEnclosingType(invocation);
+				declaringBinding = getEnclosingType(invocation);
 		} else {
 			// Declaring class is outside of this compilation unit
 			// Find subclass in this compilation unit.
-			ASTNode enclosing= getEnclosingTypeDeclaration(invocation);
-			declaringBinding= getEnclosingType(enclosing);
+			ASTNode enclosing = getEnclosingTypeDeclaration(invocation);
+			declaringBinding = getEnclosingType(enclosing);
 			while (enclosing != null && findMethodInHierarchy(declaringBinding, binding) == null) {
-				enclosing= getEnclosingTypeDeclaration(enclosing.getParent());
-				declaringBinding= getEnclosingType(enclosing);
+				enclosing = getEnclosingTypeDeclaration(enclosing.getParent());
+				declaringBinding = getEnclosingType(enclosing);
 			}
 		}
 
 		if (declaringBinding == null) {
-			status.merge(RefactoringStatus.createWarningStatus(MessageFormat.format("The declaring type of the method invocation ''{0}'' could not be found. This occurrence will not be updated.", invocation.toString())));
+			status.merge(RefactoringStatus.createWarningStatus(MessageFormat.format(
+					"The declaring type of the method invocation ''{0}'' could not be found. This occurrence will not be updated.",
+					invocation.toString())));
 			return status;
 		}
 
-		ITypeBinding type= getEnclosingType(invocation);
+		ITypeBinding type = getEnclosingType(invocation);
 		if (!type.equals(declaringBinding)) {
 			if (declaringBinding.isAnonymous()) {
-				status.merge(RefactoringStatus.createWarningStatus(MessageFormat.format("The declaring type of the method invocation ''{0}'' is anonymous and therefore cannot be qualified. This occurrence will not be updated.", invocation.toString())));
+				status.merge(RefactoringStatus.createWarningStatus(MessageFormat.format(
+						"The declaring type of the method invocation ''{0}'' is anonymous and therefore cannot be qualified. This occurrence will not be updated.",
+						invocation.toString())));
 			} else {
 				expression.setQualifier(ast.newSimpleName(declaringBinding.getName()));
 			}
@@ -724,17 +755,17 @@ public class IntroduceIndirectionRefactoring extends Refactoring {
 	}
 
 	public void setDeclaringType(IType type) {
-		fType= type;
+		fType = type;
 	}
 
 	public RefactoringStatus setDeclaringTypeName(String name) {
-		IType type= null;
+		IType type = null;
 
 		try {
 			if (name.length() == 0)
 				return RefactoringStatus.createFatalErrorStatus("Select a type.");
 
-			type= fMethod.getJavaProject().findType(name, new NullProgressMonitor());
+			type = fMethod.getJavaProject().findType(name, new NullProgressMonitor());
 			if (type == null || !type.exists())
 				return RefactoringStatus.createErrorStatus(MessageFormat.format("Type ''{0}'' does not exist.", name));
 			if (type.isAnnotation())
@@ -751,30 +782,31 @@ public class IntroduceIndirectionRefactoring extends Refactoring {
 		if (type.isBinary())
 			return RefactoringStatus.createErrorStatus("Type is binary.");
 
-		fType= type;
+		fType = type;
 
 		return new RefactoringStatus();
 	}
 
 	public void setMethod(IMethod method) {
-		fMethod= method;
-		fName= fMethod.getElementName();
-		fType= fMethod.getDeclaringType();
+		fMethod = method;
+		fName = fMethod.getElementName();
+		fType = fMethod.getDeclaringType();
 	}
 
 	public RefactoringStatus setMethodName(String name) {
-		fName= name;
-		RefactoringStatus status= checkMethodName(name, JavaConventions.validateMethodName(name));
+		fName = name;
+		RefactoringStatus status = checkMethodName(name, JavaConventions.validateMethodName(name));
 		status.merge(checkOverloading());
 		return status;
 	}
 
 	public void setUpdateReferences(boolean update) {
-		fUpdateReferences= update;
+		fUpdateReferences = update;
 	}
 
-	private ChildListPropertyDescriptor typeToBodyDeclarationProperty(IType type, CompilationUnit node) throws JavaModelException {
-		ASTNode result= typeToDeclaration(type, node);
+	private ChildListPropertyDescriptor typeToBodyDeclarationProperty(IType type, CompilationUnit node)
+			throws JavaModelException {
+		ASTNode result = typeToDeclaration(type, node);
 		if (result instanceof AbstractTypeDeclaration)
 			return ((AbstractTypeDeclaration) result).getBodyDeclarationsProperty();
 		else if (result instanceof AnonymousClassDeclaration)
@@ -785,7 +817,7 @@ public class IntroduceIndirectionRefactoring extends Refactoring {
 	}
 
 	private ASTNode typeToDeclaration(IType type, CompilationUnit node) throws JavaModelException {
-		Name result= (Name) NodeFinder.perform(node, type.getNameRange());
+		Name result = (Name) NodeFinder.perform(node, type.getNameRange());
 		if (type.isAnonymous())
 			return getParent(result, AnonymousClassDeclaration.class);
 		return getParent(result, AbstractTypeDeclaration.class);
