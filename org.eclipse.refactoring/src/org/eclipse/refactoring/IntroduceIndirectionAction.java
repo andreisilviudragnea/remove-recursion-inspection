@@ -57,8 +57,9 @@ public class IntroduceIndirectionAction implements IWorkbenchWindowActionDelegat
 			}
 		}
 		try {
-			action.setEnabled(fMethod != null && fMethod.exists() && fMethod.isStructureKnown()
-					&& !fMethod.isConstructor() && !fMethod.getDeclaringType().isAnnotation() && Utilities.isRecursive(fMethod));
+			action.setEnabled(
+					fMethod != null && fMethod.exists() && fMethod.isStructureKnown() && !fMethod.isConstructor()
+							&& !fMethod.getDeclaringType().isAnnotation() && Utilities.isRecursive(fMethod));
 		} catch (JavaModelException exception) {
 			action.setEnabled(false);
 		} catch (CoreException e) {
