@@ -27,11 +27,15 @@ import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.NodeFinder;
 import org.eclipse.jdt.core.dom.ParameterizedType;
+import org.eclipse.jdt.core.dom.PrefixExpression;
+import org.eclipse.jdt.core.dom.PrefixExpression.Operator;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.jdt.core.dom.WhileStatement;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
@@ -64,6 +68,39 @@ public class Utilities {
 				}, null);
 		return !invocations.isEmpty();
 	}
+	
+	private static List<Statement> createPopStatements(AST ast, TypeDeclaration typeDeclaration, MethodDeclaration method) {
+		MethodInvocation invocation = ast.newMethodInvocation();
+		invocation.setExpression(ast.newSimpleName("programStack"));
+		invocation.setName(ast.newSimpleName("pop"));
+		
+		SimpleName topRecord = ast.newSimpleName("topRecord");
+		
+		VariableDeclarationFragment fragment = ast.newVariableDeclarationFragment();
+		fragment.setName(topRecord);
+		fragment.setInitializer(invocation);
+		
+		VariableDeclarationStatement declarationStatement = ast.newVariableDeclarationStatement(fragment);
+		declarationStatement.setType(ast.newSimpleType(copySubtree(ast, typeDeclaration.getName())));
+		
+		List<Statement> statements = new ArrayList<Statement>();
+		statements.add(declarationStatement);
+		
+		List<SingleVariableDeclaration> parameters = method.parameters();
+		for (SingleVariableDeclaration parameter : parameters) {
+			FieldAccess fieldAccess = ast.newFieldAccess();
+			fieldAccess.setExpression(copySubtree(ast, topRecord));
+			fieldAccess.setName(copySubtree(ast, parameter.getName()));
+			
+			Assignment assignment = ast.newAssignment();
+			assignment.setLeftHandSide(copySubtree(ast, parameter.getName()));
+			assignment.setRightHandSide(fieldAccess);
+			
+			statements.add(ast.newExpressionStatement(assignment));
+		}
+		
+		return statements;
+	}
 
 	public static Change createContextClass(IMethod method) throws JavaModelException {
 		IType declaringType = method.getDeclaringType();
@@ -77,15 +114,44 @@ public class Utilities {
 				TypeDeclaration.BODY_DECLARATIONS_PROPERTY);
 		listRewrite.insertLast(typeDeclaration, null);
 		MethodDeclaration newMethod = createMethodDeclaration(method, astNode, astRewrite);
+
+		List<Statement> programStackStatements = createProgramStack(newMethod, astNode, typeDeclaration, astRewrite);
+		WhileStatement whileStatement = createWhileStatement(ast, astRewrite);
+
 		Block body = newMethod.getBody();
-		body.statements().addAll(0, createProgramStack(newMethod, astNode, typeDeclaration, astRewrite));
+		Block whileBody = copySubtree(ast, body);
+		whileBody.statements().addAll(0, createPopStatements(ast, typeDeclaration, newMethod));
+		whileStatement.setBody(whileBody);
+		
+		body.statements().clear();
+		body.statements().addAll(programStackStatements);
+		body.statements().add(whileStatement);
+		
 		listRewrite.insertLast(newMethod, null);
+		
 		TextEdit edit = astRewrite.rewriteAST();
 		ICompilationUnit unit = method.getCompilationUnit();
+		
 		TextFileChange change = new TextFileChange(unit.getElementName(), (IFile) unit.getResource());
 		change.setTextType("java");
 		change.setEdit(edit);
+		
 		return change;
+	}
+
+	private static WhileStatement createWhileStatement(AST ast, ASTRewrite astRewrite) {
+		MethodInvocation invocation = ast.newMethodInvocation();
+		invocation.setExpression(ast.newSimpleName("programStack"));
+		invocation.setName(ast.newSimpleName("isEmpty"));
+
+		PrefixExpression prefixExpression = ast.newPrefixExpression();
+		prefixExpression.setOperator(Operator.NOT);
+		prefixExpression.setOperand(invocation);
+
+		WhileStatement whileStatement = ast.newWhileStatement();
+		whileStatement.setExpression(prefixExpression);
+
+		return whileStatement;
 	}
 
 	private static List<Statement> createProgramStack(MethodDeclaration method, ASTNode root,
@@ -105,14 +171,14 @@ public class Utilities {
 		VariableDeclarationStatement variableDeclarationStatement = ast
 				.newVariableDeclarationStatement(variableDeclarationFragment);
 		variableDeclarationStatement.setType(dequeType);
-		
+
 		ClassInstanceCreation creation2 = ast.newClassInstanceCreation();
 		creation2.setType(ast.newSimpleType(copySubtree(ast, typeDeclaration.getName())));
 		List<SingleVariableDeclaration> parameters = method.parameters();
-		for (SingleVariableDeclaration parameter: parameters) {
+		for (SingleVariableDeclaration parameter : parameters) {
 			creation2.arguments().add(copySubtree(ast, parameter.getName()));
 		}
-		
+
 		MethodInvocation invocation = ast.newMethodInvocation();
 		invocation.setExpression(ast.newSimpleName("programStack"));
 		invocation.setName(ast.newSimpleName("push"));
@@ -121,6 +187,7 @@ public class Utilities {
 		List<Statement> statements = new ArrayList<Statement>();
 		statements.add(variableDeclarationStatement);
 		statements.add(ast.newExpressionStatement(invocation));
+
 		return statements;
 	}
 
@@ -182,7 +249,7 @@ public class Utilities {
 	private static <T extends ASTNode> T createCopyTarget(ASTRewrite astRewrite, T node) {
 		return (T) astRewrite.createCopyTarget(node);
 	}
-	
+
 	private static <T extends ASTNode> T copySubtree(AST target, T node) {
 		return (T) ASTNode.copySubtree(target, node);
 	}
