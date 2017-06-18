@@ -107,6 +107,8 @@ public class Utilities {
 		return statements;
 	}
 	
+	
+	
 	public static void simplifyIfStatements(AST ast, ASTRewrite astRewrite, List<Statement> statements) {
 		if (statements.size() != 1 || !(statements.get(0) instanceof IfStatement)) {
 			return;
@@ -138,6 +140,9 @@ public class Utilities {
 			Block block = (Block) elseStatement;
 			for (Statement statement : (List<Statement>) block.statements()) {
 				statements.add(copySubtree(ast, statement));
+			}
+			if (!(statements.get(statements.size() - 1) instanceof ReturnStatement)) {
+				statements.add(ast.newReturnStatement());
 			}
 		} else {
 			statements.add(elseStatement);
