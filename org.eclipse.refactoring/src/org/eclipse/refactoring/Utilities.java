@@ -29,6 +29,7 @@ import org.eclipse.jdt.core.dom.NodeFinder;
 import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression.Operator;
+import org.eclipse.jdt.core.dom.PrimitiveType;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
@@ -47,6 +48,7 @@ import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
+import org.eclipse.refactoring.LocalVariableCollector.Pair;
 import org.eclipse.text.edits.TextEdit;
 
 public class Utilities {
@@ -68,37 +70,38 @@ public class Utilities {
 				}, null);
 		return !invocations.isEmpty();
 	}
-	
-	private static List<Statement> createPopStatements(AST ast, TypeDeclaration typeDeclaration, MethodDeclaration method) {
+
+	private static List<Statement> createPopStatements(AST ast, TypeDeclaration typeDeclaration,
+			MethodDeclaration method) {
 		MethodInvocation invocation = ast.newMethodInvocation();
 		invocation.setExpression(ast.newSimpleName("programStack"));
 		invocation.setName(ast.newSimpleName("pop"));
-		
+
 		SimpleName topRecord = ast.newSimpleName("topRecord");
-		
+
 		VariableDeclarationFragment fragment = ast.newVariableDeclarationFragment();
 		fragment.setName(topRecord);
 		fragment.setInitializer(invocation);
-		
+
 		VariableDeclarationStatement declarationStatement = ast.newVariableDeclarationStatement(fragment);
 		declarationStatement.setType(ast.newSimpleType(copySubtree(ast, typeDeclaration.getName())));
-		
+
 		List<Statement> statements = new ArrayList<Statement>();
 		statements.add(declarationStatement);
-		
+
 		List<SingleVariableDeclaration> parameters = method.parameters();
 		for (SingleVariableDeclaration parameter : parameters) {
 			FieldAccess fieldAccess = ast.newFieldAccess();
 			fieldAccess.setExpression(copySubtree(ast, topRecord));
 			fieldAccess.setName(copySubtree(ast, parameter.getName()));
-			
+
 			Assignment assignment = ast.newAssignment();
 			assignment.setLeftHandSide(copySubtree(ast, parameter.getName()));
 			assignment.setRightHandSide(fieldAccess);
-			
+
 			statements.add(ast.newExpressionStatement(assignment));
 		}
-		
+
 		return statements;
 	}
 
@@ -122,20 +125,20 @@ public class Utilities {
 		Block whileBody = copySubtree(ast, body);
 		whileBody.statements().addAll(0, createPopStatements(ast, typeDeclaration, newMethod));
 		whileStatement.setBody(whileBody);
-		
+
 		body.statements().clear();
 		body.statements().addAll(programStackStatements);
 		body.statements().add(whileStatement);
-		
+
 		listRewrite.insertLast(newMethod, null);
-		
+
 		TextEdit edit = astRewrite.rewriteAST();
 		ICompilationUnit unit = method.getCompilationUnit();
-		
+
 		TextFileChange change = new TextFileChange(unit.getElementName(), (IFile) unit.getResource());
 		change.setTextType("java");
 		change.setEdit(edit);
-		
+
 		return change;
 	}
 
@@ -216,32 +219,44 @@ public class Utilities {
 		modifiers.add(ast.newModifier(ModifierKeyword.STATIC_KEYWORD));
 
 		MethodDeclaration methodDeclaration = extractMethodDeclaration(method, astNode);
-		List<SingleVariableDeclaration> parameters = methodDeclaration.parameters();
-		List<FieldDeclaration> fieldDeclarations = addFieldsFromParameters(ast, typeDeclaration, parameters,
+		LocalVariableCollector visitor = new LocalVariableCollector();
+		methodDeclaration.accept(visitor);
+		List<Pair> variableDeclarations = visitor.getVariableDeclarations();
+		
+		List<FieldDeclaration> fieldDeclarations = addFieldsFromParameters(ast, typeDeclaration, variableDeclarations,
 				astRewrite);
 		List<BodyDeclaration> bodyDeclarations = typeDeclaration.bodyDeclarations();
 		bodyDeclarations.addAll(fieldDeclarations);
 
-		MethodDeclaration constructor = createConstructor(ast, typeDeclaration, parameters, astRewrite);
+		MethodDeclaration constructor = createConstructor(ast, typeDeclaration, variableDeclarations, astRewrite);
 		bodyDeclarations.add(constructor);
 
 		return typeDeclaration;
 	}
 
 	private static List<FieldDeclaration> addFieldsFromParameters(AST ast, TypeDeclaration typeDeclaration,
-			List<SingleVariableDeclaration> parameters, ASTRewrite astRewrite) {
+			List<Pair> variableDeclarations, ASTRewrite astRewrite) {
 		List<FieldDeclaration> fields = new ArrayList<FieldDeclaration>();
 
-		for (SingleVariableDeclaration parameter : parameters) {
+		for (Pair variableDeclaration : variableDeclarations) {
 			VariableDeclarationFragment fragment = ast.newVariableDeclarationFragment();
-			fragment.setName(createCopyTarget(astRewrite, parameter.getName()));
+			fragment.setName(createCopyTarget(astRewrite, variableDeclaration.variableDeclaration.getName()));
 
 			FieldDeclaration fieldDeclaration = ast.newFieldDeclaration(fragment);
-			fieldDeclaration.setType(createCopyTarget(astRewrite, parameter.getType()));
+			fieldDeclaration.setType(createCopyTarget(astRewrite, variableDeclaration.type));
 			fieldDeclaration.modifiers().add(ast.newModifier(ModifierKeyword.PUBLIC_KEYWORD));
 
 			fields.add(fieldDeclaration);
 		}
+
+		VariableDeclarationFragment fragment = ast.newVariableDeclarationFragment();
+		fragment.setName(ast.newSimpleName("section"));
+
+		FieldDeclaration fieldDeclaration = ast.newFieldDeclaration(fragment);
+		fieldDeclaration.setType(ast.newPrimitiveType(PrimitiveType.INT));
+		fieldDeclaration.modifiers().add(ast.newModifier(ModifierKeyword.PUBLIC_KEYWORD));
+
+		fields.add(fieldDeclaration);
 
 		return fields;
 	}
@@ -255,7 +270,7 @@ public class Utilities {
 	}
 
 	private static MethodDeclaration createConstructor(AST ast, TypeDeclaration typeDeclaration,
-			List<SingleVariableDeclaration> parameters, ASTRewrite astRewrite) {
+			List<Pair> variableDeclarations, ASTRewrite astRewrite) {
 		MethodDeclaration constructor = ast.newMethodDeclaration();
 		constructor.modifiers().add(ast.newModifier(ModifierKeyword.PUBLIC_KEYWORD));
 		constructor.setName(copySubtree(ast, typeDeclaration.getName()));
@@ -263,19 +278,40 @@ public class Utilities {
 
 		Block block = ast.newBlock();
 
-		for (SingleVariableDeclaration parameter : parameters) {
-			constructor.parameters().add(createCopyTarget(astRewrite, parameter));
+		for (Pair variableDeclaration : variableDeclarations) {
+			SingleVariableDeclaration declaration = ast.newSingleVariableDeclaration();
+			declaration.setName(createCopyTarget(astRewrite, variableDeclaration.variableDeclaration.getName()));
+			declaration.setType(createCopyTarget(astRewrite, variableDeclaration.type));
+
+			constructor.parameters().add(declaration);
 
 			FieldAccess fieldAccess = ast.newFieldAccess();
 			fieldAccess.setExpression(ast.newThisExpression());
-			fieldAccess.setName(createCopyTarget(astRewrite, parameter.getName()));
+			fieldAccess.setName(createCopyTarget(astRewrite, variableDeclaration.variableDeclaration.getName()));
 
 			Assignment assignment = ast.newAssignment();
 			assignment.setLeftHandSide(fieldAccess);
-			assignment.setRightHandSide(createCopyTarget(astRewrite, parameter.getName()));
+			assignment
+					.setRightHandSide(createCopyTarget(astRewrite, variableDeclaration.variableDeclaration.getName()));
 
 			block.statements().add(ast.newExpressionStatement(assignment));
 		}
+		
+		SingleVariableDeclaration declaration = ast.newSingleVariableDeclaration();
+		declaration.setName(ast.newSimpleName("section"));
+		declaration.setType(ast.newPrimitiveType(PrimitiveType.INT));
+
+		constructor.parameters().add(declaration);
+
+		FieldAccess fieldAccess = ast.newFieldAccess();
+		fieldAccess.setExpression(ast.newThisExpression());
+		fieldAccess.setName(ast.newSimpleName("section"));
+
+		Assignment assignment = ast.newAssignment();
+		assignment.setLeftHandSide(fieldAccess);
+		assignment.setRightHandSide(ast.newSimpleName("section"));
+
+		block.statements().add(ast.newExpressionStatement(assignment));
 
 		constructor.setBody(block);
 
