@@ -21,6 +21,7 @@ import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
+import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier;
@@ -30,6 +31,7 @@ import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression.Operator;
 import org.eclipse.jdt.core.dom.PrimitiveType;
+import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
@@ -104,6 +106,45 @@ public class Utilities {
 
 		return statements;
 	}
+	
+	public static void simplifyIfStatements(AST ast, ASTRewrite astRewrite, List<Statement> statements) {
+		if (statements.size() != 1 || !(statements.get(0) instanceof IfStatement)) {
+			return;
+		}
+		IfStatement ifStatement = (IfStatement) statements.get(0);
+		
+		Statement thenStatement = ifStatement.getThenStatement();
+		if (!(thenStatement instanceof Block) && !(thenStatement instanceof ReturnStatement)) {
+			Block block = ast.newBlock();
+			block.statements().add(copySubtree(ast, thenStatement));
+			block.statements().add(ast.newReturnStatement());
+			
+			ifStatement.setThenStatement(block);
+		} else if (thenStatement instanceof Block) {
+			Block block = (Block) thenStatement;
+			if (!(block.statements().get(block.statements().size() - 1) instanceof ReturnStatement)) {
+				block.statements().add(ast.newReturnStatement());
+			}
+		} else {
+			Block block = ast.newBlock();
+			block.statements().add(copySubtree(ast, thenStatement));
+			ifStatement.setThenStatement(block);
+		}
+		
+		Statement elseStatement = ifStatement.getElseStatement();
+		ifStatement.setElseStatement(null);
+		
+		if (elseStatement instanceof Block) {
+			Block block = (Block) elseStatement;
+			for (Statement statement : (List<Statement>) block.statements()) {
+				statements.add(copySubtree(ast, statement));
+			}
+		} else {
+			statements.add(elseStatement);
+		}
+		
+		return;
+	}
 
 	public static Change createContextClass(IMethod method) throws JavaModelException {
 		IType declaringType = method.getDeclaringType();
@@ -118,17 +159,18 @@ public class Utilities {
 		listRewrite.insertLast(typeDeclaration, null);
 		MethodDeclaration newMethod = createMethodDeclaration(method, astNode, astRewrite);
 
-		List<Statement> programStackStatements = createProgramStack(newMethod, astNode, typeDeclaration, astRewrite);
-		WhileStatement whileStatement = createWhileStatement(ast, astRewrite);
+//		List<Statement> programStackStatements = createProgramStack(newMethod, astNode, typeDeclaration, astRewrite);
+//		WhileStatement whileStatement = createWhileStatement(ast, astRewrite);
 
 		Block body = newMethod.getBody();
-		Block whileBody = copySubtree(ast, body);
-		whileBody.statements().addAll(0, createPopStatements(ast, typeDeclaration, newMethod));
-		whileStatement.setBody(whileBody);
+//		Block whileBody = copySubtree(ast, body);
+//		whileBody.statements().addAll(0, createPopStatements(ast, typeDeclaration, newMethod));
+//		whileStatement.setBody(whileBody);
 
-		body.statements().clear();
-		body.statements().addAll(programStackStatements);
-		body.statements().add(whileStatement);
+//		body.statements().clear();
+//		body.statements().addAll(programStackStatements);
+//		body.statements().add(whileStatement);
+		simplifyIfStatements(ast, astRewrite, body.statements());
 
 		listRewrite.insertLast(newMethod, null);
 
