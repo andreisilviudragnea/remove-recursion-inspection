@@ -11,10 +11,9 @@ public class MethodInvocationsCollector extends ASTVisitor {
 	private String methodName;
 	private List<MethodInvocation> methodInvocations = new ArrayList<MethodInvocation>();
 
-	@Override
-	public boolean visit(MethodDeclaration node) {
-		methodName = node.getName().getFullyQualifiedName();
-		return super.visit(node);
+	public MethodInvocationsCollector(String methodName) {
+		super();
+		this.methodName = methodName;
 	}
 
 	@Override

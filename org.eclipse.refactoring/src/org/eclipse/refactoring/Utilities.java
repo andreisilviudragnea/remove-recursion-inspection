@@ -106,21 +106,19 @@ public class Utilities {
 
 		return statements;
 	}
-	
-	
-	
+
 	public static void simplifyIfStatements(AST ast, ASTRewrite astRewrite, List<Statement> statements) {
 		if (statements.size() != 1 || !(statements.get(0) instanceof IfStatement)) {
 			return;
 		}
 		IfStatement ifStatement = (IfStatement) statements.get(0);
-		
+
 		Statement thenStatement = ifStatement.getThenStatement();
 		if (!(thenStatement instanceof Block) && !(thenStatement instanceof ReturnStatement)) {
 			Block block = ast.newBlock();
 			block.statements().add(copySubtree(ast, thenStatement));
 			block.statements().add(ast.newReturnStatement());
-			
+
 			ifStatement.setThenStatement(block);
 		} else if (thenStatement instanceof Block) {
 			Block block = (Block) thenStatement;
@@ -132,10 +130,10 @@ public class Utilities {
 			block.statements().add(copySubtree(ast, thenStatement));
 			ifStatement.setThenStatement(block);
 		}
-		
+
 		Statement elseStatement = ifStatement.getElseStatement();
 		ifStatement.setElseStatement(null);
-		
+
 		if (elseStatement instanceof Block) {
 			Block block = (Block) elseStatement;
 			for (Statement statement : (List<Statement>) block.statements()) {
@@ -147,8 +145,68 @@ public class Utilities {
 		} else {
 			statements.add(elseStatement);
 		}
-		
+
 		return;
+	}
+
+	public static Statement getParentStatement(MethodInvocation invocation) {
+		ASTNode parent = invocation.getParent();
+		while (parent != null) {
+			if (parent instanceof Statement) {
+				return (Statement) parent;
+			}
+			parent = parent.getParent();
+		}
+		return null;
+	}
+
+	public static Block getParentBlock(MethodInvocation invocation) {
+		ASTNode parent = invocation.getParent();
+		while (parent != null) {
+			if (parent instanceof Block) {
+				return (Block) parent;
+			}
+			parent = parent.getParent();
+		}
+		return null;
+	}
+
+	public static int getIndexOfStatementWithInvocation(MethodInvocation invocation) {
+		Block block = getParentBlock(invocation);
+		Statement parentStatement = getParentStatement(invocation);
+		List<Statement> statements = block.statements();
+		for (int i = 0; i < statements.size(); i++) {
+			if (statements.get(i) == parentStatement) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	public static void insertAssignmentStatementBeforeStatementWithRecursiveCall(MethodInvocation invocation) {
+		Block block = getParentBlock(invocation);
+	}
+
+	public static void extractRecursiveMethodInvocationsToLocalVariables(IMethod method, ASTNode astNode,
+			MethodDeclaration newMethod, AST ast, ASTRewrite astRewrite) throws JavaModelException {
+		MethodInvocationsCollector invocationsCollector = new MethodInvocationsCollector(
+				extractMethodDeclaration(method, astNode).getName().getFullyQualifiedName());
+		newMethod.accept(invocationsCollector);
+		List<MethodInvocation> invocations = invocationsCollector.getMethodInvocations();
+		System.out.println(invocations);
+		for (MethodInvocation invocation : invocations) {
+			if (invocation.getParent() != getParentStatement(invocation)) {
+				System.out.println(invocation + " is not in immediate statement.");
+				int index = getIndexOfStatementWithInvocation(invocation);
+				VariableDeclarationFragment fragment = ast.newVariableDeclarationFragment();
+				fragment.setName(ast.newSimpleName("temp" + index));
+				fragment.setInitializer(copySubtree(ast, invocation));
+				VariableDeclarationStatement statement = ast.newVariableDeclarationStatement(fragment);
+				Block block = getParentBlock(invocation);
+				block.statements().add(index, statement);
+				astRewrite.replace(invocation, ast.newSimpleName("temp" + index), null);
+			}
+		}
 	}
 
 	public static Change createContextClass(IMethod method) throws JavaModelException {
@@ -164,18 +222,23 @@ public class Utilities {
 		listRewrite.insertLast(typeDeclaration, null);
 		MethodDeclaration newMethod = createMethodDeclaration(method, astNode, astRewrite);
 
-//		List<Statement> programStackStatements = createProgramStack(newMethod, astNode, typeDeclaration, astRewrite);
-//		WhileStatement whileStatement = createWhileStatement(ast, astRewrite);
+		// List<Statement> programStackStatements =
+		// createProgramStack(newMethod, astNode, typeDeclaration, astRewrite);
+		// WhileStatement whileStatement = createWhileStatement(ast,
+		// astRewrite);
 
 		Block body = newMethod.getBody();
-//		Block whileBody = copySubtree(ast, body);
-//		whileBody.statements().addAll(0, createPopStatements(ast, typeDeclaration, newMethod));
-//		whileStatement.setBody(whileBody);
+		// Block whileBody = copySubtree(ast, body);
+		// whileBody.statements().addAll(0, createPopStatements(ast,
+		// typeDeclaration, newMethod));
+		// whileStatement.setBody(whileBody);
 
-//		body.statements().clear();
-//		body.statements().addAll(programStackStatements);
-//		body.statements().add(whileStatement);
+		// body.statements().clear();
+		// body.statements().addAll(programStackStatements);
+		// body.statements().add(whileStatement);
 		simplifyIfStatements(ast, astRewrite, body.statements());
+
+		extractRecursiveMethodInvocationsToLocalVariables(method, astNode, newMethod, ast, astRewrite);
 
 		listRewrite.insertLast(newMethod, null);
 
@@ -269,7 +332,7 @@ public class Utilities {
 		LocalVariableCollector visitor = new LocalVariableCollector();
 		methodDeclaration.accept(visitor);
 		List<Pair> variableDeclarations = visitor.getVariableDeclarations();
-		
+
 		List<FieldDeclaration> fieldDeclarations = addFieldsFromParameters(ast, typeDeclaration, variableDeclarations,
 				astRewrite);
 		List<BodyDeclaration> bodyDeclarations = typeDeclaration.bodyDeclarations();
@@ -343,7 +406,7 @@ public class Utilities {
 
 			block.statements().add(ast.newExpressionStatement(assignment));
 		}
-		
+
 		SingleVariableDeclaration declaration = ast.newSingleVariableDeclaration();
 		declaration.setName(ast.newSimpleName("section"));
 		declaration.setType(ast.newPrimitiveType(PrimitiveType.INT));
