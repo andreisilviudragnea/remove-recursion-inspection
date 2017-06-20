@@ -19,9 +19,11 @@ import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IfStatement;
+import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier;
@@ -50,7 +52,7 @@ import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
-import org.eclipse.refactoring.LocalVariableCollector.Pair;
+import org.eclipse.refactoring.LocalVariableCollector.Tuple;
 import org.eclipse.text.edits.TextEdit;
 
 public class Utilities {
@@ -187,12 +189,15 @@ public class Utilities {
 		Block block = getParentBlock(invocation);
 	}
 
+	public static List<MethodInvocation> getInvocations(String methodName, MethodDeclaration method) {
+		MethodInvocationsCollector invocationsCollector = new MethodInvocationsCollector(methodName);
+		method.accept(invocationsCollector);
+		return invocationsCollector.getMethodInvocations();
+	}
+
 	public static void extractRecursiveMethodInvocationsToLocalVariables(IMethod method, ASTNode astNode,
 			MethodDeclaration newMethod, AST ast, ASTRewrite astRewrite) throws JavaModelException {
-		MethodInvocationsCollector invocationsCollector = new MethodInvocationsCollector(
-				extractMethodDeclaration(method, astNode).getName().getFullyQualifiedName());
-		newMethod.accept(invocationsCollector);
-		List<MethodInvocation> invocations = invocationsCollector.getMethodInvocations();
+		List<MethodInvocation> invocations = getInvocations(method.getElementName(), newMethod);
 		System.out.println(invocations);
 		for (MethodInvocation invocation : invocations) {
 			if (invocation.getParent() != getParentStatement(invocation)) {
@@ -204,9 +209,67 @@ public class Utilities {
 				VariableDeclarationStatement statement = ast.newVariableDeclarationStatement(fragment);
 				Block block = getParentBlock(invocation);
 				block.statements().add(index, statement);
-				astRewrite.replace(invocation, ast.newSimpleName("temp" + index), null);
+				invocation.getParent().setStructuralProperty(invocation.getLocationInParent(),
+						ast.newSimpleName("temp" + index));
+				// See ASTResolving
 			}
 		}
+	}
+
+	public static List<List<Statement>> getSections(String methodName, MethodDeclaration method,
+			ASTRewrite astRewrite) {
+		List<MethodInvocation> invocations = getInvocations(methodName, method);
+		Block block = method.getBody();
+		List<List<Statement>> sections = new ArrayList<>();
+		int lastIndex = 0;
+
+		for (MethodInvocation invocation : invocations) {
+			Statement statement = getParentStatement(invocation);
+			if (statement.getParent() == block) {
+				int index = block.statements().indexOf(statement);
+				System.out.println("Split at " + index);
+				List<Statement> statements = new ArrayList<Statement>();
+				statements.addAll(block.statements().subList(lastIndex, index + 1));
+				sections.add(statements);
+				lastIndex = index + 1;
+			}
+		}
+
+		List<Statement> statements = new ArrayList<Statement>();
+		statements.addAll(block.statements().subList(lastIndex, block.statements().size()));
+		sections.add(statements);
+
+		return sections;
+	}
+
+	private static void addIfNotPresent(ListRewrite listRewrite, ImportDeclaration importDeclaration,
+			List<ImportDeclaration> list) {
+		boolean isPresent = false;
+		for (ImportDeclaration declaration : list) {
+			if (declaration.getName().getFullyQualifiedName()
+					.equals(importDeclaration.getName().getFullyQualifiedName())) {
+				isPresent = true;
+				break;
+			}
+		}
+
+		if (!isPresent) {
+			listRewrite.insertLast(importDeclaration, null);
+		}
+	}
+
+	private static void addImports(AST ast, ASTNode astNode, ASTRewrite astRewrite) {
+		ImportDeclaration dequeImport = ast.newImportDeclaration();
+		dequeImport.setName(ast.newName("java.util.Deque"));
+
+		ImportDeclaration listImport = ast.newImportDeclaration();
+		listImport.setName(ast.newName("java.util.LinkedList"));
+
+		ListRewrite rewrite = astRewrite.getListRewrite(astNode, CompilationUnit.IMPORTS_PROPERTY);
+		List<ImportDeclaration> imports = rewrite.getOriginalList();
+
+		addIfNotPresent(rewrite, dequeImport, imports);
+		addIfNotPresent(rewrite, listImport, imports);
 	}
 
 	public static Change createContextClass(IMethod method) throws JavaModelException {
@@ -215,12 +278,22 @@ public class Utilities {
 		ASTNode astNode = parser.createAST(null);
 		AST ast = astNode.getAST();
 		ASTRewrite astRewrite = ASTRewrite.create(ast);
-		TypeDeclaration typeDeclaration = createTypeDeclaration(method, astNode, astRewrite);
+
+		MethodDeclaration oldMethod = (MethodDeclaration) NodeFinder.perform(astNode, method.getSourceRange());
+		
+		LocalVariableCollector visitor = new LocalVariableCollector();
+		oldMethod.accept(visitor);
+		List<Tuple> variableDeclarations = visitor.getVariableDeclarations();
+
+		TypeDeclaration typeDeclaration = createTypeDeclaration(method, astNode, astRewrite, variableDeclarations);
 		ASTNode declaringTypeNode = NodeFinder.perform(astNode, declaringType.getSourceRange());
+
+		addImports(ast, astNode, astRewrite);
+
 		ListRewrite listRewrite = astRewrite.getListRewrite(declaringTypeNode,
 				TypeDeclaration.BODY_DECLARATIONS_PROPERTY);
 		listRewrite.insertLast(typeDeclaration, null);
-		MethodDeclaration newMethod = createMethodDeclaration(method, astNode, astRewrite);
+		MethodDeclaration newMethod = createMethodDeclaration(method, astNode, astRewrite, oldMethod);
 
 		// List<Statement> programStackStatements =
 		// createProgramStack(newMethod, astNode, typeDeclaration, astRewrite);
@@ -239,6 +312,11 @@ public class Utilities {
 		simplifyIfStatements(ast, astRewrite, body.statements());
 
 		extractRecursiveMethodInvocationsToLocalVariables(method, astNode, newMethod, ast, astRewrite);
+
+		List<List<Statement>> sections = getSections(method.getElementName(), newMethod, astRewrite);
+		System.out.println(sections);
+
+		body.statements().add(0, createStackDeclarationStatement(typeDeclaration, ast));
 
 		listRewrite.insertLast(newMethod, null);
 
@@ -271,19 +349,8 @@ public class Utilities {
 			TypeDeclaration typeDeclaration, ASTRewrite astRewrite) {
 		AST ast = root.getAST();
 
-		VariableDeclarationFragment variableDeclarationFragment = ast.newVariableDeclarationFragment();
-		variableDeclarationFragment.setName(ast.newSimpleName("programStack"));
-
-		ClassInstanceCreation creation = ast.newClassInstanceCreation();
-		creation.setType(ast.newParameterizedType(ast.newSimpleType(ast.newName("java.util.LinkedList"))));
-		variableDeclarationFragment.setInitializer(creation);
-
-		ParameterizedType dequeType = ast.newParameterizedType(ast.newSimpleType(ast.newName("java.util.Deque")));
-		dequeType.typeArguments().add(ast.newSimpleType(copySubtree(ast, typeDeclaration.getName())));
-
-		VariableDeclarationStatement variableDeclarationStatement = ast
-				.newVariableDeclarationStatement(variableDeclarationFragment);
-		variableDeclarationStatement.setType(dequeType);
+		VariableDeclarationStatement variableDeclarationStatement = createStackDeclarationStatement(typeDeclaration,
+				ast);
 
 		ClassInstanceCreation creation2 = ast.newClassInstanceCreation();
 		creation2.setType(ast.newSimpleType(copySubtree(ast, typeDeclaration.getName())));
@@ -293,7 +360,7 @@ public class Utilities {
 		}
 
 		MethodInvocation invocation = ast.newMethodInvocation();
-		invocation.setExpression(ast.newSimpleName("programStack"));
+		invocation.setExpression(ast.newSimpleName("stack"));
 		invocation.setName(ast.newSimpleName("push"));
 		invocation.arguments().add(creation2);
 
@@ -304,22 +371,34 @@ public class Utilities {
 		return statements;
 	}
 
-	private static MethodDeclaration createMethodDeclaration(IMethod method, ASTNode astNode, ASTRewrite astRewrite)
-			throws JavaModelException {
-		MethodDeclaration oldMethod = extractMethodDeclaration(method, astNode);
+	private static VariableDeclarationStatement createStackDeclarationStatement(TypeDeclaration typeDeclaration,
+			AST ast) {
+		VariableDeclarationFragment variableDeclarationFragment = ast.newVariableDeclarationFragment();
+		variableDeclarationFragment.setName(ast.newSimpleName("stack"));
+
+		ClassInstanceCreation creation = ast.newClassInstanceCreation();
+		creation.setType(ast.newParameterizedType(ast.newSimpleType(ast.newName("LinkedList"))));
+		variableDeclarationFragment.setInitializer(creation);
+
+		ParameterizedType dequeType = ast.newParameterizedType(ast.newSimpleType(ast.newName("Deque")));
+		dequeType.typeArguments().add(ast.newSimpleType(copySubtree(ast, typeDeclaration.getName())));
+
+		VariableDeclarationStatement variableDeclarationStatement = ast
+				.newVariableDeclarationStatement(variableDeclarationFragment);
+		variableDeclarationStatement.setType(dequeType);
+		return variableDeclarationStatement;
+	}
+
+	private static MethodDeclaration createMethodDeclaration(IMethod method, ASTNode astNode, ASTRewrite astRewrite,
+			MethodDeclaration oldMethod) throws JavaModelException {
 		AST ast = astNode.getAST();
 		MethodDeclaration newMethod = copySubtree(ast, oldMethod);
 		newMethod.setName(ast.newSimpleName(newMethod.getName().getFullyQualifiedName() + "Iteratively"));
 		return newMethod;
 	}
 
-	private static MethodDeclaration extractMethodDeclaration(IMethod method, ASTNode astNode)
-			throws JavaModelException {
-		return (MethodDeclaration) NodeFinder.perform(astNode, method.getSourceRange());
-	}
-
-	private static TypeDeclaration createTypeDeclaration(IMethod method, ASTNode astNode, ASTRewrite astRewrite)
-			throws JavaModelException {
+	private static TypeDeclaration createTypeDeclaration(IMethod method, ASTNode astNode, ASTRewrite astRewrite,
+			List<Tuple> variableDeclarations) throws JavaModelException {
 		AST ast = astNode.getAST();
 		TypeDeclaration typeDeclaration = ast.newTypeDeclaration();
 		typeDeclaration.setName(ast.newSimpleName(method.getElementName() + "Context"));
@@ -327,11 +406,6 @@ public class Utilities {
 		List<Modifier> modifiers = typeDeclaration.modifiers();
 		modifiers.add(ast.newModifier(ModifierKeyword.PRIVATE_KEYWORD));
 		modifiers.add(ast.newModifier(ModifierKeyword.STATIC_KEYWORD));
-
-		MethodDeclaration methodDeclaration = extractMethodDeclaration(method, astNode);
-		LocalVariableCollector visitor = new LocalVariableCollector();
-		methodDeclaration.accept(visitor);
-		List<Pair> variableDeclarations = visitor.getVariableDeclarations();
 
 		List<FieldDeclaration> fieldDeclarations = addFieldsFromParameters(ast, typeDeclaration, variableDeclarations,
 				astRewrite);
@@ -345,10 +419,10 @@ public class Utilities {
 	}
 
 	private static List<FieldDeclaration> addFieldsFromParameters(AST ast, TypeDeclaration typeDeclaration,
-			List<Pair> variableDeclarations, ASTRewrite astRewrite) {
+			List<Tuple> variableDeclarations, ASTRewrite astRewrite) {
 		List<FieldDeclaration> fields = new ArrayList<FieldDeclaration>();
 
-		for (Pair variableDeclaration : variableDeclarations) {
+		for (Tuple variableDeclaration : variableDeclarations) {
 			VariableDeclarationFragment fragment = ast.newVariableDeclarationFragment();
 			fragment.setName(createCopyTarget(astRewrite, variableDeclaration.variableDeclaration.getName()));
 
@@ -380,7 +454,7 @@ public class Utilities {
 	}
 
 	private static MethodDeclaration createConstructor(AST ast, TypeDeclaration typeDeclaration,
-			List<Pair> variableDeclarations, ASTRewrite astRewrite) {
+			List<Tuple> variableDeclarations, ASTRewrite astRewrite) {
 		MethodDeclaration constructor = ast.newMethodDeclaration();
 		constructor.modifiers().add(ast.newModifier(ModifierKeyword.PUBLIC_KEYWORD));
 		constructor.setName(copySubtree(ast, typeDeclaration.getName()));
@@ -388,7 +462,7 @@ public class Utilities {
 
 		Block block = ast.newBlock();
 
-		for (Pair variableDeclaration : variableDeclarations) {
+		for (Tuple variableDeclaration : variableDeclarations) {
 			SingleVariableDeclaration declaration = ast.newSingleVariableDeclaration();
 			declaration.setName(createCopyTarget(astRewrite, variableDeclaration.variableDeclaration.getName()));
 			declaration.setType(createCopyTarget(astRewrite, variableDeclaration.type));
