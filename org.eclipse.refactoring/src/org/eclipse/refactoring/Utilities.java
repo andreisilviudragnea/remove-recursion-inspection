@@ -96,40 +96,6 @@ public class Utilities {
 		return !invocations.isEmpty();
 	}
 
-	private static List<Statement> createPopStatements(AST ast, TypeDeclaration typeDeclaration,
-			MethodDeclaration method) {
-		MethodInvocation invocation = ast.newMethodInvocation();
-		invocation.setExpression(ast.newSimpleName(STACK));
-		invocation.setName(ast.newSimpleName("pop"));
-
-		SimpleName topRecord = ast.newSimpleName("topRecord");
-
-		VariableDeclarationFragment fragment = ast.newVariableDeclarationFragment();
-		fragment.setName(topRecord);
-		fragment.setInitializer(invocation);
-
-		VariableDeclarationStatement declarationStatement = ast.newVariableDeclarationStatement(fragment);
-		declarationStatement.setType(ast.newSimpleType(copySubtree(ast, typeDeclaration.getName())));
-
-		List<Statement> statements = new ArrayList<Statement>();
-		statements.add(declarationStatement);
-
-		List<SingleVariableDeclaration> parameters = method.parameters();
-		for (SingleVariableDeclaration parameter : parameters) {
-			FieldAccess fieldAccess = ast.newFieldAccess();
-			fieldAccess.setExpression(copySubtree(ast, topRecord));
-			fieldAccess.setName(copySubtree(ast, parameter.getName()));
-
-			Assignment assignment = ast.newAssignment();
-			assignment.setLeftHandSide(copySubtree(ast, parameter.getName()));
-			assignment.setRightHandSide(fieldAccess);
-
-			statements.add(ast.newExpressionStatement(assignment));
-		}
-
-		return statements;
-	}
-
 	public static void simplifyIfStatements(AST ast, ASTRewrite astRewrite, List<Statement> statements) {
 		if (statements.size() != 1 || !(statements.get(0) instanceof IfStatement)) {
 			return;
@@ -391,18 +357,13 @@ public class Utilities {
 		return false;
 	}
 
-	private static FieldAccess createFieldAccess(AST ast, String name) {
-		FieldAccess access = ast.newFieldAccess();
-		access.setExpression(ast.newSimpleName(Utilities.CONTEXT_VAR));
-		access.setName(ast.newSimpleName(name));
-		return access;
-	}
-
 	private static void replaceSimpleNameWithContextAccess(SimpleName node, List<Tuple> tuples) {
 		String name = node.getFullyQualifiedName();
 		if (inTuples(tuples, name)) {
 			ASTNode parent = node.getParent();
 			StructuralPropertyDescriptor locationInParent = node.getLocationInParent();
+			AST ast = node.getAST();
+			FieldAccess fieldAccess = newFieldAccess(ast, ast.newSimpleName(CONTEXT_VAR), ast.newSimpleName(name));
 			if (parent instanceof MethodInvocation) {
 				MethodInvocation invocation = (MethodInvocation) parent;
 				List<Expression> arguments = invocation.arguments();
@@ -410,11 +371,11 @@ public class Utilities {
 					if (expression == node) {
 						int index = arguments.indexOf(expression);
 						arguments.remove(expression);
-						arguments.add(index, createFieldAccess(node.getAST(), name));
+						arguments.add(index, fieldAccess);
 					}
 				}
 			} else {
-				parent.setStructuralProperty(locationInParent, createFieldAccess(node.getAST(), name));
+				parent.setStructuralProperty(locationInParent, fieldAccess);
 			}
 		}
 	}
@@ -635,49 +596,68 @@ public class Utilities {
 
 	private static BodyDeclaration createConstructor(AST ast, String name, List<Tuple> tuples) {
 		MethodDeclaration constructor = ast.newMethodDeclaration();
-		constructor.modifiers().add(ast.newModifier(ModifierKeyword.PUBLIC_KEYWORD));
+		// constructor.modifiers().add(ast.newModifier(ModifierKeyword.PUBLIC_KEYWORD));
 		constructor.setName(ast.newSimpleName(name));
 		constructor.setConstructor(true);
 
-		Block block = ast.newBlock();
+		constructor.parameters().addAll(createConstructorParameters(ast, tuples));
+
+		constructor.setBody(createConstructorBody(ast, tuples));
+
+		return constructor;
+	}
+
+	private static SingleVariableDeclaration createSingleVariableDeclaration(AST ast, SimpleName name, Type type) {
+		SingleVariableDeclaration declaration = ast.newSingleVariableDeclaration();
+		declaration.setName(name);
+		declaration.setType(type);
+		return declaration;
+	}
+
+	private static List<SingleVariableDeclaration> createConstructorParameters(AST ast, List<Tuple> tuples) {
+		List<SingleVariableDeclaration> parameters = new ArrayList<>();
+		for (Tuple tuple : tuples) {
+			parameters.add(createSingleVariableDeclaration(ast, copySubtree(ast, tuple.variableDeclaration.getName()),
+					copySubtree(ast, tuple.type)));
+		}
+		parameters.add(createSingleVariableDeclaration(ast, ast.newSimpleName(SECTION),
+				ast.newPrimitiveType(PrimitiveType.INT)));
+		return parameters;
+	}
+
+	private static Block createConstructorBody(AST ast, List<Tuple> tuples) {
+		List<Statement> statements = new ArrayList<>();
 
 		for (Tuple tuple : tuples) {
-			SingleVariableDeclaration declaration = ast.newSingleVariableDeclaration();
-			declaration.setName(copySubtree(ast, tuple.variableDeclaration.getName()));
-			declaration.setType(copySubtree(ast, tuple.type));
-
-			constructor.parameters().add(declaration);
-
-			FieldAccess fieldAccess = ast.newFieldAccess();
-			fieldAccess.setExpression(ast.newThisExpression());
-			fieldAccess.setName(copySubtree(ast, tuple.variableDeclaration.getName()));
+			FieldAccess fieldAccess = newFieldAccess(ast, ast.newThisExpression(),
+					copySubtree(ast, tuple.variableDeclaration.getName()));
 
 			Assignment assignment = ast.newAssignment();
 			assignment.setLeftHandSide(fieldAccess);
 			assignment.setRightHandSide(copySubtree(ast, tuple.variableDeclaration.getName()));
 
-			block.statements().add(ast.newExpressionStatement(assignment));
+			statements.add(ast.newExpressionStatement(assignment));
 		}
 
-		SingleVariableDeclaration declaration = ast.newSingleVariableDeclaration();
-		declaration.setName(ast.newSimpleName(SECTION));
-		declaration.setType(ast.newPrimitiveType(PrimitiveType.INT));
-
-		constructor.parameters().add(declaration);
-
-		FieldAccess fieldAccess = ast.newFieldAccess();
-		fieldAccess.setExpression(ast.newThisExpression());
-		fieldAccess.setName(ast.newSimpleName(SECTION));
+		FieldAccess fieldAccess = newFieldAccess(ast, ast.newThisExpression(), ast.newSimpleName(SECTION));
 
 		Assignment assignment = ast.newAssignment();
 		assignment.setLeftHandSide(fieldAccess);
 		assignment.setRightHandSide(ast.newSimpleName(SECTION));
 
-		block.statements().add(ast.newExpressionStatement(assignment));
+		statements.add(ast.newExpressionStatement(assignment));
 
-		constructor.setBody(block);
+		Block block = ast.newBlock();
+		block.statements().addAll(statements);
 
-		return constructor;
+		return block;
+	}
+
+	private static FieldAccess newFieldAccess(AST ast, Expression expression, SimpleName name) {
+		FieldAccess fieldAccess = ast.newFieldAccess();
+		fieldAccess.setExpression(expression);
+		fieldAccess.setName(name);
+		return fieldAccess;
 	}
 
 	private static ASTParser createParser(IMethod method) {
