@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
+import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
@@ -38,8 +39,10 @@ import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
 import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SwitchStatement;
+import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
@@ -59,6 +62,7 @@ import org.eclipse.refactoring.LocalVariableCollector.Tuple;
 import org.eclipse.text.edits.TextEdit;
 
 public class Utilities {
+	static final String RET = "ret";
 	private static final String RETURN_OUTSIDE = "-1";
 	private static final String SECTION = "section";
 	public static final String CONTEXT_VAR = "context";
@@ -69,8 +73,8 @@ public class Utilities {
 	private static final String JAVA_UTIL_LINKED_LIST = "java.util.LinkedList";
 	private static final String JAVA_UTIL_DEQUE = "java.util.Deque";
 	private static final String TEMP = "temp";
-	private static final String PEEK = "peek";
-	private static final String STACK = "stack";
+	static final String PEEK = "peek";
+	static final String STACK = "stack";
 
 	public static boolean isRecursive(IMethod method) throws CoreException {
 		IJavaSearchScope scope = SearchEngine.createJavaSearchScope(new IJavaElement[] { method });
@@ -320,7 +324,8 @@ public class Utilities {
 		// body.statements().clear();
 		// body.statements().addAll(programStackStatements);
 		// body.statements().add(whileStatement);
-		simplifyIfStatements(ast, astRewrite, body.statements());
+		List<Statement> statements = body.statements();
+		simplifyIfStatements(ast, astRewrite, statements);
 
 		extractRecursiveMethodInvocationsToLocalVariables(method, astNode, newMethod, ast, astRewrite);
 
@@ -334,9 +339,9 @@ public class Utilities {
 		List<List<Statement>> sections = getSections(method.getElementName(), newMethod, astRewrite);
 		System.out.println(sections);
 
-		body.statements().add(0, createStackDeclarationStatement(typeDeclaration, ast));
-		body.statements().add(1, createPushInvocation(typeDeclaration, ast, tuples));
-		body.statements().add(2, createWhileStatement(method, ast, astRewrite, sections, tuples));
+		statements.clear();
+		statements
+				.addAll(createHeaderStatements(method, ast, astRewrite, newMethod, tuples, typeDeclaration, sections));
 
 		listRewrite.insertLast(newMethod, null);
 
@@ -350,6 +355,69 @@ public class Utilities {
 		return change;
 	}
 
+	private static List<Statement> createHeaderStatements(IMethod method, AST ast, ASTRewrite astRewrite,
+			MethodDeclaration newMethod, List<Tuple> tuples, TypeDeclaration typeDeclaration,
+			List<List<Statement>> sections) {
+		List<Statement> statements = new ArrayList<>();
+
+		statements.add(createStackDeclarationStatement(typeDeclaration, ast));
+		statements.add(createPushInvocation(typeDeclaration, ast, tuples));
+		Type type = newMethod.getReturnType2();
+		if (type instanceof PrimitiveType) {
+			PrimitiveType primitiveType = (PrimitiveType) type;
+			if (primitiveType.getPrimitiveTypeCode() != PrimitiveType.VOID) {
+				VariableDeclarationFragment fragment = ast.newVariableDeclarationFragment();
+				fragment.setName(ast.newSimpleName(RET));
+				fragment.setInitializer(ast.newNumberLiteral());
+
+				VariableDeclarationStatement statement = ast.newVariableDeclarationStatement(fragment);
+				statement.setType(copySubtree(ast, type));
+
+				statements.add(statement);
+			}
+		}
+		statements.add(createWhileStatement(method, ast, astRewrite, sections, tuples));
+
+		return statements;
+	}
+
+	private static boolean inTuples(List<Tuple> tuples, String name) {
+		for (Tuple tuple : tuples) {
+			if (tuple.variableDeclaration.getName().getFullyQualifiedName().equals(name)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static FieldAccess createFieldAccess(AST ast, String name) {
+		FieldAccess access = ast.newFieldAccess();
+		access.setExpression(ast.newSimpleName(Utilities.CONTEXT_VAR));
+		access.setName(ast.newSimpleName(name));
+		return access;
+	}
+
+	private static void replaceSimpleNameWithContextAccess(SimpleName node, List<Tuple> tuples) {
+		String name = node.getFullyQualifiedName();
+		if (inTuples(tuples, name)) {
+			ASTNode parent = node.getParent();
+			StructuralPropertyDescriptor locationInParent = node.getLocationInParent();
+			if (parent instanceof MethodInvocation) {
+				MethodInvocation invocation = (MethodInvocation) parent;
+				List<Expression> arguments = invocation.arguments();
+				for (Expression expression : arguments) {
+					if (expression == node) {
+						int index = arguments.indexOf(expression);
+						arguments.remove(expression);
+						arguments.add(index, createFieldAccess(node.getAST(), name));
+					}
+				}
+			} else {
+				parent.setStructuralProperty(locationInParent, createFieldAccess(node.getAST(), name));
+			}
+		}
+	}
+
 	private static WhileStatement createWhileStatement(IMethod method, AST ast, ASTRewrite astRewrite,
 			List<List<Statement>> sections, List<Tuple> tuples) {
 		WhileStatement whileStatement = ast.newWhileStatement();
@@ -357,7 +425,7 @@ public class Utilities {
 
 		SwitchStatement statement = ast.newSwitchStatement();
 		statement.setExpression(createContextSection(ast));
-		List statements = statement.statements();
+		List<Statement> statements = statement.statements();
 
 		for (int i = 0; i < sections.size(); i++) {
 			List<Statement> section = sections.get(i);
@@ -367,16 +435,28 @@ public class Utilities {
 			statements.add(switchCase);
 
 			Block block = ast.newBlock();
+			List<Statement> statements2 = block.statements();
 			for (Statement statement2 : section) {
-				block.statements().add(copySubtree(ast, statement2));
+				statements2.add(copySubtree(ast, statement2));
 			}
-			block.statements().add(ast.newBreakStatement());
-			
+
 			LocalVariableReplacer replacer = new LocalVariableReplacer();
 			block.accept(replacer);
-			
-			LocalVariableReplacer2 replacer2 = new LocalVariableReplacer2(tuples);
+
+			LocalVariableReplacer2 replacer2 = new LocalVariableReplacer2();
 			block.accept(replacer2);
+
+			List<SimpleName> simpleNames = replacer2.getSimpleNames();
+			for (SimpleName simpleName : simpleNames) {
+				replaceSimpleNameWithContextAccess(simpleName, tuples);
+			}
+
+			ReturnReplacer replacer3 = new ReturnReplacer();
+			block.accept(replacer3);
+
+			if (!(statements2.get(statements2.size() - 1) instanceof BreakStatement)) {
+				statements2.add(ast.newBreakStatement());
+			}
 
 			statements.add(block);
 		}
@@ -390,7 +470,7 @@ public class Utilities {
 		Block block = ast.newBlock();
 		List<Statement> statements2 = block.statements();
 		statements2.add(createStackPeek(method, ast));
-		statements2.add(createIfStatement(ast));
+		// statements2.add(createIfStatement(ast));
 		statements2.add(statement);
 
 		whileStatement.setBody(block);
