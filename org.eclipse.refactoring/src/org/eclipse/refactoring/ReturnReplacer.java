@@ -20,25 +20,22 @@ public class ReturnReplacer extends ASTVisitor {
 	private static final String SIZE = "size";
 
 	private static Statement createRetAssignmentStatement(AST ast, ReturnStatement node) {
-		Assignment assignment = ast.newAssignment();
-		assignment.setLeftHandSide(ast.newSimpleName(Utilities.RET));
-		assignment.setRightHandSide(Utilities.copySubtree(ast, node.getExpression()));
+		Assignment assignment = Utilities.newAssignment(ast, ast.newSimpleName(Utilities.RET),
+				Utilities.copySubtree(ast, node.getExpression()));
 		return ast.newExpressionStatement(assignment);
 	}
 
 	private static Statement createIfStatement(AST ast, boolean hasExpression) {
-		MethodInvocation invocation = ast.newMethodInvocation();
-		invocation.setExpression(ast.newSimpleName(Utilities.STACK));
-		invocation.setName(ast.newSimpleName(SIZE));
+		MethodInvocation invocation = Utilities.newMethodInvocation(ast, ast.newSimpleName(Utilities.STACK),
+				ast.newSimpleName(SIZE), null);
 
 		InfixExpression expression = ast.newInfixExpression();
 		expression.setOperator(Operator.EQUALS);
 		expression.setLeftOperand(invocation);
 		expression.setRightOperand(ast.newNumberLiteral("1"));
 
-		MethodInvocation invocation2 = ast.newMethodInvocation();
-		invocation2.setExpression(ast.newSimpleName(Utilities.STACK));
-		invocation2.setName(ast.newSimpleName(POP));
+		MethodInvocation invocation2 = Utilities.newMethodInvocation(ast, ast.newSimpleName(Utilities.STACK),
+				ast.newSimpleName(POP), null);
 
 		ReturnStatement returnStatement = ast.newReturnStatement();
 		if (hasExpression) {

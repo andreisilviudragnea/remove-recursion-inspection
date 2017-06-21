@@ -14,12 +14,10 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 public class LocalVariableReplacer extends ASTVisitor {
 	@Override
 	public boolean visit(VariableDeclarationStatement node) {
-		// TODO Auto-generated method stub
 		VariableDeclarationFragment fragment = (VariableDeclarationFragment) node.fragments().get(0);
 		AST ast = node.getAST();
-		Assignment assignment = ast.newAssignment();
-		assignment.setLeftHandSide(Utilities.copySubtree(ast, fragment.getName()));
-		assignment.setRightHandSide(Utilities.copySubtree(ast, fragment.getInitializer()));
+		Assignment assignment = Utilities.newAssignment(ast, Utilities.copySubtree(ast, fragment.getName()),
+				Utilities.copySubtree(ast, fragment.getInitializer()));
 		ASTNode astNode = node.getParent();
 		if (astNode instanceof Block) {
 			Block block = (Block) astNode;
