@@ -61,6 +61,7 @@ import org.eclipse.refactoring.LocalVariableCollector.Tuple;
 import org.eclipse.text.edits.TextEdit;
 
 public class Utilities {
+	private static final String NEW_CONTEXT_VAR = "newContext";
 	private static final String PUSH = "push";
 	static final String RET = "ret";
 	private static final String SECTION = "section";
@@ -187,12 +188,11 @@ public class Utilities {
 			if (invocation.getParent() != getParentStatement(invocation)) {
 				System.out.println(invocation + " is not in immediate statement.");
 				int index = getIndexOfStatementWithInvocation(invocation);
-				VariableDeclarationFragment fragment = newVariableDeclarationFragment(ast,
-						ast.newSimpleName(TEMP + index), copySubtree(ast, invocation));
+//				VariableDeclarationFragment fragment = newVariableDeclarationFragment(ast,
+//						ast.newSimpleName(TEMP + index), copySubtree(ast, invocation));
 				Block block = getParentBlock(invocation);
-				block.statements().add(index, ast.newVariableDeclarationStatement(fragment));
-				invocation.getParent().setStructuralProperty(invocation.getLocationInParent(),
-						ast.newSimpleName(TEMP + index));
+				block.statements().add(index, ast.newExpressionStatement(copySubtree(ast, invocation)));
+				invocation.getParent().setStructuralProperty(invocation.getLocationInParent(), ast.newSimpleName(RET));
 				// See ASTResolving
 			}
 		}
@@ -370,11 +370,64 @@ public class Utilities {
 		}
 	}
 
-	// private static void replaceInvocationWithStatements(AST ast) {
-	// ast.newSimpleType(ast.newSimpleName());
-	// newClassInstanceCreation(ast, type, arguments);
-	// return;
-	// }
+	private static Statement createNewContextStatement(AST ast, Type contextType) {
+		ClassInstanceCreation creation = newClassInstanceCreation(ast, copySubtree(ast, contextType), null);
+		VariableDeclarationFragment fragment = newVariableDeclarationFragment(ast, ast.newSimpleName(NEW_CONTEXT_VAR),
+				creation);
+		return newVariableDeclarationStatement(ast, fragment, copySubtree(ast, contextType));
+	}
+
+	private static Statement createSetContextToOneStatement(AST ast) {
+		FieldAccess access = newFieldAccess(ast, ast.newSimpleName(NEW_CONTEXT_VAR), ast.newSimpleName(SECTION));
+		Assignment assignment = newAssignment(ast, access, ast.newNumberLiteral());
+		return ast.newExpressionStatement(assignment);
+	}
+
+	private static Statement createStackPushNewContextStatement(AST ast) {
+		List<Expression> arguments = new ArrayList<>();
+		arguments.add(ast.newSimpleName(NEW_CONTEXT_VAR));
+		MethodInvocation invocation = newMethodInvocation(ast, ast.newSimpleName(STACK), ast.newSimpleName(PUSH),
+				arguments);
+		return ast.newExpressionStatement(invocation);
+	}
+
+	private static List<Statement> replaceInvocationWithStatements(AST ast, Type contextType, List<Tuple> tuples,
+			MethodInvocation invocation) {
+		List<Statement> statements = new ArrayList<>();
+		statements.add(createNewContextStatement(ast, contextType));
+
+		List<Expression> arguments = invocation.arguments();
+		for (int i = 0; i < arguments.size(); i++) {
+			Tuple tuple = tuples.get(i);
+			if (tuple.isParameter) {
+				FieldAccess access = newFieldAccess(ast, ast.newSimpleName(NEW_CONTEXT_VAR),
+						copySubtree(ast, tuple.variableDeclaration.getName()));
+				Assignment assignment = newAssignment(ast, access, copySubtree(ast, arguments.get(i)));
+				statements.add(ast.newExpressionStatement(assignment));
+			}
+		}
+
+		statements.add(createSetContextToOneStatement(ast));
+		statements.add(createStackPushNewContextStatement(ast));
+		statements.add(ast.newBreakStatement());
+
+		return statements;
+	}
+
+	private static void replaceInvocationWithStatements2(AST ast, Type contextType, List<Tuple> tuples,
+			MethodInvocation invocation) {
+		List<Statement> statements = replaceInvocationWithStatements(ast, contextType, tuples, invocation);
+		Statement parentStatement = getParentStatement(invocation);
+		Block parentBlock = getParentBlock(invocation);
+		List<Statement> blockStatements = parentBlock.statements();
+		for (int i = 0; i < blockStatements.size(); i++) {
+			Statement statement = blockStatements.get(i);
+			if (statement == parentStatement) {
+				blockStatements.remove(i);
+				blockStatements.addAll(i, statements);
+			}
+		}
+	}
 
 	private static Statement createContextIncrementStatement(AST ast) {
 		FieldAccess access = newFieldAccess(ast, ast.newSimpleName(CONTEXT_VAR), ast.newSimpleName(SECTION));
@@ -423,7 +476,7 @@ public class Utilities {
 			block.accept(collector);
 			List<MethodInvocation> invocations = collector.getMethodInvocations();
 			for (MethodInvocation invocation : invocations) {
-
+				replaceInvocationWithStatements2(ast, contextType, tuples, invocation);
 			}
 
 			if (!(statements2.get(statements2.size() - 1) instanceof BreakStatement)) {
