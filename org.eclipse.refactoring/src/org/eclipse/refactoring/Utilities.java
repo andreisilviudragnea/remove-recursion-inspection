@@ -61,7 +61,6 @@ import org.eclipse.refactoring.LocalVariableCollector.Tuple;
 import org.eclipse.text.edits.TextEdit;
 
 public class Utilities {
-	private static final String NEW_CONTEXT_VAR = "newContext";
 	private static final String PUSH = "push";
 	static final String RET = "ret";
 	private static final String SECTION = "section";
@@ -72,7 +71,6 @@ public class Utilities {
 	private static final String LINKED_LIST = "LinkedList";
 	private static final String JAVA_UTIL_LINKED_LIST = "java.util.LinkedList";
 	private static final String JAVA_UTIL_DEQUE = "java.util.Deque";
-	private static final String TEMP = "temp";
 	static final String PEEK = "peek";
 	static final String STACK = "stack";
 
@@ -188,8 +186,6 @@ public class Utilities {
 			if (invocation.getParent() != getParentStatement(invocation)) {
 				System.out.println(invocation + " is not in immediate statement.");
 				int index = getIndexOfStatementWithInvocation(invocation);
-//				VariableDeclarationFragment fragment = newVariableDeclarationFragment(ast,
-//						ast.newSimpleName(TEMP + index), copySubtree(ast, invocation));
 				Block block = getParentBlock(invocation);
 				block.statements().add(index, ast.newExpressionStatement(copySubtree(ast, invocation)));
 				invocation.getParent().setStructuralProperty(invocation.getLocationInParent(), ast.newSimpleName(RET));
@@ -370,47 +366,26 @@ public class Utilities {
 		}
 	}
 
-	private static Statement createNewContextStatement(AST ast, Type contextType) {
-		ClassInstanceCreation creation = newClassInstanceCreation(ast, copySubtree(ast, contextType), null);
-		VariableDeclarationFragment fragment = newVariableDeclarationFragment(ast, ast.newSimpleName(NEW_CONTEXT_VAR),
-				creation);
-		return newVariableDeclarationStatement(ast, fragment, copySubtree(ast, contextType));
-	}
-
-	private static Statement createSetContextToOneStatement(AST ast) {
-		FieldAccess access = newFieldAccess(ast, ast.newSimpleName(NEW_CONTEXT_VAR), ast.newSimpleName(SECTION));
-		Assignment assignment = newAssignment(ast, access, ast.newNumberLiteral());
-		return ast.newExpressionStatement(assignment);
-	}
-
-	private static Statement createStackPushNewContextStatement(AST ast) {
-		List<Expression> arguments = new ArrayList<>();
-		arguments.add(ast.newSimpleName(NEW_CONTEXT_VAR));
+	private static Statement createStackPushNewContextStatement(AST ast, Type contextType, List<Expression> arguments) {
+		List<Expression> newArguments = new ArrayList<>();
+		for (Expression argument : arguments) {
+			newArguments.add(copySubtree(ast, argument));
+		}
+		ClassInstanceCreation creation = newClassInstanceCreation(ast, copySubtree(ast, contextType), newArguments);
+		
+		List<Expression> args = new ArrayList<>();
+		args.add(creation);
 		MethodInvocation invocation = newMethodInvocation(ast, ast.newSimpleName(STACK), ast.newSimpleName(PUSH),
-				arguments);
+				args);
+		
 		return ast.newExpressionStatement(invocation);
 	}
 
 	private static List<Statement> replaceInvocationWithStatements(AST ast, Type contextType, List<Tuple> tuples,
 			MethodInvocation invocation) {
 		List<Statement> statements = new ArrayList<>();
-		statements.add(createNewContextStatement(ast, contextType));
-
-		List<Expression> arguments = invocation.arguments();
-		for (int i = 0; i < arguments.size(); i++) {
-			Tuple tuple = tuples.get(i);
-			if (tuple.isParameter) {
-				FieldAccess access = newFieldAccess(ast, ast.newSimpleName(NEW_CONTEXT_VAR),
-						copySubtree(ast, tuple.variableDeclaration.getName()));
-				Assignment assignment = newAssignment(ast, access, copySubtree(ast, arguments.get(i)));
-				statements.add(ast.newExpressionStatement(assignment));
-			}
-		}
-
-		statements.add(createSetContextToOneStatement(ast));
-		statements.add(createStackPushNewContextStatement(ast));
+		statements.add(createStackPushNewContextStatement(ast, contextType, invocation.arguments()));
 		statements.add(ast.newBreakStatement());
-
 		return statements;
 	}
 
@@ -540,13 +515,10 @@ public class Utilities {
 	private static List<Expression> createContextArgs(AST ast, List<Tuple> tuples) {
 		List<Expression> args = new ArrayList<>();
 		for (Tuple tuple : tuples) {
-			if (tuple.isParameter) {
-				args.add(copySubtree(ast, tuple.variableDeclaration.getName()));
-			} else {
-				args.add(ast.newNumberLiteral());
-			}
+			if (!tuple.isParameter)
+				continue;
+			args.add(copySubtree(ast, tuple.variableDeclaration.getName()));
 		}
-		args.add(ast.newNumberLiteral());
 		return args;
 	}
 
@@ -601,7 +573,6 @@ public class Utilities {
 		List<BodyDeclaration> bodyDeclarations = typeDeclaration.bodyDeclarations();
 		bodyDeclarations.addAll(createFields(ast, tuples));
 		bodyDeclarations.add(createConstructor(ast, contextName, tuples));
-		bodyDeclarations.add(createDefaultConstructor(ast, contextName));
 
 		return typeDeclaration;
 	}
@@ -655,10 +626,6 @@ public class Utilities {
 		return constructor;
 	}
 
-	private static BodyDeclaration createDefaultConstructor(AST ast, String name) {
-		return newConstructor(ast, ast.newSimpleName(name), new ArrayList<SingleVariableDeclaration>(), ast.newBlock());
-	}
-
 	private static BodyDeclaration createConstructor(AST ast, String name, List<Tuple> tuples) {
 		return newConstructor(ast, ast.newSimpleName(name), createConstructorParameters(ast, tuples),
 				createConstructorBody(ast, tuples));
@@ -674,11 +641,11 @@ public class Utilities {
 	private static List<SingleVariableDeclaration> createConstructorParameters(AST ast, List<Tuple> tuples) {
 		List<SingleVariableDeclaration> parameters = new ArrayList<>();
 		for (Tuple tuple : tuples) {
+			if (!tuple.isParameter)
+				continue;
 			parameters.add(newSingleVariableDeclaration(ast, copySubtree(ast, tuple.variableDeclaration.getName()),
 					copySubtree(ast, tuple.type)));
 		}
-		parameters.add(
-				newSingleVariableDeclaration(ast, ast.newSimpleName(SECTION), ast.newPrimitiveType(PrimitiveType.INT)));
 		return parameters;
 	}
 
@@ -693,16 +660,14 @@ public class Utilities {
 		List<Statement> statements = new ArrayList<>();
 
 		for (Tuple tuple : tuples) {
+			if (!tuple.isParameter)
+				continue;
 			FieldAccess fieldAccess = newFieldAccess(ast, ast.newThisExpression(),
 					copySubtree(ast, tuple.variableDeclaration.getName()));
 			Assignment assignment = newAssignment(ast, fieldAccess,
 					copySubtree(ast, tuple.variableDeclaration.getName()));
 			statements.add(ast.newExpressionStatement(assignment));
 		}
-
-		FieldAccess fieldAccess = newFieldAccess(ast, ast.newThisExpression(), ast.newSimpleName(SECTION));
-		Assignment assignment = newAssignment(ast, fieldAccess, ast.newSimpleName(SECTION));
-		statements.add(ast.newExpressionStatement(assignment));
 
 		Block block = ast.newBlock();
 		block.statements().addAll(statements);
