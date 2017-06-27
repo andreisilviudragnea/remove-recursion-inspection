@@ -134,8 +134,6 @@ public class Utilities {
 		} else {
 			statements.add(elseStatement);
 		}
-
-		return;
 	}
 
 	public static Statement getParentStatement(MethodInvocation invocation) {
@@ -318,20 +316,25 @@ public class Utilities {
 		statements.add(createPushInvocation(contextType, ast, tuples));
 
 		Type type = newMethod.getReturnType2();
-		if (type instanceof PrimitiveType) {
+		if (!(type instanceof PrimitiveType)) {
+			createRetDeclaration(ast, statements, type);
+		} else {
 			PrimitiveType primitiveType = (PrimitiveType) type;
 			if (primitiveType.getPrimitiveTypeCode() != PrimitiveType.VOID) {
-				VariableDeclarationFragment fragment = newVariableDeclarationFragment(ast, ast.newSimpleName(RET),
-						ast.newNumberLiteral());
-				VariableDeclarationStatement statement = newVariableDeclarationStatement(ast, fragment,
-						copySubtree(ast, type));
-				statements.add(statement);
+				createRetDeclaration(ast, statements, type);
 			}
 		}
 
 		statements.add(createWhileStatement(method, ast, sections, tuples, contextType));
 
 		return statements;
+	}
+
+	private static void createRetDeclaration(AST ast, List<Statement> statements, Type type) {
+		VariableDeclarationFragment fragment = newVariableDeclarationFragment(ast, ast.newSimpleName(RET),
+				ast.newNumberLiteral());
+		statements.add(newVariableDeclarationStatement(ast, fragment,
+				copySubtree(ast, type)));
 	}
 
 	private static boolean inTuples(List<Tuple> tuples, String name) {
@@ -372,12 +375,11 @@ public class Utilities {
 			newArguments.add(copySubtree(ast, argument));
 		}
 		ClassInstanceCreation creation = newClassInstanceCreation(ast, copySubtree(ast, contextType), newArguments);
-		
+
 		List<Expression> args = new ArrayList<>();
 		args.add(creation);
-		MethodInvocation invocation = newMethodInvocation(ast, ast.newSimpleName(STACK), ast.newSimpleName(PUSH),
-				args);
-		
+		MethodInvocation invocation = newMethodInvocation(ast, ast.newSimpleName(STACK), ast.newSimpleName(PUSH), args);
+
 		return ast.newExpressionStatement(invocation);
 	}
 
@@ -433,7 +435,7 @@ public class Utilities {
 				statements2.add(copySubtree(ast, statement2));
 			}
 
-			LocalVariableReplacer replacer = new LocalVariableReplacer();
+			DeclarationWithInitializerToAsssignmentReplacer replacer = new DeclarationWithInitializerToAsssignmentReplacer();
 			block.accept(replacer);
 
 			LocalVariableReplacer2 replacer2 = new LocalVariableReplacer2();
