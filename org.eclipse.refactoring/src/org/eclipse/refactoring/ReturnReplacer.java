@@ -27,7 +27,7 @@ public class ReturnReplacer extends ASTVisitor {
 
 	private static Statement createIfStatement(AST ast, boolean hasExpression) {
 		MethodInvocation invocation = Utilities.newMethodInvocation(ast, ast.newSimpleName(Utilities.STACK),
-				ast.newSimpleName(SIZE), null);
+				ast.newSimpleName(SIZE));
 
 		InfixExpression expression = ast.newInfixExpression();
 		expression.setOperator(Operator.EQUALS);
@@ -35,7 +35,7 @@ public class ReturnReplacer extends ASTVisitor {
 		expression.setRightOperand(ast.newNumberLiteral("1"));
 
 		MethodInvocation invocation2 = Utilities.newMethodInvocation(ast, ast.newSimpleName(Utilities.STACK),
-				ast.newSimpleName(POP), null);
+				ast.newSimpleName(POP));
 
 		ReturnStatement returnStatement = ast.newReturnStatement();
 		if (hasExpression) {

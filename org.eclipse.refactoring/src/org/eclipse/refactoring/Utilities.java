@@ -1,6 +1,7 @@
 package org.eclipse.refactoring;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -321,16 +322,10 @@ public class Utilities {
 	}
 
 	private static Statement createStackPushNewContextStatement(AST ast, Type contextType, List<Expression> arguments) {
-		List<Expression> newArguments = new ArrayList<>();
-		for (Expression argument : arguments) {
-			newArguments.add(copySubtree(ast, argument));
-		}
-		ClassInstanceCreation creation = newClassInstanceCreation(ast, copySubtree(ast, contextType), newArguments);
-
-		List<Expression> args = new ArrayList<>();
-		args.add(creation);
-		MethodInvocation invocation = newMethodInvocation(ast, ast.newSimpleName(STACK), ast.newSimpleName(PUSH), args);
-
+		ClassInstanceCreation creation = newClassInstanceCreation(ast, copySubtree(ast, contextType),
+				arguments.stream().map(argument -> copySubtree(ast, argument)).collect(Collectors.toList()));
+		MethodInvocation invocation = newMethodInvocation(ast, ast.newSimpleName(STACK), ast.newSimpleName(PUSH),
+				creation);
 		return ast.newExpressionStatement(invocation);
 	}
 
@@ -394,7 +389,7 @@ public class Utilities {
 			for (MethodInvocation invocation : collector.getMethodInvocations()) {
 				replaceInvocationWithStatements(ast, contextType, tuples, invocation);
 			}
-			
+
 			List<Statement> statements2 = block.statements();
 			if (!(statements2.get(statements2.size() - 1) instanceof BreakStatement)) {
 				statements2.add(ast.newBreakStatement());
@@ -426,7 +421,7 @@ public class Utilities {
 	}
 
 	private static VariableDeclarationStatement createStackPeek(Type contextType, AST ast) {
-		MethodInvocation invocation = newMethodInvocation(ast, ast.newSimpleName(STACK), ast.newSimpleName(PEEK), null);
+		MethodInvocation invocation = newMethodInvocation(ast, ast.newSimpleName(STACK), ast.newSimpleName(PEEK));
 		VariableDeclarationFragment fragment = newVariableDeclarationFragment(ast, ast.newSimpleName(CONTEXT_VAR),
 				invocation);
 		VariableDeclarationStatement statement = newVariableDeclarationStatement(ast, fragment,
@@ -435,13 +430,11 @@ public class Utilities {
 	}
 
 	static MethodInvocation newMethodInvocation(AST ast, Expression expression, SimpleName name,
-			List<Expression> arguments) {
+			Expression... arguments) {
 		MethodInvocation invocation = ast.newMethodInvocation();
 		invocation.setExpression(expression);
 		invocation.setName(name);
-		if (arguments != null) {
-			invocation.arguments().addAll(arguments);
-		}
+		((List<Expression>) invocation.arguments()).addAll(Arrays.asList(arguments));
 		return invocation;
 	}
 
@@ -462,12 +455,8 @@ public class Utilities {
 			List<SingleVariableDeclaration> parameters) {
 		ClassInstanceCreation creation = newClassInstanceCreation(ast, copySubtree(ast, contextType),
 				createContextArgs(ast, parameters));
-
-		List<Expression> invocationArgs = new ArrayList<>();
-		invocationArgs.add(creation);
 		MethodInvocation invocation = newMethodInvocation(ast, ast.newSimpleName(STACK), ast.newSimpleName(PUSH),
-				invocationArgs);
-
+				creation);
 		return ast.newExpressionStatement(invocation);
 	}
 
