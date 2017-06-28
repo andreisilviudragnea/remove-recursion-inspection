@@ -265,25 +265,24 @@ public class Utilities {
 
 		MethodDeclaration newMethod = createMethodDeclaration(method, astNode, oldMethod);
 
+		LocalVariableCollector visitor = new LocalVariableCollector();
+		newMethod.accept(visitor);
+		List<Tuple> tuples = visitor.getVariableDeclarations();
+		
 		Block body = newMethod.getBody();
 
 		List<Statement> statements = body.statements();
 
 		simplifyIfStatements(ast, statements);
-
 		extractRecursiveMethodInvocationsToLocalVariables(method, astNode, newMethod, ast);
-
-		LocalVariableCollector visitor = new LocalVariableCollector();
-		newMethod.accept(visitor);
-		List<Tuple> tuples = visitor.getVariableDeclarations();
+		body.accept(new DeclarationWithInitializerToAsssignmentReplacer());
 
 		String methodName = method.getElementName();
 		String contextName = getContextName(methodName);
 
 		listRewrite.insertLast(createTypeDeclaration(contextName, ast, tuples), null);
-
+		
 		List<List<Statement>> sections = getSections(methodName, newMethod);
-		System.out.println(sections);
 
 		statements.clear();
 		Type contextType = getContextType(ast, methodName);
@@ -434,9 +433,6 @@ public class Utilities {
 			for (Statement statement2 : section) {
 				statements2.add(copySubtree(ast, statement2));
 			}
-
-			DeclarationWithInitializerToAsssignmentReplacer replacer = new DeclarationWithInitializerToAsssignmentReplacer();
-			block.accept(replacer);
 
 			LocalVariableReplacer2 replacer2 = new LocalVariableReplacer2();
 			block.accept(replacer2);
