@@ -34,6 +34,7 @@ import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.NodeFinder;
 import org.eclipse.jdt.core.dom.ParameterizedType;
+import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.PrimitiveType;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
@@ -287,7 +288,7 @@ public class Utilities {
 
 		statements.clear();
 		Type contextType = getContextType(ast, methodName);
-		
+
 		statements.add(createStackDeclarationStatement(contextType, ast));
 		statements.add(createPushInvocation(contextType, ast, newMethod.parameters()));
 		addRetDeclaration(ast, newMethod.getReturnType2(), statements);
@@ -366,17 +367,18 @@ public class Utilities {
 		return ast.newExpressionStatement(invocation);
 	}
 
-	private static List<Statement> replaceInvocationWithStatements(AST ast, Type contextType, List<Tuple> tuples,
+	private static List<Statement> createInvocationStatements(AST ast, Type contextType, List<Tuple> tuples,
 			MethodInvocation invocation) {
 		List<Statement> statements = new ArrayList<>();
+		statements.add(createContextIncrementStatement(ast));
 		statements.add(createStackPushNewContextStatement(ast, contextType, invocation.arguments()));
 		statements.add(ast.newBreakStatement());
 		return statements;
 	}
 
-	private static void replaceInvocationWithStatements2(AST ast, Type contextType, List<Tuple> tuples,
+	private static void replaceInvocationWithStatements(AST ast, Type contextType, List<Tuple> tuples,
 			MethodInvocation invocation) {
-		List<Statement> statements = replaceInvocationWithStatements(ast, contextType, tuples, invocation);
+		List<Statement> statements = createInvocationStatements(ast, contextType, tuples, invocation);
 		Statement parentStatement = getParentStatement(invocation);
 		Block parentBlock = getParentBlock(invocation);
 		List<Statement> blockStatements = parentBlock.statements();
@@ -412,8 +414,6 @@ public class Utilities {
 			Block block = ast.newBlock();
 			List<Statement> statements2 = block.statements();
 
-			statements2.add(createContextIncrementStatement(ast));
-
 			for (Statement statement2 : section) {
 				statements2.add(copySubtree(ast, statement2));
 			}
@@ -431,9 +431,8 @@ public class Utilities {
 
 			MethodInvocationsCollector collector = new MethodInvocationsCollector(method.getElementName());
 			block.accept(collector);
-			List<MethodInvocation> invocations = collector.getMethodInvocations();
-			for (MethodInvocation invocation : invocations) {
-				replaceInvocationWithStatements2(ast, contextType, tuples, invocation);
+			for (MethodInvocation invocation : collector.getMethodInvocations()) {
+				replaceInvocationWithStatements(ast, contextType, tuples, invocation);
 			}
 
 			if (!(statements2.get(statements2.size() - 1) instanceof BreakStatement)) {
@@ -498,7 +497,8 @@ public class Utilities {
 		return parameters.stream().map(parameter -> copySubtree(ast, parameter.getName())).collect(Collectors.toList());
 	}
 
-	private static Statement createPushInvocation(Type contextType, AST ast, List<SingleVariableDeclaration> parameters) {
+	private static Statement createPushInvocation(Type contextType, AST ast,
+			List<SingleVariableDeclaration> parameters) {
 		ClassInstanceCreation creation = newClassInstanceCreation(ast, copySubtree(ast, contextType),
 				createContextArgs(ast, parameters));
 
