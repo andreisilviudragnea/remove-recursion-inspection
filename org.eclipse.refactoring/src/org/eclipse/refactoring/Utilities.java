@@ -25,7 +25,6 @@ import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -257,7 +256,7 @@ public class Utilities {
 		Type contextType = getContextType(ast, methodName);
 
 		statements.add(createStackDeclarationStatement(contextType, ast, importRewrite));
-		statements.add(createPushInvocation(contextType, ast, newMethod.parameters()));
+		statements.add(createPush(ast, contextType, createContextArgs(ast, newMethod.parameters())));
 		addRetDeclaration(ast, newMethod.getReturnType2(), statements);
 		statements.add(createWhileStatement(method, ast, sections, tuples, contextType));
 
@@ -321,19 +320,17 @@ public class Utilities {
 		}
 	}
 
-	private static Statement createStackPushNewContextStatement(AST ast, Type contextType, List<Expression> arguments) {
-		ClassInstanceCreation creation = newClassInstanceCreation(ast, copySubtree(ast, contextType),
-				arguments.stream().map(argument -> copySubtree(ast, argument)).collect(Collectors.toList()));
-		MethodInvocation invocation = newMethodInvocation(ast, ast.newSimpleName(STACK), ast.newSimpleName(PUSH),
-				creation);
-		return ast.newExpressionStatement(invocation);
+	private static Statement createPush(AST ast, Type contextType, List<Expression> arguments) {
+		ClassInstanceCreation creation = newClassInstanceCreation(ast, copySubtree(ast, contextType), arguments);
+		return ast.newExpressionStatement(
+				newMethodInvocation(ast, ast.newSimpleName(STACK), ast.newSimpleName(PUSH), creation));
 	}
 
 	private static List<Statement> createInvocationStatements(AST ast, Type contextType, List<Tuple> tuples,
 			MethodInvocation invocation) {
 		List<Statement> statements = new ArrayList<>();
 		statements.add(createContextIncrementStatement(ast));
-		statements.add(createStackPushNewContextStatement(ast, contextType, invocation.arguments()));
+		statements.add(createPush(ast, contextType, copyList(ast, (List<Expression>) invocation.arguments())));
 		statements.add(ast.newBreakStatement());
 		return statements;
 	}
@@ -373,7 +370,7 @@ public class Utilities {
 			switchCase.setExpression(ast.newNumberLiteral(Integer.toString(i)));
 			statements.add(switchCase);
 
-			Block block = newBlock(ast, section.stream().map(s -> copySubtree(ast, s)).collect(Collectors.toList()));
+			Block block = newBlock(ast, copyList(ast, section));
 
 			LocalVariableReplacer2 replacer2 = new LocalVariableReplacer2();
 			block.accept(replacer2);
@@ -447,17 +444,12 @@ public class Utilities {
 		return creation;
 	}
 
-	private static List<Expression> createContextArgs(AST ast, List<SingleVariableDeclaration> parameters) {
-		return parameters.stream().map(parameter -> copySubtree(ast, parameter.getName())).collect(Collectors.toList());
+	private static <T extends ASTNode> List<T> copyList(AST ast, List<T> list) {
+		return list.stream().map(e -> copySubtree(ast, e)).collect(Collectors.toList());
 	}
 
-	private static Statement createPushInvocation(Type contextType, AST ast,
-			List<SingleVariableDeclaration> parameters) {
-		ClassInstanceCreation creation = newClassInstanceCreation(ast, copySubtree(ast, contextType),
-				createContextArgs(ast, parameters));
-		MethodInvocation invocation = newMethodInvocation(ast, ast.newSimpleName(STACK), ast.newSimpleName(PUSH),
-				creation);
-		return ast.newExpressionStatement(invocation);
+	private static List<Expression> createContextArgs(AST ast, List<SingleVariableDeclaration> parameters) {
+		return parameters.stream().map(parameter -> copySubtree(ast, parameter.getName())).collect(Collectors.toList());
 	}
 
 	private static Statement createStackDeclarationStatement(Type contextType, AST ast, ImportRewrite importRewrite) {
@@ -535,10 +527,6 @@ public class Utilities {
 		return fields;
 	}
 
-	private static <T extends ASTNode> T createCopyTarget(ASTRewrite astRewrite, T node) {
-		return (T) astRewrite.createCopyTarget(node);
-	}
-
 	public static <T extends ASTNode> T copySubtree(AST target, T node) {
 		return (T) ASTNode.copySubtree(target, node);
 	}
@@ -560,11 +548,6 @@ public class Utilities {
 		return constructor;
 	}
 
-	private static List<SingleVariableDeclaration> createConstructorParameters(AST ast,
-			List<SingleVariableDeclaration> parameters) {
-		return parameters.stream().map(parameter -> copySubtree(ast, parameter)).collect(Collectors.toList());
-	}
-
 	private static Block createConstructorBody(AST ast, List<SingleVariableDeclaration> parameters) {
 		return newBlock(ast, parameters.stream().map(parameter -> {
 			SimpleName name = parameter.getName();
@@ -575,7 +558,7 @@ public class Utilities {
 	}
 
 	private static BodyDeclaration createConstructor(AST ast, String name, List<SingleVariableDeclaration> parameters) {
-		return newConstructor(ast, ast.newSimpleName(name), createConstructorParameters(ast, parameters),
+		return newConstructor(ast, ast.newSimpleName(name), copyList(ast, parameters),
 				createConstructorBody(ast, parameters));
 	}
 
