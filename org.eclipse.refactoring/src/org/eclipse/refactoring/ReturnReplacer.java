@@ -26,15 +26,15 @@ public class ReturnReplacer extends ASTVisitor {
 	}
 
 	private static Statement createIfStatement(AST ast, boolean hasExpression) {
-		MethodInvocation invocation = Utilities.newMethodInvocation(ast, ast.newSimpleName(Utilities.STACK),
+		MethodInvocation stackSize = Utilities.newMethodInvocation(ast, ast.newSimpleName(Utilities.STACK),
 				ast.newSimpleName(SIZE));
 
 		InfixExpression expression = ast.newInfixExpression();
+		expression.setLeftOperand(stackSize);
 		expression.setOperator(Operator.EQUALS);
-		expression.setLeftOperand(invocation);
 		expression.setRightOperand(ast.newNumberLiteral("1"));
 
-		MethodInvocation invocation2 = Utilities.newMethodInvocation(ast, ast.newSimpleName(Utilities.STACK),
+		MethodInvocation stackPop = Utilities.newMethodInvocation(ast, ast.newSimpleName(Utilities.STACK),
 				ast.newSimpleName(POP));
 
 		ReturnStatement returnStatement = ast.newReturnStatement();
@@ -45,7 +45,7 @@ public class ReturnReplacer extends ASTVisitor {
 		IfStatement statement = ast.newIfStatement();
 		statement.setExpression(expression);
 		statement.setThenStatement(returnStatement);
-		statement.setElseStatement(ast.newExpressionStatement(invocation2));
+		statement.setElseStatement(ast.newExpressionStatement(stackPop));
 
 		return statement;
 	}

@@ -244,6 +244,14 @@ public class Utilities {
 		simplifyIfStatements(ast, statements);
 		extractRecursiveMethodInvocationsToLocalVariables(method, astNode, newMethod, ast);
 		body.accept(new DeclarationWithInitializerToAsssignmentReplacer());
+		
+		SimpleNameCollector collector = new SimpleNameCollector();
+		body.accept(collector);
+		for (SimpleName simpleName : collector.getSimpleNames()) {
+			replaceSimpleNameWithContextAccess(simpleName, tuples);
+		}
+		
+		body.accept(new ReturnReplacer());
 
 		String methodName = method.getElementName();
 		String contextName = getContextName(methodName);
@@ -371,15 +379,6 @@ public class Utilities {
 			statements.add(switchCase);
 
 			Block block = newBlock(ast, copyList(ast, section));
-
-			LocalVariableReplacer2 replacer2 = new LocalVariableReplacer2();
-			block.accept(replacer2);
-			for (SimpleName simpleName : replacer2.getSimpleNames()) {
-				replaceSimpleNameWithContextAccess(simpleName, tuples);
-			}
-
-			ReturnReplacer replacer3 = new ReturnReplacer();
-			block.accept(replacer3);
 
 			MethodInvocationsCollector collector = new MethodInvocationsCollector(method.getElementName());
 			block.accept(collector);
