@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -69,8 +70,8 @@ public class Utilities {
 	private static final String ITERATIVE = "Iterative";
 	private static final String DEQUE = "Deque";
 	private static final String LINKED_LIST = "LinkedList";
-	private static final String JAVA_UTIL_LINKED_LIST = "java.util.LinkedList";
-	private static final String JAVA_UTIL_DEQUE = "java.util.Deque";
+	private static final String JAVA_UTIL_LINKED_LIST = "java.util." + LINKED_LIST;
+	private static final String JAVA_UTIL_DEQUE = "java.util." + DEQUE;
 	static final String PEEK = "peek";
 	static final String STACK = "stack";
 
@@ -263,12 +264,12 @@ public class Utilities {
 		ListRewrite listRewrite = astRewrite.getListRewrite(declaringTypeNode,
 				TypeDeclaration.BODY_DECLARATIONS_PROPERTY);
 
-		MethodDeclaration newMethod = createMethodDeclaration(method, astNode, oldMethod);
+		MethodDeclaration newMethod = createMethodDeclaration(astNode, oldMethod);
 
 		LocalVariableCollector visitor = new LocalVariableCollector();
-		newMethod.accept(visitor);
+		oldMethod.accept(visitor);
 		List<Tuple> tuples = visitor.getVariableDeclarations();
-		
+
 		Block body = newMethod.getBody();
 
 		List<Statement> statements = body.statements();
@@ -281,12 +282,16 @@ public class Utilities {
 		String contextName = getContextName(methodName);
 
 		listRewrite.insertLast(createTypeDeclaration(contextName, ast, tuples), null);
-		
+
 		List<List<Statement>> sections = getSections(methodName, newMethod);
 
 		statements.clear();
 		Type contextType = getContextType(ast, methodName);
-		statements.addAll(createHeaderStatements(method, ast, newMethod, tuples, contextType, sections));
+		
+		statements.add(createStackDeclarationStatement(contextType, ast));
+		statements.add(createPushInvocation(contextType, ast, newMethod.parameters()));
+		addRetDeclaration(ast, newMethod.getReturnType2(), statements);
+		statements.add(createWhileStatement(method, ast, sections, tuples, contextType));
 
 		listRewrite.insertLast(newMethod, null);
 
@@ -307,33 +312,12 @@ public class Utilities {
 		return statement;
 	}
 
-	private static List<Statement> createHeaderStatements(IMethod method, AST ast, MethodDeclaration newMethod,
-			List<Tuple> tuples, Type contextType, List<List<Statement>> sections) {
-		List<Statement> statements = new ArrayList<>();
-
-		statements.add(createStackDeclarationStatement(contextType, ast));
-		statements.add(createPushInvocation(contextType, ast, tuples));
-
-		Type type = newMethod.getReturnType2();
-		if (!(type instanceof PrimitiveType)) {
-			createRetDeclaration(ast, statements, type);
-		} else {
-			PrimitiveType primitiveType = (PrimitiveType) type;
-			if (primitiveType.getPrimitiveTypeCode() != PrimitiveType.VOID) {
-				createRetDeclaration(ast, statements, type);
-			}
-		}
-
-		statements.add(createWhileStatement(method, ast, sections, tuples, contextType));
-
-		return statements;
-	}
-
-	private static void createRetDeclaration(AST ast, List<Statement> statements, Type type) {
+	private static void addRetDeclaration(AST ast, Type type, List<Statement> statements) {
+		if (type instanceof PrimitiveType && ((PrimitiveType) type).getPrimitiveTypeCode() == PrimitiveType.VOID)
+			return;
 		VariableDeclarationFragment fragment = newVariableDeclarationFragment(ast, ast.newSimpleName(RET),
 				ast.newNumberLiteral());
-		statements.add(newVariableDeclarationStatement(ast, fragment,
-				copySubtree(ast, type)));
+		statements.add(newVariableDeclarationStatement(ast, fragment, copySubtree(ast, type)));
 	}
 
 	private static boolean inTuples(List<Tuple> tuples, String name) {
@@ -510,19 +494,13 @@ public class Utilities {
 		return creation;
 	}
 
-	private static List<Expression> createContextArgs(AST ast, List<Tuple> tuples) {
-		List<Expression> args = new ArrayList<>();
-		for (Tuple tuple : tuples) {
-			if (!tuple.isParameter)
-				continue;
-			args.add(copySubtree(ast, tuple.variableDeclaration.getName()));
-		}
-		return args;
+	private static List<Expression> createContextArgs(AST ast, List<SingleVariableDeclaration> parameters) {
+		return parameters.stream().map(parameter -> copySubtree(ast, parameter.getName())).collect(Collectors.toList());
 	}
 
-	private static Statement createPushInvocation(Type contextType, AST ast, List<Tuple> tuples) {
+	private static Statement createPushInvocation(Type contextType, AST ast, List<SingleVariableDeclaration> parameters) {
 		ClassInstanceCreation creation = newClassInstanceCreation(ast, copySubtree(ast, contextType),
-				createContextArgs(ast, tuples));
+				createContextArgs(ast, parameters));
 
 		List<Expression> invocationArgs = new ArrayList<>();
 		invocationArgs.add(creation);
@@ -543,8 +521,8 @@ public class Utilities {
 		return newVariableDeclarationStatement(ast, fragment, dequeType);
 	}
 
-	private static MethodDeclaration createMethodDeclaration(IMethod method, ASTNode astNode,
-			MethodDeclaration oldMethod) throws JavaModelException {
+	private static MethodDeclaration createMethodDeclaration(ASTNode astNode, MethodDeclaration oldMethod)
+			throws JavaModelException {
 		AST ast = astNode.getAST();
 		MethodDeclaration newMethod = copySubtree(ast, oldMethod);
 		newMethod.setName(ast.newSimpleName(newMethod.getName().getFullyQualifiedName() + ITERATIVE));
