@@ -9,7 +9,7 @@ class ContextClassGenerator {
     private static final String CONTEXT = "Context";
     private static final String THIS = "this";
 
-    static PsiClass createContextClass(PsiElementFactory factory, PsiMethod method, List<PsiVariable> variables) {
+    static PsiClass createContextClass(PsiElementFactory factory, PsiMethod method, List<Variable> variables) {
         final PsiClass psiClass = factory.createClass(getContextClassName(method.getName()));
 
         setModifiers(psiClass);
@@ -40,8 +40,8 @@ class ContextClassGenerator {
         psiClass.add(constructor);
     }
 
-    private static void addFields(PsiElementFactory factory, PsiClass psiClass, List<PsiVariable> variables) {
-        for (PsiVariable variable : variables) {
+    private static void addFields(PsiElementFactory factory, PsiClass psiClass, List<Variable> variables) {
+        for (Variable variable : variables) {
             final String name = variable.getName();
             assert name != null;
             psiClass.add(factory.createField(name, variable.getType()));

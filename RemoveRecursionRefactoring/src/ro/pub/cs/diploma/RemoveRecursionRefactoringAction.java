@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RemoveRecursionRefactoringAction extends AnAction {
@@ -35,7 +36,7 @@ public class RemoveRecursionRefactoringAction extends AnAction {
         final PsiElementFactory factory = JavaPsiFacade.getElementFactory(project);
         WriteCommandAction.runWriteCommandAction(project, () -> {
             assert psiClass != null;
-            final List<PsiVariable> variables = Visitors.extractVariables(factory, method);
+            List<Variable> variables = new ArrayList<>();
             psiClass.addAfter(IterativeMethodGenerator.createIterativeMethod(project, factory, method, variables),
                     method);
             psiClass.addAfter(ContextClassGenerator.createContextClass(factory, method, variables), method);

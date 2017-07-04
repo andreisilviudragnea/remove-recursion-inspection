@@ -8,23 +8,22 @@ import java.util.List;
 class Visitors {
     private static final String SECTION = "section";
 
-    static List<PsiVariable> extractVariables(PsiElementFactory factory, PsiMethod method) {
-        final List<PsiVariable> variables = new ArrayList<>();
+    static void extractVariables(PsiMethod method, PsiCodeBlock block, List<Variable> variables) {
         method.accept(new JavaRecursiveElementWalkingVisitor() {
-            @Override
-            public void visitLocalVariable(PsiLocalVariable variable) {
-                super.visitLocalVariable(variable);
-                variables.add(variable);
-            }
-
             @Override
             public void visitParameter(PsiParameter parameter) {
                 super.visitParameter(parameter);
-                variables.add(parameter);
+                variables.add(new Variable(parameter.getName(), parameter.getType()));
             }
         });
-        variables.add(factory.createField(SECTION, PsiType.INT));
-        return variables;
+        block.accept(new JavaRecursiveElementWalkingVisitor() {
+            @Override
+            public void visitLocalVariable(PsiLocalVariable variable) {
+                super.visitLocalVariable(variable);
+                variables.add(new Variable(variable.getName(), variable.getType()));
+            }
+        });
+        variables.add(new Variable(SECTION, PsiType.INT));
     }
 
     static List<PsiMethodCallExpression> extractRecursiveCalls(PsiCodeBlock block, String name) {

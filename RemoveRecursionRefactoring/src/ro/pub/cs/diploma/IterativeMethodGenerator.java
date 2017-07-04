@@ -22,10 +22,11 @@ class IterativeMethodGenerator {
 
     @Nullable
     static PsiMethod createIterativeMethod(Project project, PsiElementFactory factory, PsiMethod oldMethod,
-                                           List<PsiVariable> variables) {
+                                           List<Variable> variables) {
         final String name = oldMethod.getName();
         final String contextClassName = ContextClassGenerator.getContextClassName(name);
-        final PsiMethod method = factory.createMethod(name + ITERATIVE, oldMethod.getReturnType());
+        final PsiType returnType = oldMethod.getReturnType();
+        final PsiMethod method = factory.createMethod(name + ITERATIVE, returnType);
         final PsiCodeBlock body = method.getBody();
 
         if (body == null)
@@ -33,36 +34,43 @@ class IterativeMethodGenerator {
 
         final PsiCodeBlock block = factory.createCodeBlockFromText(oldMethod.getBody().getText(), null);
 
+        Visitors.replaceSingleStatementsWithBlockStatements(factory, block);
+        extractRecursiveCallsToStatements(factory, block, name, returnType);
+
+        Visitors.extractVariables(oldMethod, block, variables);
+
         copyParameters(oldMethod, method);
         copyModifiers(oldMethod, method);
 
-        Visitors.replaceSingleStatementsWithBlockStatements(factory, block);
-
-        simplifyIfStatement(factory, block);
-        extractRecursiveCallsToStatements(factory, block, name);
         replaceDeclarationsWithInitializersWithAssignments(factory, block);
-
-        replaceReturnStatements(factory, block);
         replaceIdentifierWithContextAccess(factory, variables, block);
 
-        final List<PsiCodeBlock> sections = extractSections(factory, block, name);
+        final BasicBlocksGenerator basicBlocksGenerator = new BasicBlocksGenerator(factory, name, contextClassName,
+                returnType);
+        block.accept(basicBlocksGenerator);
+        final List<BasicBlocksGenerator.Pair> blocks = basicBlocksGenerator.getBlocks();
+        for (BasicBlocksGenerator.Pair codeBlock : blocks) {
+            replaceReturnStatements(factory, codeBlock.getBlock());
+        }
+
+//        simplifyIfStatement(factory, block);
+
+//        final List<PsiCodeBlock> sections = extractSections(factory, block, name);
 
         body.add(createStackDeclaration(project, factory, contextClassName));
         body.add(createPushStatement(factory, contextClassName, method));
         addRetDeclaration(factory, method);
 
         final List<String> cases = new ArrayList<>();
-        for (int i = 0; i < sections.size(); i++) {
-            final PsiCodeBlock section = sections.get(i);
+        for (final BasicBlocksGenerator.Pair section : blocks) {
+            //            replaceRecursiveCallsWithPushStatements(factory, name, contextClassName, section);
 
-            replaceRecursiveCallsWithPushStatements(factory, name, contextClassName, section);
+//            final PsiStatement[] statements = section.getStatements();
+//            if (!(statements[statements.length - 1] instanceof PsiBreakStatement)) {
+//                section.add(factory.createStatementFromText("break;", null));
+//            }
 
-            final PsiStatement[] statements = section.getStatements();
-            if (!(statements[statements.length - 1] instanceof PsiBreakStatement)) {
-                section.add(factory.createStatementFromText("break;", null));
-            }
-
-            cases.add("case " + i + ": " + section.getText());
+            cases.add("case " + section.getId() + ": " + section.getBlock().getText());
         }
 
         body.add(factory.createStatementFromText("while (true) {" +
@@ -96,7 +104,7 @@ class IterativeMethodGenerator {
         }
     }
 
-    private static void replaceIdentifierWithContextAccess(PsiElementFactory factory, List<PsiVariable> variables,
+    private static void replaceIdentifierWithContextAccess(PsiElementFactory factory, List<Variable> variables,
                                                            PsiCodeBlock block) {
         for (PsiIdentifier identifier : Visitors.extractIdentifiers(block)) {
             if (!inVariables(variables, identifier))
@@ -105,8 +113,8 @@ class IterativeMethodGenerator {
         }
     }
 
-    private static boolean inVariables(List<PsiVariable> variables, PsiIdentifier identifier) {
-        for (PsiVariable variable : variables) {
+    private static boolean inVariables(List<Variable> variables, PsiIdentifier identifier) {
+        for (Variable variable : variables) {
             if (variable.getName().equals(identifier.getText())) {
                 return true;
             }
@@ -199,8 +207,10 @@ class IterativeMethodGenerator {
         return sections;
     }
 
-    private static void extractRecursiveCallsToStatements(PsiElementFactory factory, PsiCodeBlock block, String name) {
+    private static void extractRecursiveCallsToStatements(PsiElementFactory factory, PsiCodeBlock block, String name,
+                                                          PsiType returnType) {
         final List<PsiMethodCallExpression> calls = Visitors.extractRecursiveCalls(block, name);
+        int count = 0;
         for (PsiMethodCallExpression call : calls) {
             final PsiStatement parentStatement = PsiTreeUtil.getParentOfType(call, PsiStatement.class, true);
             final PsiElement parent = call.getParent();
@@ -208,8 +218,9 @@ class IterativeMethodGenerator {
                 continue;
             final PsiCodeBlock parentBlock = PsiTreeUtil.getParentOfType(call, PsiCodeBlock.class, true);
             assert parentBlock != null;
-            parentBlock.addBefore(factory.createStatementFromText(call.getText() + ";", null), parentStatement);
-            call.replace(factory.createExpressionFromText("ret", null));
+            final String temp = "temp" + count++;
+            parentBlock.addBefore(factory.createVariableDeclarationStatement(temp, returnType, call), parentStatement);
+            call.replace(factory.createExpressionFromText(temp, null));
         }
     }
 
