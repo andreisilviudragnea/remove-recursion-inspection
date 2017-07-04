@@ -7,12 +7,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
-    public class Pair {
+class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
+    class Pair {
         private PsiCodeBlock block;
         private int id;
 
-        public Pair(PsiCodeBlock block, int id) {
+        Pair(PsiCodeBlock block, int id) {
             this.block = block;
             this.id = id;
         }
@@ -32,7 +32,6 @@ public class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     private PsiStatement currentStatement;
     private PsiElementFactory factory;
     private int blockCounter;
-    //    private int currentJumpIndex;
     private String methodName;
     private String contextClassName;
     private PsiType returnType;
@@ -87,7 +86,6 @@ public class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
 
         final Pair mergePair = new Pair(factory.createCodeBlock(), blockCounter++);
         blocks.add(mergePair);
-//        currentJumpIndex = mergePair.getId();
         if (elseBranch == null) {
             elseJump = "else\ncontext.section = " + mergePair.getId() + ";";
         }
