@@ -36,7 +36,7 @@ public class RemoveRecursionRefactoringAction extends AnAction {
         final PsiElementFactory factory = JavaPsiFacade.getElementFactory(project);
         WriteCommandAction.runWriteCommandAction(project, () -> {
             assert psiClass != null;
-            List<Variable> variables = new ArrayList<>();
+            final List<Variable> variables = Visitors.extractVariables(method);
             psiClass.addAfter(IterativeMethodGenerator.createIterativeMethod(project, factory, method, variables),
                     method);
             psiClass.addAfter(ContextClassGenerator.createContextClass(factory, method, variables), method);

@@ -87,29 +87,56 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
             index = elsePair.getId();
         }
 
-        currentPair.getBlock().add(factory.createStatementFromText("if (" + statement.getCondition().getText() +
-                ")\ncontext.section = " + thenPair.getId() + ";\nelse\ncontext.section = " + index + ";", null));
-        currentPair.getBlock().add(factory.createStatementFromText("break;", null));
+        createConditionalJump(statement.getCondition(), thenPair.getId(), index);
 
         currentPair = thenPair;
         statement.getThenBranch().accept(this);
-        addBreakToMergeBlock(mergePair);
+        addBreakToMergeBlock(mergePair.getId());
 
         if (elseBranch != null) {
             currentPair = elsePair;
             elseBranch.accept(this);
-            addBreakToMergeBlock(mergePair);
+            addBreakToMergeBlock(mergePair.getId());
         }
 
         currentPair = mergePair;
     }
 
-    private void addBreakToMergeBlock(final Pair mergePair) {
+    private void createConditionalJump(PsiExpression condition, int thenIndex, int elseIndex) {
         final PsiCodeBlock block = currentPair.getBlock();
-        final PsiStatement[] statements = block.getStatements();
+        block.add(factory.createStatementFromText(
+                "context.section = " + condition.getText() + "? " + thenIndex + " : " + elseIndex + ";", null));
+        block.add(factory.createStatementFromText("break;", null));
+    }
+
+    private void createJump(int index) {
+        final PsiCodeBlock block = currentPair.getBlock();
+        block.add(factory.createStatementFromText("context.section = " + index + ";", null));
+        block.add(factory.createStatementFromText("break;", null));
+    }
+
+    @Override
+    public void visitWhileStatement(PsiWhileStatement statement) {
+        final Pair conditionPair = newPair();
+        final Pair bodyPair = newPair();
+        final Pair mergePair = newPair();
+
+        createJump(conditionPair.getId());
+
+        currentPair = conditionPair;
+        createConditionalJump(statement.getCondition(), bodyPair.getId(), mergePair.getId());
+
+        currentPair = bodyPair;
+        statement.getBody().accept(this);
+        addBreakToMergeBlock(conditionPair.getId());
+
+        currentPair = mergePair;
+    }
+
+    private void addBreakToMergeBlock(int index) {
+        final PsiStatement[] statements = currentPair.getBlock().getStatements();
         if (statements.length == 0 || !(statements[statements.length - 1] instanceof PsiReturnStatement)) {
-            block.add(factory.createStatementFromText("context.section = " + mergePair.getId() + ";", null));
-            block.add(factory.createStatementFromText("break;", null));
+            createJump(index);
         }
     }
 

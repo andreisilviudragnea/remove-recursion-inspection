@@ -8,15 +8,15 @@ import java.util.List;
 class Visitors {
     private static final String SECTION = "section";
 
-    static void extractVariables(PsiMethod method, PsiCodeBlock block, List<Variable> variables) {
+    static List<Variable> extractVariables(PsiMethod method) {
+        List<Variable> variables = new ArrayList<>();
         method.accept(new JavaRecursiveElementWalkingVisitor() {
             @Override
             public void visitParameter(PsiParameter parameter) {
                 super.visitParameter(parameter);
                 variables.add(new Variable(parameter.getName(), parameter.getType()));
             }
-        });
-        block.accept(new JavaRecursiveElementWalkingVisitor() {
+
             @Override
             public void visitLocalVariable(PsiLocalVariable variable) {
                 super.visitLocalVariable(variable);
@@ -24,6 +24,7 @@ class Visitors {
             }
         });
         variables.add(new Variable(SECTION, PsiType.INT));
+        return variables;
     }
 
     static List<PsiMethodCallExpression> extractRecursiveCalls(PsiCodeBlock block, String name) {

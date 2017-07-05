@@ -20,7 +20,6 @@ class IterativeMethodGenerator {
     private static final String JAVA_UTIL_LINKED_LIST = "java.util.LinkedList";
     private static final String NEW = "new";
 
-    @Nullable
     static PsiMethod createIterativeMethod(Project project, PsiElementFactory factory, PsiMethod oldMethod,
                                            List<Variable> variables) {
         final String name = oldMethod.getName();
@@ -31,12 +30,10 @@ class IterativeMethodGenerator {
         copyParameters(oldMethod, method);
         copyModifiers(oldMethod, method);
 
-        final PsiCodeBlock block = factory.createCodeBlockFromText(oldMethod.getBody().getText(), null);
+        final PsiCodeBlock block = factory.createCodeBlockFromText(oldMethod.getBody().getText(), oldMethod);
 
         Visitors.replaceSingleStatementsWithBlockStatements(factory, block);
-        extractRecursiveCallsToStatements(factory, block, name, returnType);
-
-        Visitors.extractVariables(oldMethod, block, variables);
+        extractRecursiveCallsToStatements(factory, block, name, returnType, variables);
 
         replaceDeclarationsWithInitializersWithAssignments(factory, block);
         replaceIdentifierWithContextAccess(factory, variables, block);
@@ -130,7 +127,7 @@ class IterativeMethodGenerator {
     }
 
     private static void extractRecursiveCallsToStatements(PsiElementFactory factory, PsiCodeBlock block, String name,
-                                                          PsiType returnType) {
+                                                          PsiType returnType, List<Variable> variables) {
         int count = 0;
         for (PsiMethodCallExpression call : Visitors.extractRecursiveCalls(block, name)) {
             final PsiStatement parentStatement = PsiTreeUtil.getParentOfType(call, PsiStatement.class, true);
@@ -138,6 +135,7 @@ class IterativeMethodGenerator {
                 continue;
             final PsiCodeBlock parentBlock = PsiTreeUtil.getParentOfType(call, PsiCodeBlock.class, true);
             final String temp = "temp" + count++;
+            variables.add(new Variable(temp, returnType));
             parentBlock.addBefore(factory.createVariableDeclarationStatement(temp, returnType, call), parentStatement);
             call.replace(factory.createExpressionFromText(temp, null));
         }
