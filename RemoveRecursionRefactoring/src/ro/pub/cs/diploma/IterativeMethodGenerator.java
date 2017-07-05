@@ -30,7 +30,9 @@ class IterativeMethodGenerator {
         copyParameters(oldMethod, method);
         copyModifiers(oldMethod, method);
 
-        final PsiCodeBlock block = factory.createCodeBlockFromText(oldMethod.getBody().getText(), oldMethod);
+        final PsiCodeBlock block = (PsiCodeBlock) oldMethod.getBody().copy();
+
+        Visitors.replaceForStatementsWithWhileStatements(block);
 
         Visitors.replaceSingleStatementsWithBlockStatements(factory, block);
         extractRecursiveCallsToStatements(factory, block, name, returnType, variables);

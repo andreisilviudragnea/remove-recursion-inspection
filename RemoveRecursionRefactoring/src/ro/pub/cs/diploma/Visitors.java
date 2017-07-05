@@ -120,4 +120,14 @@ class Visitors {
             }
         });
     }
+
+    static void replaceForStatementsWithWhileStatements(PsiCodeBlock block) {
+        block.accept(new JavaRecursiveElementVisitor() {
+            @Override
+            public void visitForStatement(PsiForStatement statement) {
+                super.visitForStatement(statement);
+                Refactorings.replaceForStatementWithWhileStatement(statement);
+            }
+        });
+    }
 }
