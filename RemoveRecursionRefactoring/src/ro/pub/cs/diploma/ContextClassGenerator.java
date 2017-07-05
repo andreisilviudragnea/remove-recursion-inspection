@@ -42,7 +42,8 @@ class ContextClassGenerator {
 
     private static void addFields(PsiElementFactory factory, PsiClass psiClass, List<Variable> variables) {
         for (Variable variable : variables) {
-            psiClass.add(factory.createField(variable.getName(), variable.getType()));
+            psiClass.add(factory.createFieldFromText(
+                    variable.getType() + " " + variable.getName() + ";", null));
         }
     }
 

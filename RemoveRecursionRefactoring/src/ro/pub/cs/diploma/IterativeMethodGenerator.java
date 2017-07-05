@@ -5,7 +5,6 @@ import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,13 +31,22 @@ class IterativeMethodGenerator {
 
         final PsiCodeBlock block = (PsiCodeBlock) oldMethod.getBody().copy();
 
+        Visitors.replaceForEachStatementsWithForStatements(block);
         Visitors.replaceForStatementsWithWhileStatements(block);
+
+        block.accept(new JavaRecursiveElementVisitor() {
+            @Override
+            public void visitLocalVariable(PsiLocalVariable variable) {
+                super.visitLocalVariable(variable);
+                variables.add(new Variable(variable.getName(), variable.getType().getPresentableText()));
+            }
+        });
 
         Visitors.replaceSingleStatementsWithBlockStatements(factory, block);
         extractRecursiveCallsToStatements(factory, block, name, returnType, variables);
 
-        replaceDeclarationsWithInitializersWithAssignments(factory, block);
         replaceIdentifierWithContextAccess(factory, variables, block);
+        replaceDeclarationsWithInitializersWithAssignments(factory, block);
 
         final BasicBlocksGenerator basicBlocksGenerator = new BasicBlocksGenerator(factory, name, contextClassName,
                 returnType);
@@ -65,11 +73,25 @@ class IterativeMethodGenerator {
 
     private static void replaceIdentifierWithContextAccess(PsiElementFactory factory, List<Variable> variables,
                                                            PsiCodeBlock block) {
-        Visitors.extractIdentifiers(block).stream()
-                .filter(identifier -> variables.stream().anyMatch(
-                        variable -> variable.getName().equals(identifier.getText())))
-                .forEach(identifier -> identifier.replace(
-                        factory.createExpressionFromText("context." + identifier.getText(), null)));
+        for (PsiReferenceExpression expression : Visitors.extractReferenceExpressions(block)) {
+            final PsiElement element = expression.resolve();
+            if (element instanceof PsiLocalVariable) {
+                PsiLocalVariable variable = (PsiLocalVariable) element;
+                if (variables.stream().anyMatch(variable1 -> variable1.getName().equals(variable.getName()))) {
+                    final PsiElement nameElement = expression.getReferenceNameElement();
+                    nameElement.replace(
+                            factory.createExpressionFromText("context." + nameElement.getText(), null));
+                }
+            }
+            if (element instanceof PsiParameter) {
+                PsiParameter parameter = (PsiParameter) element;
+                if (variables.stream().anyMatch(variable1 -> variable1.getName().equals(parameter.getName()))) {
+                    final PsiElement nameElement = expression.getReferenceNameElement();
+                    nameElement.replace(
+                            factory.createExpressionFromText("context." + nameElement.getText(), null));
+                }
+            }
+        }
     }
 
     private static void replaceReturnStatements(final PsiElementFactory factory, final PsiCodeBlock block) {
@@ -103,7 +125,7 @@ class IterativeMethodGenerator {
                 final PsiLocalVariable variable = (PsiLocalVariable) element;
                 if (!variable.hasInitializer())
                     continue;
-                assignments.add(factory.createStatementFromText(
+                assignments.add(factory.createStatementFromText("context." +
                         variable.getName() + " = " + variable.getInitializer().getText() + ";", null));
             }
             final PsiElement parent = statement.getParent();
@@ -137,7 +159,7 @@ class IterativeMethodGenerator {
                 continue;
             final PsiCodeBlock parentBlock = PsiTreeUtil.getParentOfType(call, PsiCodeBlock.class, true);
             final String temp = "temp" + count++;
-            variables.add(new Variable(temp, returnType));
+            variables.add(new Variable(temp, returnType.getPresentableText()));
             parentBlock.addBefore(factory.createVariableDeclarationStatement(temp, returnType, call), parentStatement);
             call.replace(factory.createExpressionFromText(temp, null));
         }

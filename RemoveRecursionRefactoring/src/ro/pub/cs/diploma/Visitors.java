@@ -3,27 +3,19 @@ package ro.pub.cs.diploma;
 import com.intellij.psi.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 class Visitors {
     private static final String SECTION = "section";
 
     static List<Variable> extractVariables(PsiMethod method) {
-        List<Variable> variables = new ArrayList<>();
-        method.accept(new JavaRecursiveElementWalkingVisitor() {
-            @Override
-            public void visitParameter(PsiParameter parameter) {
-                super.visitParameter(parameter);
-                variables.add(new Variable(parameter.getName(), parameter.getType()));
-            }
-
-            @Override
-            public void visitLocalVariable(PsiLocalVariable variable) {
-                super.visitLocalVariable(variable);
-                variables.add(new Variable(variable.getName(), variable.getType()));
-            }
-        });
-        variables.add(new Variable(SECTION, PsiType.INT));
+        List<Variable> variables = Arrays
+                .stream(method.getParameterList().getParameters())
+                .map(parameter -> new Variable(parameter.getName(), parameter.getType().getPresentableText()))
+                .collect(Collectors.toList());
+        variables.add(new Variable(SECTION, PsiType.INT.getPresentableText()));
         return variables;
     }
 
@@ -64,16 +56,16 @@ class Visitors {
         return returnStatements;
     }
 
-    static List<PsiIdentifier> extractIdentifiers(PsiCodeBlock block) {
-        final List<PsiIdentifier> identifiers = new ArrayList<>();
+    static List<PsiReferenceExpression> extractReferenceExpressions(PsiCodeBlock block) {
+        final List<PsiReferenceExpression> expressions = new ArrayList<>();
         block.accept(new JavaRecursiveElementWalkingVisitor() {
             @Override
-            public void visitIdentifier(PsiIdentifier identifier) {
-                super.visitIdentifier(identifier);
-                identifiers.add(identifier);
+            public void visitReferenceExpression(PsiReferenceExpression expression) {
+                super.visitReferenceExpression(expression);
+                expressions.add(expression);
             }
         });
-        return identifiers;
+        return expressions;
     }
 
     static void replaceSingleStatementsWithBlockStatements(PsiElementFactory factory, PsiCodeBlock block) {
@@ -117,6 +109,16 @@ class Visitors {
             public void visitForeachStatement(PsiForeachStatement statement) {
                 super.visitForeachStatement(statement);
                 replaceStatement(statement.getBody());
+            }
+        });
+    }
+
+    static void replaceForEachStatementsWithForStatements(PsiCodeBlock block) {
+        block.accept(new JavaRecursiveElementVisitor() {
+            @Override
+            public void visitForeachStatement(PsiForeachStatement statement) {
+                super.visitForeachStatement(statement);
+                Refactorings.replaceForEachStatementWithIteratorForLoopStatement(statement);
             }
         });
     }
