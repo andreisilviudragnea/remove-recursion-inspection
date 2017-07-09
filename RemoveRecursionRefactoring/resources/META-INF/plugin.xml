@@ -26,6 +26,11 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
+    <localInspection groupPath="Java" language="JAVA" shortName="RemoveRecursion"
+                     bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="remove.recursion.display.name"
+                     groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"
+                     enabledByDefault="true" level="WARNING"
+                     implementationClass="ro.pub.cs.diploma.RemoveRecursionInspection"/>
   </extensions>
 
   <actions>
