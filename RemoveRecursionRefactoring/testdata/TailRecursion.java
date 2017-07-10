@@ -9,7 +9,7 @@ public class TailRecursion {
 
     public static int foo() throws IOException
     {
-        return <warning descr="Tail recursive call 'foo()'">foo</warning>();
+        return <warning descr="Recursive call 'foo()'">foo</warning>();
     }
 
     public int factorial(int val) {
@@ -20,7 +20,7 @@ public class TailRecursion {
         if (val == 1) {
             return runningVal;
         } else {
-            return <warning descr="Tail recursive call 'factorial()'">factorial</warning>(val - 1, runningVal * val);
+            return <warning descr="Recursive call 'factorial()'">factorial</warning>(val - 1, runningVal * val);
         }
     }
 
@@ -37,13 +37,13 @@ public class TailRecursion {
             return true;
         }
 
-        return <warning descr="Tail recursive call 'hasParent()'">hasParent</warning>(child.getParent(), parent);
+        return <warning descr="Recursive call 'hasParent()'">hasParent</warning>(child.getParent(), parent);
     }
 
     private TailRecursion getRootSO() {
         if (getParent() instanceof TailRecursion)
         {
-            return ((TailRecursion) getParent()).<warning descr="Tail recursive call 'getRootSO()'">getRootSO</warning>();
+            return ((TailRecursion) getParent()).<warning descr="Recursive call 'getRootSO()'">getRootSO</warning>();
         }
         return this;
     }
@@ -62,7 +62,7 @@ class TailRecursion2
         if (something == null) {
             if (isDuplicate()) {
                 final TailRecursion2 recursion = getOriginal();
-                return recursion.<warning descr="Tail recursive call 'getSomething()'">getSomething</warning>();
+                return recursion.<warning descr="Recursive call 'getSomething()'">getSomething</warning>();
             } else {
                 something = new Something();
             }
@@ -74,7 +74,7 @@ class TailRecursion2
         if (!duplicate) {
             return something;
         } else {
-            return getOriginal().<warning descr="Tail recursive call 'foo()'">foo</warning>();
+            return getOriginal().<warning descr="Recursive call 'foo()'">foo</warning>();
         }
     }
 
