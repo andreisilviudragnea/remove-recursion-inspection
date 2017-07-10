@@ -1,3 +1,5 @@
+package inspection;
+
 interface I {
   int get();
 }

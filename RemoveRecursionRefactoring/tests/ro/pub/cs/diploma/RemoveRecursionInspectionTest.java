@@ -2,10 +2,11 @@ package ro.pub.cs.diploma;
 
 import com.intellij.codeInspection.InspectionProfileEntry;
 import com.siyeh.ig.LightInspectionTestCase;
+import com.siyeh.ig.performance.TailRecursionInspectionTest;
 import org.jetbrains.annotations.Nullable;
 
-/*
- * @see com.siyeh.ig.performance.TailRecursionInspectionTest
+/**
+ * @see TailRecursionInspectionTest
  */
 public class RemoveRecursionInspectionTest extends LightInspectionTestCase {
   @Nullable
@@ -16,7 +17,7 @@ public class RemoveRecursionInspectionTest extends LightInspectionTestCase {
 
   @Override
   protected String getTestDataPath() {
-    return "testdata";
+    return "testdata/inspection";
   }
 
   public void testLambdaWithReturnStmt() {
