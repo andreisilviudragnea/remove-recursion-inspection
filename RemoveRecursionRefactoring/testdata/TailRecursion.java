@@ -1,5 +1,3 @@
-package com.siyeh.igtest.performance;
-
 import java.awt.Container;
 import java.io.IOException;
 

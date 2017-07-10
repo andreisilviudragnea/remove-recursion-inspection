@@ -1,6 +1,3 @@
-package com.siyeh.igtest.performance.tail_recursion;
-
-
 interface I {
   int get();
 }
