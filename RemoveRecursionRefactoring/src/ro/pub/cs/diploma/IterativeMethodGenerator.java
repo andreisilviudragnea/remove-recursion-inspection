@@ -166,13 +166,42 @@ class IterativeMethodGenerator {
     }
   }
 
+  @NotNull
+  private static String getInitialValue(PsiType type) {
+    if (PsiPrimitiveType.BYTE.equals(type)) {
+      return "(byte) 0";
+    }
+    if (PsiPrimitiveType.SHORT.equals(type)) {
+      return "(short) 0";
+    }
+    if (PsiPrimitiveType.INT.equals(type)) {
+      return "0";
+    }
+    if (PsiPrimitiveType.LONG.equals(type)) {
+      return "0L";
+    }
+    if (PsiPrimitiveType.FLOAT.equals(type)) {
+      return "0.0f";
+    }
+    if (PsiPrimitiveType.DOUBLE.equals(type)) {
+      return "0.0d";
+    }
+    if (PsiPrimitiveType.CHAR.equals(type)) {
+      return "'\u0000'";
+    }
+    if (PsiPrimitiveType.BOOLEAN.equals(type)) {
+      return "false";
+    }
+    return "null";
+  }
+
   private static void addRetDeclaration(@NotNull final PsiElementFactory factory,
                                         @NotNull final PsiCodeBlock body,
                                         @NotNull final PsiType returnType) {
     if (returnType instanceof PsiPrimitiveType && PsiPrimitiveType.VOID.equals(returnType)) {
       return;
     }
-    body.add(factory.createStatementFromText(returnType.getPresentableText() + " ret = 0;", null));
+    body.add(factory.createStatementFromText(returnType.getPresentableText() + " ret = " + getInitialValue(returnType) + ";", null));
   }
 
   private static void extractRecursiveCallsToStatements(PsiElementFactory factory, PsiCodeBlock block, String name,
@@ -180,7 +209,7 @@ class IterativeMethodGenerator {
     int count = 0;
     for (PsiMethodCallExpression call : Visitors.extractRecursiveCalls(block, name)) {
       final PsiStatement parentStatement = PsiTreeUtil.getParentOfType(call, PsiStatement.class, true);
-      if (parentStatement == call.getParent()) {
+      if (parentStatement == call.getParent() && parentStatement instanceof PsiExpressionStatement) {
         continue;
       }
       final PsiCodeBlock parentBlock = PsiTreeUtil.getParentOfType(call, PsiCodeBlock.class, true);
