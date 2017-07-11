@@ -19,6 +19,7 @@ class Visitors {
     return variables;
   }
 
+  // TODO: Replace the name check with something that checks the resolved reference.
   static List<PsiMethodCallExpression> extractRecursiveCalls(PsiCodeBlock block, String name) {
     final List<PsiMethodCallExpression> calls = new ArrayList<>();
     block.accept(new JavaRecursiveElementWalkingVisitor() {
