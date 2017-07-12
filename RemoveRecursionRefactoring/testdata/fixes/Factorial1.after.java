@@ -1,24 +1,20 @@
 import java.util.ArrayList;
 import java.util.List;
 
-class Dependency1 {
-    public int factorial(int val) {
-        return factorial(val, 1);
-    }
-
-    private int factorial(int val, int runningVal) {
-        List<FactorialContext> stack = new ArrayList<>();
-        stack.add(new FactorialContext(val, runningVal));
+public class Factorial1 {
+    static int factorial1(int n) {
+        List<Factorial1Context> stack = new ArrayList<>();
+        stack.add(new Factorial1Context(n));
         int ret = 0;
         while (true) {
-            FactorialContext context = stack.get(stack.size() - 1);
+            Factorial1Context context = stack.get(stack.size() - 1);
             switch (context.section) {
                 case 0: {
-                    context.section = context.val == 1 ? 1 : 3;
+                    context.section = context.n == 0 ? 1 : 3;
                     break;
                 }
                 case 1: {
-                    ret = context.runningVal;
+                    ret = 1;
                     if (stack.size() == 1)
                         return ret;
                     else
@@ -29,12 +25,12 @@ class Dependency1 {
                 }
                 case 3: {
                     context.section = 4;
-                    stack.add(new FactorialContext(context.val - 1, context.runningVal * context.val));
+                    stack.add(new Factorial1Context(context.n - 1));
                     break;
                 }
                 case 4: {
                     context.temp0 = ret;
-                    ret = (context.temp0);
+                    ret = context.n * context.temp0;
                     if (stack.size() == 1)
                         return ret;
                     else
@@ -45,15 +41,17 @@ class Dependency1 {
         }
     }
 
-    private static class FactorialContext {
-        int val;
-        int runningVal;
+    private static class Factorial1Context {
+        int n;
         int section;
         int temp0;
 
-        private FactorialContext(int val, int runningVal) {
-            this.val = val;
-            this.runningVal = runningVal;
+        private Factorial1Context(int n) {
+            this.n = n;
         }
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Factorial1.factorial1(12));
     }
 }
