@@ -13,15 +13,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 class IterativeMethodGenerator {
-  private static final String ITERATIVE = "Iterative";
-  private static final String STACK = "stack";
-  private static final String PUSH = "push";
-  private static final String JAVA_UTIL_DEQUE = "java.util.Deque";
-  private static final String JAVA_UTIL_LINKED_LIST = "java.util.LinkedList";
-  private static final String NEW = "new";
-
   static PsiMethod createIterativeMethod(PsiElementFactory factory, PsiMethod oldMethod, PsiCodeBlock body) {
-    final PsiMethod method = factory.createMethod(oldMethod.getName() + ITERATIVE, oldMethod.getReturnType());
+    final PsiMethod method = factory.createMethod(oldMethod.getName() + "Iterative", oldMethod.getReturnType());
 
     // Copy parameters
     final PsiParameterList parameterList = method.getParameterList();
@@ -71,8 +64,7 @@ class IterativeMethodGenerator {
     replaceIdentifierWithContextAccess(factory, variables, block);
     replaceDeclarationsWithInitializersWithAssignments(factory, block);
 
-    final BasicBlocksGenerator basicBlocksGenerator = new BasicBlocksGenerator(factory, name, contextClassName,
-                                                                               returnType);
+    final BasicBlocksGenerator basicBlocksGenerator = new BasicBlocksGenerator(factory, name, contextClassName, returnType);
     block.accept(basicBlocksGenerator);
     final List<BasicBlocksGenerator.Pair> blocks = basicBlocksGenerator.getBlocks();
 
@@ -85,10 +77,10 @@ class IterativeMethodGenerator {
     final PsiCodeBlock body = factory.createCodeBlock();
 
     body.add(createStackDeclaration(project, factory, contextClassName));
-    body.add(createPushStatement(factory, contextClassName, oldMethod));
+    body.add(createAddStatement(factory, contextClassName, oldMethod));
     addRetDeclaration(factory, body, returnType);
     body.add(factory.createStatementFromText("while (true) {" +
-                                             contextClassName + " context = stack.peek();" +
+                                             contextClassName + " context = stack.get(stack.size() - 1);" +
                                              "switch (context.section) {" + casesString + "} }", null));
 
     return body;
@@ -125,8 +117,8 @@ class IterativeMethodGenerator {
       if (hasExpression) {
         statements.add(factory.createStatementFromText("ret = " + returnValue.getText() + ";", null));
       }
-      statements.add(factory.createStatementFromText("if (stack.size() == 1)\nreturn " +
-                                                     (hasExpression ? "ret" : "") + "; else\nstack.pop();", null));
+      statements.add(factory.createStatementFromText(
+        "if (stack.size() == 1)\nreturn " + (hasExpression ? "ret" : "") + "; else\nstack.remove(stack.size() - 1);", null));
       statements.add(factory.createStatementFromText("break;", null));
       PsiElement anchor = statement;
       final PsiCodeBlock parentBlock = PsiTreeUtil.getParentOfType(statement, PsiCodeBlock.class, true);
@@ -221,13 +213,12 @@ class IterativeMethodGenerator {
   }
 
   @NotNull
-  private static PsiStatement createPushStatement(@NotNull final PsiElementFactory factory,
-                                                  @NotNull final String contextClassName,
-                                                  @NotNull final PsiMethod method) {
+  private static PsiStatement createAddStatement(@NotNull final PsiElementFactory factory,
+                                                 @NotNull final String contextClassName,
+                                                 @NotNull final PsiMethod method) {
     final String arguments = Arrays.stream(method.getParameterList().getParameters())
       .map(PsiNamedElement::getName).collect(Collectors.joining(","));
-    return factory.createStatementFromText(
-      STACK + "." + PUSH + "(" + NEW + " " + contextClassName + "(" + arguments + "));", null);
+    return factory.createStatementFromText("stack.add(new " + contextClassName + "(" + arguments + "));", null);
   }
 
   @NotNull
@@ -235,8 +226,7 @@ class IterativeMethodGenerator {
                                                    @NotNull final PsiElementFactory factory,
                                                    @NotNull final String contextClassName) {
     final PsiStatement declarationStatement = factory.createStatementFromText(
-      JAVA_UTIL_DEQUE + "<" + contextClassName + "> " + STACK + " = " +
-      NEW + " " + JAVA_UTIL_LINKED_LIST + "<>();", null);
+      "java.util.List<" + contextClassName + "> stack = new java.util.ArrayList<>();", null);
     return JavaCodeStyleManager.getInstance(project).shortenClassReferences(declarationStatement);
   }
 }

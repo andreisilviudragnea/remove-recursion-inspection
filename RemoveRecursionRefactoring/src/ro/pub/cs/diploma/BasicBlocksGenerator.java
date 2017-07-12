@@ -164,8 +164,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
       statements1.add(factory.createStatementFromText("context.section = " + newPair.getId() + ";", null));
       final String s = Arrays.stream(expression.getArgumentList().getExpressions())
         .map(PsiElement::getText).collect(Collectors.joining(","));
-      statements1.add(factory.createStatementFromText("stack.push(new " +
-                                                      contextClassName + "(" + s + "));", null));
+      statements1.add(factory.createStatementFromText("stack.add(new " + contextClassName + "(" + s + "));", null));
       statements1.add(factory.createStatementFromText("break;", null));
       for (PsiStatement statement : statements1) {
         currentPair.getBlock().add(statement);
