@@ -1,4 +1,4 @@
-class Factorial {
+public class Factorial1 {
     static int factorial1(int n) {
         if (n == 0)
             return 1;
@@ -6,9 +6,7 @@ class Factorial {
             return n * factorial1(n - 1);
     }
 
-    static int factorial2(int n) {
-        if (n == 0)
-            return 1;
-        return n * factorial2(n - 1);
+    public static void main(String[] args) {
+        System.out.println(Factorial1.factorial1(12));
     }
 }

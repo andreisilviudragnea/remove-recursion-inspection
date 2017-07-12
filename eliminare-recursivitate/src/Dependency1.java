@@ -1,5 +1,4 @@
 class Dependency1 {
-
     public int factorial(int val) {
         return factorial(val, 1);
     }

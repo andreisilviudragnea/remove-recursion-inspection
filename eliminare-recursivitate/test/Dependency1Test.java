@@ -7,5 +7,6 @@ public class Dependency1Test {
     @Test
     public void factorial() throws Exception {
         assertEquals(3628800, new Dependency1().factorial(10));
+        assertEquals(1, new Dependency1().factorial(1));
     }
 }
