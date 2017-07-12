@@ -1,10 +1,10 @@
 package ro.pub.cs.diploma;
 
 import com.intellij.psi.*;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
@@ -26,7 +26,6 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     }
   }
 
-
   private List<Pair> blocks = new ArrayList<>();
   private Pair currentPair;
   private PsiStatement currentStatement;
@@ -35,6 +34,46 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   private String methodName;
   private String contextClassName;
   private PsiType returnType;
+  private Map<PsiStatement, Integer> breakJumps = new HashMap<>();
+
+  private Pair newPair() {
+    final Pair pair = new Pair(factory.createCodeBlock(), blockCounter++);
+    blocks.add(pair);
+    return pair;
+  }
+
+  @NotNull
+  private PsiStatement createStatement(@NotNull final String text) {
+    return factory.createStatementFromText(text, null);
+  }
+
+  @Contract(pure = true)
+  private static boolean breakOrReturnStatement(@NotNull final PsiStatement statement) {
+    return statement instanceof PsiBreakStatement || statement instanceof PsiReturnStatement;
+  }
+
+  private boolean isJumpNecessary() {
+    final PsiStatement[] statements = currentPair.getBlock().getStatements();
+    return statements.length == 0 || !breakOrReturnStatement(statements[statements.length - 1]);
+  }
+
+  private void createJump(int index) {
+    if (!isJumpNecessary()) {
+      return;
+    }
+    final PsiCodeBlock block = currentPair.getBlock();
+    block.add(createStatement("context.section = " + index + ";"));
+    block.add(createStatement("break;"));
+  }
+
+  private void createConditionalJump(PsiExpression condition, int thenIndex, int elseIndex) {
+    if (!isJumpNecessary()) {
+      return;
+    }
+    final PsiCodeBlock block = currentPair.getBlock();
+    block.add(createStatement("context.section = " + condition.getText() + "? " + thenIndex + " : " + elseIndex + ";"));
+    block.add(createStatement("break;"));
+  }
 
   BasicBlocksGenerator(PsiElementFactory factory, String methodName, String contextClassName, PsiType returnType) {
     this.factory = factory;
@@ -51,7 +90,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     final PsiStatement[] statements = block.getStatements();
     // This is a hack, this method gets called only for the method block, not for blocks of block statements.
     if (PsiPrimitiveType.VOID.equals(returnType) && !(statements[statements.length - 1] instanceof PsiReturnStatement)) {
-      currentPair.getBlock().add(factory.createStatementFromText("return;", null));
+      currentPair.getBlock().add(createStatement("return;"));
     }
   }
 
@@ -66,12 +105,6 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     //        super.visitExpressionStatement(statement);
     currentStatement = (PsiStatement)currentPair.getBlock().add(statement);
     statement.getExpression().accept(this);
-  }
-
-  private Pair newPair() {
-    final Pair pair = new Pair(factory.createCodeBlock(), blockCounter++);
-    blocks.add(pair);
-    return pair;
   }
 
   @Override
@@ -91,28 +124,15 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
 
     currentPair = thenPair;
     statement.getThenBranch().accept(this);
-    addBreakToMergeBlock(mergePair.getId());
+    createJump(mergePair.getId());
 
     if (elseBranch != null) {
       currentPair = elsePair;
       elseBranch.accept(this);
-      addBreakToMergeBlock(mergePair.getId());
+      createJump(mergePair.getId());
     }
 
     currentPair = mergePair;
-  }
-
-  private void createConditionalJump(PsiExpression condition, int thenIndex, int elseIndex) {
-    final PsiCodeBlock block = currentPair.getBlock();
-    block.add(factory.createStatementFromText(
-      "context.section = " + condition.getText() + "? " + thenIndex + " : " + elseIndex + ";", null));
-    block.add(factory.createStatementFromText("break;", null));
-  }
-
-  private void createJump(int index) {
-    final PsiCodeBlock block = currentPair.getBlock();
-    block.add(factory.createStatementFromText("context.section = " + index + ";", null));
-    block.add(factory.createStatementFromText("break;", null));
   }
 
   @Override
@@ -121,6 +141,8 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     final Pair bodyPair = newPair();
     final Pair mergePair = newPair();
 
+    breakJumps.put(statement, mergePair.getId());
+
     createJump(conditionPair.getId());
 
     currentPair = conditionPair;
@@ -128,16 +150,9 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
 
     currentPair = bodyPair;
     statement.getBody().accept(this);
-    addBreakToMergeBlock(conditionPair.getId());
+    createJump(conditionPair.getId());
 
     currentPair = mergePair;
-  }
-
-  private void addBreakToMergeBlock(int index) {
-    final PsiStatement[] statements = currentPair.getBlock().getStatements();
-    if (statements.length == 0 || !(statements[statements.length - 1] instanceof PsiReturnStatement)) {
-      createJump(index);
-    }
   }
 
   @Override
@@ -160,15 +175,13 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     if (expression.getMethodExpression().getReferenceName().equals(methodName)) {
       final Pair newPair = newPair();
 
-      List<PsiStatement> statements1 = new ArrayList<>();
-      statements1.add(factory.createStatementFromText("context.section = " + newPair.getId() + ";", null));
+      final PsiCodeBlock block = currentPair.getBlock();
+      block.add(createStatement("context.section = " + newPair.getId() + ";"));
       final String s = Arrays.stream(expression.getArgumentList().getExpressions())
         .map(PsiElement::getText).collect(Collectors.joining(","));
-      statements1.add(factory.createStatementFromText("stack.add(new " + contextClassName + "(" + s + "));", null));
-      statements1.add(factory.createStatementFromText("break;", null));
-      for (PsiStatement statement : statements1) {
-        currentPair.getBlock().add(statement);
-      }
+      block.add(createStatement("stack.add(new " + contextClassName + "(" + s + "));"));
+      block.add(createStatement("break;"));
+
       currentStatement.delete();
 
       currentPair = newPair;
@@ -176,10 +189,19 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
       final PsiElement parent = expression.getParent();
       if (parent instanceof PsiAssignmentExpression) {
         PsiAssignmentExpression assignment = (PsiAssignmentExpression)parent;
-        currentPair.getBlock().add(factory.createStatementFromText(
-          assignment.getLExpression().getText() + " = ret;", null));
+        currentPair.getBlock().add(createStatement(assignment.getLExpression().getText() + " = ret;"));
       }
     }
+  }
+
+  @Override
+  public void visitBreakStatement(PsiBreakStatement statement) {
+    super.visitBreakStatement(statement);
+    final PsiStatement exitedStatement = statement.findExitedStatement();
+    if (exitedStatement == null) {
+      return;
+    }
+    createJump(breakJumps.get(exitedStatement));
   }
 
   List<Pair> getBlocks() {
