@@ -9,10 +9,10 @@ import java.util.stream.Collectors;
 
 class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   class Pair {
-    private PsiCodeBlock block;
-    private int id;
+    private final PsiCodeBlock block;
+    private final int id;
 
-    Pair(PsiCodeBlock block, int id) {
+    Pair(final PsiCodeBlock block, final int id) {
       this.block = block;
       this.id = id;
     }
@@ -26,15 +26,18 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     }
   }
 
-  private List<Pair> blocks = new ArrayList<>();
+  private final List<Pair> blocks = new ArrayList<>();
   private Pair currentPair;
   private PsiStatement currentStatement;
-  private PsiElementFactory factory;
+  private final PsiElementFactory factory;
   private int blockCounter;
-  private String methodName;
-  private String contextClassName;
-  private PsiType returnType;
-  private Map<PsiStatement, Integer> breakJumps = new HashMap<>();
+  private final String methodName;
+  private final String frameClassName;
+  private final String frameVarName;
+  private final String blockFieldName;
+  private final String stackVarName;
+  private final PsiType returnType;
+  private final Map<PsiStatement, Integer> breakJumps = new HashMap<>();
 
   private Pair newPair() {
     final Pair pair = new Pair(factory.createCodeBlock(), blockCounter++);
@@ -57,29 +60,37 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     return statements.length == 0 || !breakOrReturnStatement(statements[statements.length - 1]);
   }
 
-  private void createJump(int index) {
+  private void createJumpCommon(String indexExpression) {
     if (!isJumpNecessary()) {
       return;
     }
     final PsiCodeBlock block = currentPair.getBlock();
-    block.add(createStatement("context.section = " + index + ";"));
+    block.add(createStatement(frameVarName + "." + blockFieldName + " = " + indexExpression + ";"));
     block.add(createStatement("break;"));
+  }
+
+  private void createJump(int index) {
+    createJumpCommon(Integer.toString(index));
   }
 
   private void createConditionalJump(PsiExpression condition, int thenIndex, int elseIndex) {
-    if (!isJumpNecessary()) {
-      return;
-    }
-    final PsiCodeBlock block = currentPair.getBlock();
-    block.add(createStatement("context.section = " + condition.getText() + "? " + thenIndex + " : " + elseIndex + ";"));
-    block.add(createStatement("break;"));
+    createJumpCommon(condition.getText() + "? " + thenIndex + " : " + elseIndex);
   }
 
-  BasicBlocksGenerator(PsiElementFactory factory, String methodName, String contextClassName, PsiType returnType) {
+  BasicBlocksGenerator(final PsiElementFactory factory,
+                       final String methodName,
+                       final String frameClassName,
+                       final String frameVarName,
+                       final String blockFieldName,
+                       final String stackVarName,
+                       final PsiType returnType) {
     this.factory = factory;
     currentPair = newPair();
     this.methodName = methodName;
-    this.contextClassName = contextClassName;
+    this.frameClassName = frameClassName;
+    this.frameVarName = frameVarName;
+    this.blockFieldName = blockFieldName;
+    this.stackVarName = stackVarName;
     this.returnType = returnType;
   }
 
@@ -175,12 +186,10 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     if (expression.getMethodExpression().getReferenceName().equals(methodName)) {
       final Pair newPair = newPair();
 
-      final PsiCodeBlock block = currentPair.getBlock();
-      block.add(createStatement("context.section = " + newPair.getId() + ";"));
-      final String s = Arrays.stream(expression.getArgumentList().getExpressions())
-        .map(PsiElement::getText).collect(Collectors.joining(","));
-      block.add(createStatement("stack.add(new " + contextClassName + "(" + s + "));"));
-      block.add(createStatement("break;"));
+      final String arguments =
+        Arrays.stream(expression.getArgumentList().getExpressions()).map(PsiElement::getText).collect(Collectors.joining(","));
+      currentPair.getBlock().add(IterativeMethodGenerator.createAddStatement(factory, frameClassName, stackVarName, arguments));
+      createJump(newPair.getId());
 
       currentStatement.delete();
 

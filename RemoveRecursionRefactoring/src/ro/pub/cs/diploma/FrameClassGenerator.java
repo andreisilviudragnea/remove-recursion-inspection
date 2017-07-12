@@ -1,27 +1,18 @@
 package ro.pub.cs.diploma;
 
 import com.intellij.psi.*;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-class ContextClassGenerator {
-  private static final String CONTEXT = "Context";
-  private static final String THIS = "this";
-
-  static PsiClass createContextClass(PsiElementFactory factory, PsiMethod method, List<Variable> variables) {
-    final PsiClass psiClass = factory.createClass(getContextClassName(method.getName()));
+class FrameClassGenerator {
+  static PsiClass createFrameClass(PsiElementFactory factory, PsiMethod method, List<Variable> variables) {
+    final PsiClass psiClass = factory.createClass(Utilities.capitalize(method.getName()) + Constants.FRAME);
 
     setModifiers(psiClass);
     addFields(factory, psiClass, variables);
     addConstructor(factory, psiClass, method.getParameterList().getParameters());
 
     return psiClass;
-  }
-
-  @NotNull
-  static String getContextClassName(String methodName) {
-    return Utilities.capitalize(methodName) + CONTEXT;
   }
 
   private static void addConstructor(PsiElementFactory factory, PsiClass psiClass, PsiParameter[] parameters) {
@@ -35,15 +26,14 @@ class ContextClassGenerator {
       final String name = parameter.getName();
       assert name != null;
       constructor.getParameterList().add(factory.createParameter(name, parameter.getType()));
-      body.add(factory.createStatementFromText(THIS + "." + name + " = " + name + ";", null));
+      body.add(factory.createStatementFromText(Constants.THIS + "." + name + " = " + name + ";", null));
     }
     psiClass.add(constructor);
   }
 
   private static void addFields(PsiElementFactory factory, PsiClass psiClass, List<Variable> variables) {
     for (Variable variable : variables) {
-      psiClass.add(factory.createFieldFromText(
-        variable.getType() + " " + variable.getName() + ";", null));
+      psiClass.add(factory.createFieldFromText(variable.getType() + " " + variable.getName() + ";", null));
     }
   }
 

@@ -9,53 +9,52 @@ public class ArrayPrinter1 {
     }
 
     void displayArray1(int first, int last) {
-        List<DisplayArray1Context> stack = new ArrayList<>();
-        stack.add(new DisplayArray1Context(first, last));
+        List<DisplayArray1Frame> stack = new ArrayList<>();
+        stack.add(new DisplayArray1Frame(first, last));
         while (true) {
-            DisplayArray1Context context = stack.get(stack.size() - 1);
-            switch (context.section) {
+            DisplayArray1Frame frame = stack.get(stack.size() - 1);
+            switch (frame.block) {
                 case 0: {
-                    context.section = context.first == context.last ? 1 : 3;
+                    frame.block = frame.first == frame.last ? 1 : 3;
                     break;
                 }
                 case 1: {
-                    System.out.print(array[context.first] + " ");
-                    context.section = 2;
+                    System.out.print(array[frame.first] + " ");
+                    frame.block = 2;
                     break;
                 }
                 case 2: {
                     if (stack.size() == 1)
                         return;
-                    else
-                        stack.remove(stack.size() - 1);
+                    stack.remove(stack.size() - 1);
                     break;
                 }
                 case 3: {
-                    context.mid = context.first + (context.last - context.first) / 2;
-                    context.section = 4;
-                    stack.add(new DisplayArray1Context(context.first, context.mid));
+                    frame.mid = frame.first + (frame.last - frame.first) / 2;
+                    stack.add(new DisplayArray1Frame(frame.first, frame.mid));
+                    frame.block = 4;
                     break;
                 }
                 case 4: {
-                    context.section = 5;
-                    stack.add(new DisplayArray1Context(context.mid + 1, context.last));
+                    stack.add(new DisplayArray1Frame(frame.mid + 1, frame.last));
+                    frame.block = 5;
                     break;
                 }
                 case 5: {
-                    context.section = 2;
+                    frame.block = 2;
                     break;
                 }
             }
         }
     }
 
-    private static class DisplayArray1Context {
+    private static class DisplayArray1Frame {
         int first;
         int last;
-        int section;
+        int block;
         int mid;
 
-        private DisplayArray1Context(int first, int last) {
+        private DisplayArray1Frame(int first, int last) {
             this.first = first;
             this.last = last;
         }

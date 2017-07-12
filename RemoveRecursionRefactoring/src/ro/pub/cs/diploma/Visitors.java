@@ -8,15 +8,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 class Visitors {
-  private static final String SECTION = "section";
-
   static List<Variable> extractVariables(PsiMethod method) {
-    List<Variable> variables = Arrays
+    return Arrays
       .stream(method.getParameterList().getParameters())
       .map(parameter -> new Variable(parameter.getName(), parameter.getType().getPresentableText()))
       .collect(Collectors.toList());
-    variables.add(new Variable(SECTION, PsiType.INT.getPresentableText()));
-    return variables;
   }
 
   // TODO: Replace the name check with something that checks the resolved reference.

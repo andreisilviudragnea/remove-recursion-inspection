@@ -43,7 +43,7 @@ public class RemoveRecursionRefactoringAction extends AnAction {
     }
     final List<Variable> variables = Visitors.extractVariables(method);
     final PsiElementFactory factory = JavaPsiFacade.getElementFactory(project);
-    final @Nullable PsiCodeBlock body = IterativeMethodGenerator.createIterativeBody(project, factory, method, variables);
+    final @Nullable PsiCodeBlock body = IterativeMethodGenerator.createIterativeBody(project, factory, psiClass, method, variables);
     if (body == null) {
       return;
     }
@@ -57,6 +57,6 @@ public class RemoveRecursionRefactoringAction extends AnAction {
     else {
       psiClass.addAfter(IterativeMethodGenerator.createIterativeMethod(factory, method, body), method);
     }
-    psiClass.addAfter(ContextClassGenerator.createContextClass(factory, method, variables), method);
+    psiClass.addAfter(FrameClassGenerator.createFrameClass(factory, method, variables), method);
   }
 }

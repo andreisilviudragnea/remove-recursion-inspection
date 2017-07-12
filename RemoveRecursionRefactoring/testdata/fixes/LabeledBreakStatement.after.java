@@ -3,80 +3,78 @@ import java.util.List;
 
 public class LabeledBreakStatement {
     static void labeledBreakStatement(int iter, List<Integer> list) {
-        List<LabeledBreakStatementContext> stack = new ArrayList<>();
-        stack.add(new LabeledBreakStatementContext(iter, list));
+        List<LabeledBreakStatementFrame> stack = new ArrayList<>();
+        stack.add(new LabeledBreakStatementFrame(iter, list));
         while (true) {
-            LabeledBreakStatementContext context = stack.get(stack.size() - 1);
-            switch (context.section) {
+            LabeledBreakStatementFrame frame = stack.get(stack.size() - 1);
+            switch (frame.block) {
                 case 0: {
-                    context.section = context.iter == 0 ? 1 : 2;
+                    frame.block = frame.iter == 0 ? 1 : 2;
                     break;
                 }
                 case 1: {
                     if (stack.size() == 1)
                         return;
-                    else
-                        stack.remove(stack.size() - 1);
+                    stack.remove(stack.size() - 1);
                     break;
                 }
                 case 2: {
-                    context.count = context.iter;
-                    context.section = 3;
+                    frame.count = frame.iter;
+                    frame.block = 3;
                     break;
                 }
                 case 3: {
-                    context.section = true ? 4 : 5;
+                    frame.block = true ? 4 : 5;
                     break;
                 }
                 case 4: {
-                    context.section = 6;
+                    frame.block = 6;
                     break;
                 }
                 case 5: {
-                    context.section = 11;
-                    stack.add(new LabeledBreakStatementContext(context.iter - 1, context.list));
+                    stack.add(new LabeledBreakStatementFrame(frame.iter - 1, frame.list));
+                    frame.block = 11;
                     break;
                 }
                 case 6: {
-                    context.section = true ? 7 : 8;
+                    frame.block = true ? 7 : 8;
                     break;
                 }
                 case 7: {
-                    context.list.add(context.iter);
-                    context.count--;
-                    context.section = context.count == 0 ? 9 : 10;
+                    frame.list.add(frame.iter);
+                    frame.count--;
+                    frame.block = frame.count == 0 ? 9 : 10;
                     break;
                 }
                 case 8: {
-                    context.section = 3;
+                    frame.block = 3;
                     break;
                 }
                 case 9: {
-                    context.section = 5;
+                    frame.block = 5;
                     break;
                 }
                 case 10: {
-                    context.section = 6;
+                    frame.block = 6;
                     break;
                 }
                 case 11: {
                     if (stack.size() == 1)
                         return;
-                    else
-                        stack.remove(stack.size() - 1);
+                    stack.remove(stack.size() - 1);
                     break;
                 }
             }
         }
     }
 
-    private static class LabeledBreakStatementContext {
+    private static class LabeledBreakStatementFrame {
         int iter;
         List<Integer> list;
-        int section;
+        int block;
         int count;
 
-        private LabeledBreakStatementContext(int iter, List<Integer> list) {
+        private LabeledBreakStatementFrame(int iter, List<Integer> list) {
             this.iter = iter;
             this.list = list;
         }

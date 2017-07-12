@@ -3,50 +3,48 @@ import java.util.List;
 
 public class Factorial1 {
     static int factorial1(int n) {
-        List<Factorial1Context> stack = new ArrayList<>();
-        stack.add(new Factorial1Context(n));
+        List<Factorial1Frame> stack = new ArrayList<>();
+        stack.add(new Factorial1Frame(n));
         int ret = 0;
         while (true) {
-            Factorial1Context context = stack.get(stack.size() - 1);
-            switch (context.section) {
+            Factorial1Frame frame = stack.get(stack.size() - 1);
+            switch (frame.block) {
                 case 0: {
-                    context.section = context.n == 0 ? 1 : 3;
+                    frame.block = frame.n == 0 ? 1 : 3;
                     break;
                 }
                 case 1: {
                     ret = 1;
                     if (stack.size() == 1)
                         return ret;
-                    else
-                        stack.remove(stack.size() - 1);
+                    stack.remove(stack.size() - 1);
                     break;
                 }
                 case 2: {
                 }
                 case 3: {
-                    context.section = 4;
-                    stack.add(new Factorial1Context(context.n - 1));
+                    stack.add(new Factorial1Frame(frame.n - 1));
+                    frame.block = 4;
                     break;
                 }
                 case 4: {
-                    context.temp0 = ret;
-                    ret = context.n * context.temp0;
+                    frame.temp = ret;
+                    ret = frame.n * frame.temp;
                     if (stack.size() == 1)
                         return ret;
-                    else
-                        stack.remove(stack.size() - 1);
+                    stack.remove(stack.size() - 1);
                     break;
                 }
             }
         }
     }
 
-    private static class Factorial1Context {
+    private static class Factorial1Frame {
         int n;
-        int section;
-        int temp0;
+        int block;
+        int temp;
 
-        private Factorial1Context(int n) {
+        private Factorial1Frame(int n) {
             this.n = n;
         }
     }

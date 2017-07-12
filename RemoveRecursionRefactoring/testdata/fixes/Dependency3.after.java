@@ -3,38 +3,37 @@ import java.util.List;
 
 class Dependency3 {
     int calculate(int one, int two, int three) {
-        List<CalculateContext> stack = new ArrayList<>();
-        stack.add(new CalculateContext(one, two, three));
+        List<CalculateFrame> stack = new ArrayList<>();
+        stack.add(new CalculateFrame(one, two, three));
         int ret = 0;
         while (true) {
-            CalculateContext context = stack.get(stack.size() - 1);
-            switch (context.section) {
+            CalculateFrame frame = stack.get(stack.size() - 1);
+            switch (frame.block) {
                 case 0: {
-                    context.section = 1;
-                    stack.add(new CalculateContext(context.three + context.two, context.two + context.one, context.one));
+                    stack.add(new CalculateFrame(frame.three + frame.two, frame.two + frame.one, frame.one));
+                    frame.block = 1;
                     break;
                 }
                 case 1: {
-                    context.temp0 = ret;
-                    ret = context.temp0;
+                    frame.temp = ret;
+                    ret = frame.temp;
                     if (stack.size() == 1)
                         return ret;
-                    else
-                        stack.remove(stack.size() - 1);
+                    stack.remove(stack.size() - 1);
                     break;
                 }
             }
         }
     }
 
-    private static class CalculateContext {
+    private static class CalculateFrame {
         int one;
         int two;
         int three;
-        int section;
-        int temp0;
+        int block;
+        int temp;
 
-        private CalculateContext(int one, int two, int three) {
+        private CalculateFrame(int one, int two, int three) {
             this.one = one;
             this.two = two;
             this.three = three;
