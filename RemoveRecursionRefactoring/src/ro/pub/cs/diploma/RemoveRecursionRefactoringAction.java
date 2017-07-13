@@ -55,6 +55,10 @@ public class RemoveRecursionRefactoringAction extends AnAction {
       method.setName(styleManager.suggestUniqueVariableName(oldMethod.getName() + Constants.ITERATIVE, psiClass, true));
     }
     IterativeMethodGenerator.createIterativeBody(styleManager, factory, frameClassName, method, variables);
-    psiClass.addAfter(FrameClassGenerator.createFrameClass(factory, oldMethod, variables, frameClassName), oldMethod);
+    final PsiClass frameClass = FrameClassGenerator.createFrameClass(factory, oldMethod, variables, frameClassName);
+    if (frameClass == null) {
+      return;
+    }
+    psiClass.addAfter(frameClass, oldMethod);
   }
 }

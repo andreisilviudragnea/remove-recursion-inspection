@@ -1,46 +1,47 @@
 package ro.pub.cs.diploma;
 
 import com.intellij.psi.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 class FrameClassGenerator {
+  @Nullable
   static PsiClass createFrameClass(PsiElementFactory factory, PsiMethod method, List<Variable> variables, String frameClassName) {
-    final PsiClass psiClass = factory.createClass(frameClassName);
+    @NotNull final PsiClass psiClass = factory.createClass(frameClassName);
 
-    setModifiers(psiClass);
-    addFields(factory, psiClass, variables);
-    addConstructor(factory, psiClass, method.getParameterList().getParameters());
+    // Set modifiers
+    @Nullable final PsiModifierList modifierList = psiClass.getModifierList();
+    if (modifierList == null) {
+      return null;
+    }
+    modifierList.setModifierProperty(PsiModifier.PRIVATE, true);
+    modifierList.setModifierProperty(PsiModifier.STATIC, true);
 
-    return psiClass;
-  }
+    // Add fields
+    variables.stream()
+      .map(variable -> factory.createFieldFromText(variable.getType() + " " + variable.getName() + ";", null))
+      .forEach(psiClass::add);
 
-  private static void addConstructor(PsiElementFactory factory, PsiClass psiClass, PsiParameter[] parameters) {
-    final String className = psiClass.getName();
-    assert className != null;
-    final PsiMethod constructor = factory.createConstructor(className);
+    // Create constructor
+    @NotNull final PsiMethod constructor = factory.createConstructor(frameClassName);
     constructor.getModifierList().setModifierProperty(PsiModifier.PRIVATE, true);
-    final PsiCodeBlock body = constructor.getBody();
-    assert body != null;
-    for (PsiParameter parameter : parameters) {
-      final String name = parameter.getName();
-      assert name != null;
-      constructor.getParameterList().add(factory.createParameter(name, parameter.getType()));
+    @Nullable final PsiCodeBlock body = constructor.getBody();
+    if (body == null) {
+      return null;
+    }
+    @NotNull final PsiParameterList parameterList = constructor.getParameterList();
+    for (@NotNull final PsiParameter parameter : method.getParameterList().getParameters()) {
+      @Nullable final String name = parameter.getName();
+      if (name == null) {
+        return null;
+      }
+      parameterList.add(factory.createParameter(name, parameter.getType()));
       body.add(factory.createStatementFromText(Constants.THIS + "." + name + " = " + name + ";", null));
     }
     psiClass.add(constructor);
-  }
 
-  private static void addFields(PsiElementFactory factory, PsiClass psiClass, List<Variable> variables) {
-    for (Variable variable : variables) {
-      psiClass.add(factory.createFieldFromText(variable.getType() + " " + variable.getName() + ";", null));
-    }
-  }
-
-  private static void setModifiers(PsiClass psiClass) {
-    final PsiModifierList modifierList = psiClass.getModifierList();
-    assert modifierList != null;
-    modifierList.setModifierProperty(PsiModifier.PRIVATE, true);
-    modifierList.setModifierProperty(PsiModifier.STATIC, true);
+    return psiClass;
   }
 }
