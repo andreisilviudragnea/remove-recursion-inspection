@@ -66,6 +66,9 @@ class IterativeMethodGenerator {
 
     Visitors.replaceForEachStatementsWithForStatements(body);
     Visitors.replaceForStatementsWithWhileStatements(body);
+    Visitors.replaceSingleStatementsWithBlockStatements(factory, body);
+
+    extractRecursiveCallsToStatements(factory, styleManager, body, returnType);
 
     body.accept(new JavaRecursiveElementVisitor() {
       @Override
@@ -74,10 +77,6 @@ class IterativeMethodGenerator {
         variables.add(new Variable(variable.getName(), variable.getType().getPresentableText()));
       }
     });
-
-    Visitors.replaceSingleStatementsWithBlockStatements(factory, body);
-
-    extractRecursiveCallsToStatements(factory, styleManager, body, returnType, variables);
 
     replaceIdentifierWithFrameAccess(factory, frameVarName, variables, body);
     replaceDeclarationsWithInitializersWithAssignments(factory, frameVarName, body);
@@ -214,8 +213,7 @@ class IterativeMethodGenerator {
   private static void extractRecursiveCallsToStatements(@NotNull final PsiElementFactory factory,
                                                         @NotNull final JavaCodeStyleManager styleManager,
                                                         @NotNull final PsiCodeBlock block,
-                                                        @NotNull final PsiType returnType,
-                                                        @NotNull final List<Variable> variables) {
+                                                        @NotNull final PsiType returnType) {
     for (final PsiMethodCallExpression call : Visitors.extractRecursiveCalls(block)) {
       final PsiStatement parentStatement = PsiTreeUtil.getParentOfType(call, PsiStatement.class, true);
       if (parentStatement == call.getParent() && parentStatement instanceof PsiExpressionStatement) {
@@ -226,7 +224,6 @@ class IterativeMethodGenerator {
         continue;
       }
       final String temp = styleManager.suggestUniqueVariableName(Constants.TEMP, block, true);
-      variables.add(new Variable(temp, returnType.getPresentableText()));
       parentBlock.addBefore(factory.createVariableDeclarationStatement(temp, returnType, call), parentStatement);
       call.replace(factory.createExpressionFromText(temp, null));
     }

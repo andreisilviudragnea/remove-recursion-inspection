@@ -3,7 +3,8 @@ import java.util.List;
 
 public class BreakStatement {
     static void breakStatement(int iter, List<Integer> list) {
-        List<BreakStatementFrame> stack = new ArrayList<>(); stack.add(new BreakStatementFrame(iter, list));
+        List<BreakStatementFrame> stack = new ArrayList<>();
+        stack.add(new BreakStatementFrame(iter, list));
         while (true) {
             BreakStatementFrame frame = stack.get(stack.size() - 1);
             switch (frame.block) {
