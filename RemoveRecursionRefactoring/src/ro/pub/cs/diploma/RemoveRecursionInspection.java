@@ -9,8 +9,6 @@ import com.siyeh.ig.BaseInspection;
 import com.siyeh.ig.BaseInspectionVisitor;
 import com.siyeh.ig.InspectionGadgetsFix;
 import com.siyeh.ig.performance.TailRecursionInspection;
-import com.siyeh.ig.psiutils.MethodUtils;
-import com.siyeh.ig.psiutils.ParenthesesUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -87,18 +85,8 @@ public class RemoveRecursionInspection extends BaseInspection {
     @Override
     public void visitMethodCallExpression(PsiMethodCallExpression expression) {
       super.visitMethodCallExpression(expression);
-      final PsiReferenceExpression methodExpression = expression.getMethodExpression();
-      final PsiMethod containingMethod =
-        PsiTreeUtil.getParentOfType(expression, PsiMethod.class, true, PsiClass.class, PsiLambdaExpression.class);
+      final PsiMethod containingMethod = IterativeMethodGenerator.isRecursiveMethodCall(expression);
       if (containingMethod == null) {
-        return;
-      }
-      final JavaResolveResult resolveResult = expression.resolveMethodGenerics();
-      if (!resolveResult.isValidResult() || !containingMethod.equals(resolveResult.getElement())) {
-        return;
-      }
-      final PsiExpression qualifier = ParenthesesUtils.stripParentheses(methodExpression.getQualifierExpression());
-      if (qualifier != null && !(qualifier instanceof PsiThisExpression) && MethodUtils.isOverridden(containingMethod)) {
         return;
       }
       registerMethodCallError(expression, containingMethod);

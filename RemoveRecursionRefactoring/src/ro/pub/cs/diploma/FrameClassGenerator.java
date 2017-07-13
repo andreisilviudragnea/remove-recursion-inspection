@@ -5,8 +5,8 @@ import com.intellij.psi.*;
 import java.util.List;
 
 class FrameClassGenerator {
-  static PsiClass createFrameClass(PsiElementFactory factory, PsiMethod method, List<Variable> variables) {
-    final PsiClass psiClass = factory.createClass(Utilities.capitalize(method.getName()) + Constants.FRAME);
+  static PsiClass createFrameClass(PsiElementFactory factory, PsiMethod method, List<Variable> variables, String frameClassName) {
+    final PsiClass psiClass = factory.createClass(frameClassName);
 
     setModifiers(psiClass);
     addFields(factory, psiClass, variables);

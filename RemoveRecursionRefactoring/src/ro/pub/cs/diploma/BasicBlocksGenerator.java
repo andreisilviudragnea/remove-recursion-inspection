@@ -31,12 +31,12 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   private PsiStatement currentStatement;
   private final PsiElementFactory factory;
   private int blockCounter;
-  private final String methodName;
   private final String frameClassName;
   private final String frameVarName;
   private final String blockFieldName;
   private final String stackVarName;
   private final PsiType returnType;
+  private final String retVarName;
   private final Map<PsiStatement, Integer> breakJumps = new HashMap<>();
 
   private Pair newPair() {
@@ -78,20 +78,20 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   }
 
   BasicBlocksGenerator(final PsiElementFactory factory,
-                       final String methodName,
                        final String frameClassName,
                        final String frameVarName,
                        final String blockFieldName,
                        final String stackVarName,
-                       final PsiType returnType) {
+                       final PsiType returnType,
+                       final String retVarName) {
     this.factory = factory;
     currentPair = newPair();
-    this.methodName = methodName;
     this.frameClassName = frameClassName;
     this.frameVarName = frameVarName;
     this.blockFieldName = blockFieldName;
     this.stackVarName = stackVarName;
     this.returnType = returnType;
+    this.retVarName = retVarName;
   }
 
   @Override
@@ -183,23 +183,26 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   @Override
   public void visitMethodCallExpression(PsiMethodCallExpression expression) {
     //        super.visitMethodCallExpression(expression);
-    if (expression.getMethodExpression().getReferenceName().equals(methodName)) {
-      final Pair newPair = newPair();
+    final PsiMethod method = IterativeMethodGenerator.isRecursiveMethodCall(expression);
+    if (method == null) {
+      return;
+    }
 
-      final String arguments =
-        Arrays.stream(expression.getArgumentList().getExpressions()).map(PsiElement::getText).collect(Collectors.joining(","));
-      currentPair.getBlock().add(IterativeMethodGenerator.createAddStatement(factory, frameClassName, stackVarName, arguments));
-      createJump(newPair.getId());
+    final Pair newPair = newPair();
 
-      currentStatement.delete();
+    final String arguments =
+      Arrays.stream(expression.getArgumentList().getExpressions()).map(PsiElement::getText).collect(Collectors.joining(","));
+    currentPair.getBlock().add(IterativeMethodGenerator.createAddStatement(factory, frameClassName, stackVarName, arguments));
+    createJump(newPair.getId());
 
-      currentPair = newPair;
+    currentStatement.delete();
 
-      final PsiElement parent = expression.getParent();
-      if (parent instanceof PsiAssignmentExpression) {
-        PsiAssignmentExpression assignment = (PsiAssignmentExpression)parent;
-        currentPair.getBlock().add(createStatement(assignment.getLExpression().getText() + " = ret;"));
-      }
+    currentPair = newPair;
+
+    final PsiElement parent = expression.getParent();
+    if (parent instanceof PsiAssignmentExpression) {
+      PsiAssignmentExpression assignment = (PsiAssignmentExpression)parent;
+      currentPair.getBlock().add(createStatement(assignment.getLExpression().getText() + " = " + retVarName + ";"));
     }
   }
 

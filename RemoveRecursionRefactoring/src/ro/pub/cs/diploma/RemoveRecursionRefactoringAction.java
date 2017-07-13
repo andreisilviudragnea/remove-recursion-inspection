@@ -7,8 +7,8 @@ import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
+import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -36,27 +36,25 @@ public class RemoveRecursionRefactoringAction extends AnAction {
     });
   }
 
-  static void removeRecursion(PsiMethod method, Project project, boolean replaceOriginalMethod) {
-    final PsiClass psiClass = PsiTreeUtil.getParentOfType(method, PsiClass.class, true);
+  static void removeRecursion(PsiMethod oldMethod, Project project, boolean replaceOriginalMethod) {
+    final PsiClass psiClass = PsiTreeUtil.getParentOfType(oldMethod, PsiClass.class, true);
     if (psiClass == null) {
       return;
     }
-    final List<Variable> variables = Visitors.extractVariables(method);
+    final List<Variable> variables = Visitors.extractVariables(oldMethod);
     final PsiElementFactory factory = JavaPsiFacade.getElementFactory(project);
-    final @Nullable PsiCodeBlock body = IterativeMethodGenerator.createIterativeBody(project, factory, psiClass, method, variables);
-    if (body == null) {
-      return;
-    }
+    final JavaCodeStyleManager styleManager = JavaCodeStyleManager.getInstance(project);
+    final String frameClassName =
+      styleManager.suggestUniqueVariableName(Utilities.capitalize(oldMethod.getName()) + Constants.FRAME, psiClass, true);
+    PsiMethod method;
     if (replaceOriginalMethod) {
-      final PsiCodeBlock oldBody = method.getBody();
-      if (oldBody == null) {
-        return;
-      }
-      oldBody.replace(body);
+      method = oldMethod;
     }
     else {
-      psiClass.addAfter(IterativeMethodGenerator.createIterativeMethod(factory, method, body), method);
+      method = (PsiMethod)psiClass.addAfter(oldMethod, oldMethod);
+      method.setName(styleManager.suggestUniqueVariableName(oldMethod.getName() + Constants.ITERATIVE, psiClass, true));
     }
-    psiClass.addAfter(FrameClassGenerator.createFrameClass(factory, method, variables), method);
+    IterativeMethodGenerator.createIterativeBody(styleManager, factory, frameClassName, method, variables);
+    psiClass.addAfter(FrameClassGenerator.createFrameClass(factory, oldMethod, variables, frameClassName), oldMethod);
   }
 }

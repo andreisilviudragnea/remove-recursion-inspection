@@ -1,66 +1,73 @@
 package ro.pub.cs.diploma;
 
-import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.siyeh.ig.psiutils.MethodUtils;
+import com.siyeh.ig.psiutils.ParenthesesUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 class IterativeMethodGenerator {
-
-  static PsiMethod createIterativeMethod(PsiElementFactory factory, PsiMethod oldMethod, PsiCodeBlock body) {
-    final PsiMethod method = factory.createMethod(oldMethod.getName() + "Iterative", oldMethod.getReturnType());
-
-    // Copy parameters
-    final PsiParameterList parameterList = method.getParameterList();
-    Arrays.stream(oldMethod.getParameterList().getParameters()).forEach(parameterList::add);
-
-    // Copy modifiers
-    final PsiModifierList modifierList = method.getModifierList();
-    final PsiModifierList oldMethodModifierList = oldMethod.getModifierList();
-    Arrays.stream(PsiModifier.MODIFIERS)
-      .forEach(modifier -> modifierList.setModifierProperty(modifier, oldMethodModifierList.hasExplicitModifier(modifier)));
-
-    final PsiCodeBlock oldBody = method.getBody();
-    if (oldBody == null) {
-      return method;
-    }
-
-    oldBody.replace(body);
-
-    return method;
-  }
-
-  @Nullable
-  static PsiCodeBlock createIterativeBody(@NotNull final Project project,
-                                          @NotNull final PsiElementFactory factory,
-                                          @NotNull final PsiClass psiClass,
-                                          @NotNull final PsiMethod oldMethod,
-                                          @NotNull final List<Variable> variables) {
-    final JavaCodeStyleManager styleManager = JavaCodeStyleManager.getInstance(project);
-    final String oldMethodName = oldMethod.getName();
-    final String frameClassName =
-      styleManager.suggestUniqueVariableName(Utilities.capitalize(oldMethodName) + Constants.FRAME, psiClass, true);
-    final PsiType returnType = oldMethod.getReturnType();
-    if (returnType == null) {
-      return null;
-    }
-
-    final String blockFieldName = styleManager.suggestUniqueVariableName(Constants.BLOCK_FIELD_NAME, oldMethod, true);
+  static void createIterativeBody(@NotNull final JavaCodeStyleManager styleManager,
+                                  @NotNull final PsiElementFactory factory,
+                                  @NotNull final String frameClassName,
+                                  @NotNull final PsiMethod method,
+                                  @NotNull final List<Variable> variables) {
+    final String blockFieldName = styleManager.suggestUniqueVariableName(Constants.BLOCK_FIELD_NAME, method, true);
     variables.add(new Variable(blockFieldName, PsiType.INT.getPresentableText()));
 
-    final PsiCodeBlock block = (PsiCodeBlock)oldMethod.getBody().copy();
+    PsiCodeBlock body = method.getBody();
+    if (body == null) {
+      return;
+    }
 
-    Visitors.replaceForEachStatementsWithForStatements(block);
-    Visitors.replaceForStatementsWithWhileStatements(block);
+    final String frameVarName = styleManager.suggestUniqueVariableName(Constants.FRAME_VAR_NAME, body, true);
+    final String stackVarName = styleManager.suggestUniqueVariableName(Constants.STACK_VAR_NAME, body, true);
 
-    block.accept(new JavaRecursiveElementVisitor() {
+    PsiWhileStatement whileStatement = (PsiWhileStatement)factory.createStatementFromText(
+      "while (true) {" +
+      frameClassName + " " + frameVarName + " = " + stackVarName + ".get(" + stackVarName + ".size() - 1);" +
+      body.getText() +
+      "}", null);
+
+    body = (PsiCodeBlock)body.replace(factory.createCodeBlock());
+
+    body.add(styleManager.shortenClassReferences(factory.createStatementFromText(
+      "java.util.List<" + frameClassName + "> " + stackVarName + " = new java.util.ArrayList<>();", null)));
+    final String arguments =
+      Arrays.stream(method.getParameterList().getParameters()).map(PsiNamedElement::getName).collect(Collectors.joining(","));
+    body.add(createAddStatement(factory, frameClassName, stackVarName, arguments));
+    final PsiType returnType = method.getReturnType();
+    if (returnType == null) {
+      return;
+    }
+    final String retVarName = styleManager.suggestUniqueVariableName(Constants.RET_VAR_NAME, body, true);
+    if (!(returnType instanceof PsiPrimitiveType) || !(PsiPrimitiveType.VOID.equals(returnType))) {
+      body.add(factory.createStatementFromText(
+        returnType.getPresentableText() + " " + retVarName + " = " + getInitialValue(returnType) + ";", null));
+    }
+
+    whileStatement = (PsiWhileStatement)body.add(whileStatement);
+
+    final PsiBlockStatement whileStatementBody = (PsiBlockStatement)whileStatement.getBody();
+    if (whileStatementBody == null) {
+      return;
+    }
+    final PsiBlockStatement lastBodyStatement = (PsiBlockStatement)whileStatementBody.getCodeBlock().getLastBodyElement();
+    if (lastBodyStatement == null) {
+      return;
+    }
+    body = lastBodyStatement.getCodeBlock();
+
+    Visitors.replaceForEachStatementsWithForStatements(body);
+    Visitors.replaceForStatementsWithWhileStatements(body);
+
+    body.accept(new JavaRecursiveElementVisitor() {
       @Override
       public void visitLocalVariable(PsiLocalVariable variable) {
         super.visitLocalVariable(variable);
@@ -68,20 +75,16 @@ class IterativeMethodGenerator {
       }
     });
 
-    final String frameVarName = styleManager.suggestUniqueVariableName(Constants.FRAME_VAR_NAME, block, true);
+    Visitors.replaceSingleStatementsWithBlockStatements(factory, body);
 
-    Visitors.replaceSingleStatementsWithBlockStatements(factory, block);
-    extractRecursiveCallsToStatements(factory, styleManager, block, oldMethodName, returnType, variables);
+    extractRecursiveCallsToStatements(factory, styleManager, body, returnType, variables);
 
-    replaceIdentifierWithFrameAccess(factory, frameVarName, variables, block);
-    replaceDeclarationsWithInitializersWithAssignments(factory, frameVarName, block);
-
-    final String stackVarName = styleManager.suggestUniqueVariableName(Constants.STACK_VAR_NAME, block, true);
-    final String retVarName = styleManager.suggestUniqueVariableName(Constants.RET_VAR_NAME, block, true);
+    replaceIdentifierWithFrameAccess(factory, frameVarName, variables, body);
+    replaceDeclarationsWithInitializersWithAssignments(factory, frameVarName, body);
 
     final BasicBlocksGenerator basicBlocksGenerator =
-      new BasicBlocksGenerator(factory, oldMethodName, frameClassName, frameVarName, blockFieldName, stackVarName, returnType);
-    block.accept(basicBlocksGenerator);
+      new BasicBlocksGenerator(factory, frameClassName, frameVarName, blockFieldName, stackVarName, returnType, retVarName);
+    body.accept(basicBlocksGenerator);
     final List<BasicBlocksGenerator.Pair> blocks = basicBlocksGenerator.getBlocks();
 
     blocks.forEach(codeBlock -> replaceReturnStatements(factory, codeBlock.getBlock(), stackVarName, retVarName));
@@ -90,51 +93,21 @@ class IterativeMethodGenerator {
       .map(section -> "case " + section.getId() + ": " + section.getBlock().getText())
       .collect(Collectors.joining(""));
 
-    final PsiCodeBlock body = factory.createCodeBlock();
-
-    body.add(createStackDeclaration(project, factory, frameClassName, stackVarName));
-    final String arguments =
-      Arrays.stream(oldMethod.getParameterList().getParameters()).map(PsiNamedElement::getName).collect(Collectors.joining(","));
-    body.add(createAddStatement(factory, frameClassName, stackVarName, arguments));
-    addRetDeclaration(factory, body, returnType, retVarName);
-    body.add(factory.createStatementFromText("while (true) {" +
-                                             frameClassName +
-                                             " " +
-                                             frameVarName +
-                                             " = " +
-                                             stackVarName +
-                                             ".get(" +
-                                             stackVarName +
-                                             ".size() - 1);" +
-                                             "switch (" +
-                                             frameVarName +
-                                             "." +
-                                             blockFieldName +
-                                             ") {" +
-                                             casesString +
-                                             "} }", null));
-
-    return body;
+    body.replace(factory.createStatementFromText(
+      "switch (" + frameVarName + "." + blockFieldName + ") {" + casesString + "}", null));
   }
 
+  // TODO: FIX BUG
   private static void replaceIdentifierWithFrameAccess(@NotNull final PsiElementFactory factory,
                                                        @NotNull final String frameVarName,
                                                        @NotNull final List<Variable> variables,
                                                        @NotNull final PsiCodeBlock block) {
     for (final PsiReferenceExpression expression : Visitors.extractReferenceExpressions(block)) {
       final PsiElement element = expression.resolve();
-      if (element instanceof PsiLocalVariable) {
-        final PsiLocalVariable variable = (PsiLocalVariable)element;
-        if (variables.stream().anyMatch(variable1 -> variable1.getName().equals(variable.getName()))) {
-          final PsiElement nameElement = expression.getReferenceNameElement();
-          nameElement.replace(factory.createExpressionFromText(frameVarName + "." + nameElement.getText(), null));
-        }
-      }
-      if (element instanceof PsiParameter) {
-        final PsiParameter parameter = (PsiParameter)element;
-        if (variables.stream().anyMatch(variable1 -> variable1.getName().equals(parameter.getName()))) {
-          final PsiElement nameElement = expression.getReferenceNameElement();
-          nameElement.replace(factory.createExpressionFromText(frameVarName + "." + nameElement.getText(), null));
+      if (element instanceof PsiLocalVariable || element instanceof PsiParameter) {
+        final PsiNamedElement namedElement = (PsiNamedElement)element;
+        if (variables.stream().anyMatch(variable -> variable.getName().equals(namedElement.getName()))) {
+          expression.setQualifierExpression(factory.createExpressionFromText(frameVarName, null));
         }
       }
     }
@@ -147,19 +120,21 @@ class IterativeMethodGenerator {
     for (final PsiReturnStatement statement : Visitors.extractReturnStatements(block)) {
       final PsiExpression returnValue = statement.getReturnValue();
       final boolean hasExpression = returnValue != null;
-      final List<PsiStatement> statements = new ArrayList<>();
-      if (hasExpression) {
-        statements.add(factory.createStatementFromText(retVarName + " = " + returnValue.getText() + ";", null));
-      }
-      statements.add(factory.createStatementFromText(
-        "if (" + stackVarName + ".size() == 1)\n" + "return " + (hasExpression ? retVarName : "") + ";\n", null));
-      statements.add(factory.createStatementFromText(stackVarName + ".remove(" + stackVarName + ".size() - 1);", null));
-      statements.add(factory.createStatementFromText("break;", null));
-      PsiElement anchor = statement;
       final PsiCodeBlock parentBlock = PsiTreeUtil.getParentOfType(statement, PsiCodeBlock.class, true);
-      for (PsiStatement statement1 : statements) {
-        anchor = parentBlock.addAfter(statement1, anchor);
+      if (parentBlock == null) {
+        continue;
       }
+      PsiElement anchor = statement;
+      if (hasExpression) {
+        anchor = parentBlock.addAfter(factory.createStatementFromText(
+          retVarName + " = " + returnValue.getText() + ";", null), anchor);
+      }
+      anchor = parentBlock.addAfter(factory.createStatementFromText(
+        "if (" + stackVarName + ".size() == 1)\n" + "return " + (hasExpression ? retVarName : "") + ";\n", null), anchor);
+      anchor = parentBlock.addAfter(factory.createStatementFromText(
+        stackVarName + ".remove(" + stackVarName + ".size() - 1);", null), anchor);
+      parentBlock.addAfter(factory.createStatementFromText("break;", null), anchor);
+
       statement.delete();
     }
   }
@@ -168,27 +143,22 @@ class IterativeMethodGenerator {
                                                                          @NotNull final String frameVarName,
                                                                          @NotNull final PsiCodeBlock block) {
     for (final PsiDeclarationStatement statement : Visitors.extractDeclarationStatements(block)) {
-      final PsiElement[] elements = statement.getDeclaredElements();
-      final List<PsiStatement> assignments = new ArrayList<>();
-      for (final PsiElement element : elements) {
+      final PsiCodeBlock parentBlock = PsiTreeUtil.getParentOfType(statement, PsiCodeBlock.class, true);
+      if (parentBlock == null) {
+        continue;
+      }
+      PsiElement anchor = statement;
+      for (final PsiElement element : statement.getDeclaredElements()) {
         if (!(element instanceof PsiLocalVariable)) {
           continue;
         }
         final PsiLocalVariable variable = (PsiLocalVariable)element;
-        if (!variable.hasInitializer()) {
+        final PsiExpression initializer = variable.getInitializer();
+        if (initializer == null) {
           continue;
         }
-        assignments.add(factory.createStatementFromText(
-          frameVarName + "." + variable.getName() + " = " + variable.getInitializer().getText() + ";", null));
-      }
-      final PsiElement parent = statement.getParent();
-      if (!(parent instanceof PsiCodeBlock)) {
-        continue;
-      }
-      final PsiCodeBlock parentBlock = (PsiCodeBlock)parent;
-      PsiElement anchor = statement;
-      for (PsiStatement assignment : assignments) {
-        anchor = parentBlock.addAfter(assignment, anchor);
+        anchor = parentBlock.addAfter(factory.createStatementFromText(
+          frameVarName + "." + variable.getName() + " = " + initializer.getText() + ";", null), anchor);
       }
       statement.delete();
     }
@@ -223,29 +193,38 @@ class IterativeMethodGenerator {
     return "null";
   }
 
-  private static void addRetDeclaration(@NotNull final PsiElementFactory factory,
-                                        @NotNull final PsiCodeBlock body,
-                                        @NotNull final PsiType returnType,
-                                        @NotNull final String retVarName) {
-    if (returnType instanceof PsiPrimitiveType && PsiPrimitiveType.VOID.equals(returnType)) {
-      return;
+  @Nullable
+  static PsiMethod isRecursiveMethodCall(@NotNull final PsiMethodCallExpression expression) {
+    final PsiMethod containingMethod =
+      PsiTreeUtil.getParentOfType(expression, PsiMethod.class, true, PsiClass.class, PsiLambdaExpression.class);
+    if (containingMethod == null) {
+      return null;
     }
-    body.add(factory.createStatementFromText(returnType.getPresentableText() + " " + retVarName + " = " + getInitialValue(returnType) + ";",
-                                             null));
+    final PsiMethod resolvedMethod = expression.resolveMethod();
+    if (!containingMethod.equals(resolvedMethod)) {
+      return null;
+    }
+    final PsiExpression qualifier = ParenthesesUtils.stripParentheses(expression.getMethodExpression().getQualifierExpression());
+    if (qualifier != null && !(qualifier instanceof PsiThisExpression) && MethodUtils.isOverridden(containingMethod)) {
+      return null;
+    }
+    return containingMethod;
   }
 
   private static void extractRecursiveCallsToStatements(@NotNull final PsiElementFactory factory,
                                                         @NotNull final JavaCodeStyleManager styleManager,
                                                         @NotNull final PsiCodeBlock block,
-                                                        @NotNull final String oldMethodName,
                                                         @NotNull final PsiType returnType,
                                                         @NotNull final List<Variable> variables) {
-    for (PsiMethodCallExpression call : Visitors.extractRecursiveCalls(block, oldMethodName)) {
+    for (final PsiMethodCallExpression call : Visitors.extractRecursiveCalls(block)) {
       final PsiStatement parentStatement = PsiTreeUtil.getParentOfType(call, PsiStatement.class, true);
       if (parentStatement == call.getParent() && parentStatement instanceof PsiExpressionStatement) {
         continue;
       }
       final PsiCodeBlock parentBlock = PsiTreeUtil.getParentOfType(call, PsiCodeBlock.class, true);
+      if (parentBlock == null) {
+        continue;
+      }
       final String temp = styleManager.suggestUniqueVariableName(Constants.TEMP, block, true);
       variables.add(new Variable(temp, returnType.getPresentableText()));
       parentBlock.addBefore(factory.createVariableDeclarationStatement(temp, returnType, call), parentStatement);
@@ -254,20 +233,10 @@ class IterativeMethodGenerator {
   }
 
   @NotNull
-  static <T extends PsiElement> PsiStatement createAddStatement(@NotNull final PsiElementFactory factory,
-                                                                @NotNull final String frameClassName,
-                                                                @NotNull final String stackVarName,
-                                                                @NotNull final String arguments) {
+  static PsiStatement createAddStatement(@NotNull final PsiElementFactory factory,
+                                         @NotNull final String frameClassName,
+                                         @NotNull final String stackVarName,
+                                         @NotNull final String arguments) {
     return factory.createStatementFromText(stackVarName + ".add(new " + frameClassName + "(" + arguments + "));", null);
-  }
-
-  @NotNull
-  private static PsiElement createStackDeclaration(@NotNull final Project project,
-                                                   @NotNull final PsiElementFactory factory,
-                                                   @NotNull final String frameClassName,
-                                                   @NotNull final String stackVarName) {
-    final PsiStatement declarationStatement = factory.createStatementFromText(
-      "java.util.List<" + frameClassName + "> " + stackVarName + " = new java.util.ArrayList<>();", null);
-    return JavaCodeStyleManager.getInstance(project).shortenClassReferences(declarationStatement);
   }
 }

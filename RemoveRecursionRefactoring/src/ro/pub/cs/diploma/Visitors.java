@@ -15,16 +15,17 @@ class Visitors {
       .collect(Collectors.toList());
   }
 
-  // TODO: Replace the name check with something that checks the resolved reference.
-  static List<PsiMethodCallExpression> extractRecursiveCalls(PsiCodeBlock block, String name) {
+  static List<PsiMethodCallExpression> extractRecursiveCalls(PsiCodeBlock block) {
     final List<PsiMethodCallExpression> calls = new ArrayList<>();
     block.accept(new JavaRecursiveElementWalkingVisitor() {
       @Override
       public void visitMethodCallExpression(PsiMethodCallExpression expression) {
         super.visitMethodCallExpression(expression);
-        if (expression.getMethodExpression().getReferenceName().equals(name)) {
-          calls.add(expression);
+        final PsiMethod containingMethod = IterativeMethodGenerator.isRecursiveMethodCall(expression);
+        if (containingMethod == null) {
+          return;
         }
+        calls.add(expression);
       }
     });
     return calls;
