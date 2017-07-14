@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 class IterativeMethodGenerator {
@@ -39,9 +40,8 @@ class IterativeMethodGenerator {
 
     body.add(styleManager.shortenClassReferences(factory.createStatementFromText(
       "java.util.List<" + frameClassName + "> " + stackVarName + " = new java.util.ArrayList<>();", null)));
-    final String arguments =
-      Arrays.stream(method.getParameterList().getParameters()).map(PsiNamedElement::getName).collect(Collectors.joining(","));
-    body.add(createAddStatement(factory, frameClassName, stackVarName, arguments));
+    body
+      .add(createAddStatement(factory, frameClassName, stackVarName, method.getParameterList().getParameters(), PsiNamedElement::getName));
     final PsiType returnType = method.getReturnType();
     if (returnType == null) {
       return;
@@ -230,10 +230,12 @@ class IterativeMethodGenerator {
   }
 
   @NotNull
-  static PsiStatement createAddStatement(@NotNull final PsiElementFactory factory,
-                                         @NotNull final String frameClassName,
-                                         @NotNull final String stackVarName,
-                                         @NotNull final String arguments) {
-    return factory.createStatementFromText(stackVarName + ".add(new " + frameClassName + "(" + arguments + "));", null);
+  static <T extends PsiElement> PsiStatement createAddStatement(@NotNull final PsiElementFactory factory,
+                                                                @NotNull final String frameClassName,
+                                                                @NotNull final String stackVarName,
+                                                                @NotNull final T[] arguments,
+                                                                @NotNull Function<T, String> function) {
+    final String argumentsString = Arrays.stream(arguments).map(function).collect(Collectors.joining(","));
+    return factory.createStatementFromText(stackVarName + ".add(new " + frameClassName + "(" + argumentsString + "));", null);
   }
 }

@@ -4,8 +4,10 @@ import com.intellij.psi.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   class Pair {
@@ -190,9 +192,9 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
 
     final Pair newPair = newPair();
 
-    final String arguments =
-      Arrays.stream(expression.getArgumentList().getExpressions()).map(PsiElement::getText).collect(Collectors.joining(","));
-    currentPair.getBlock().add(IterativeMethodGenerator.createAddStatement(factory, frameClassName, stackVarName, arguments));
+    currentPair.getBlock().add(IterativeMethodGenerator
+                                 .createAddStatement(factory, frameClassName, stackVarName, expression.getArgumentList().getExpressions(),
+                                                     PsiElement::getText));
     createJump(newPair.getId());
 
     currentStatement.delete();
