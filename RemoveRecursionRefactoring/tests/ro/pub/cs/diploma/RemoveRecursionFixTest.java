@@ -88,4 +88,8 @@ public class RemoveRecursionFixTest extends IGQuickFixesTestCase {
   public void testContinueStatement() {
     doTest();
   }
+
+  public void testDoWhileStatement() {
+    doTest();
+  }
 }

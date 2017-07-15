@@ -179,6 +179,27 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   }
 
   @Override
+  public void visitDoWhileStatement(PsiDoWhileStatement statement) {
+    final Pair conditionPair = newPair();
+    final Pair bodyPair = newPair();
+    final Pair mergePair = newPair();
+
+    breakJumps.put(statement, mergePair.getId());
+    continueJumps.put(statement, conditionPair.getId());
+
+    createJump(bodyPair.getId());
+
+    currentPair = bodyPair;
+    statement.getBody().accept(this);
+    createJump(conditionPair.getId());
+
+    currentPair = conditionPair;
+    createConditionalJump(statement.getCondition(), bodyPair.getId(), mergePair.getId());
+
+    currentPair = mergePair;
+  }
+
+  @Override
   public void visitBlockStatement(PsiBlockStatement statement) {
     //        super.visitBlockStatement(statement);
     for (PsiStatement statement1 : statement.getCodeBlock().getStatements()) {
