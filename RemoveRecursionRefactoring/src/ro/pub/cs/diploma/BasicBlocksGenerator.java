@@ -40,6 +40,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   private final PsiType returnType;
   private final String retVarName;
   private final Map<PsiStatement, Integer> breakJumps = new HashMap<>();
+  private final Map<PsiStatement, Integer> continueJumps = new HashMap<>();
 
   private Pair newPair() {
     final Pair pair = new Pair(factory.createCodeBlock(), blockCounter++);
@@ -155,6 +156,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     final Pair mergePair = newPair();
 
     breakJumps.put(statement, mergePair.getId());
+    continueJumps.put(statement, conditionPair.getId());
 
     createJump(conditionPair.getId());
 
@@ -216,6 +218,16 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
       return;
     }
     createJump(breakJumps.get(exitedStatement));
+  }
+
+  @Override
+  public void visitContinueStatement(PsiContinueStatement statement) {
+    super.visitContinueStatement(statement);
+    final PsiStatement continuedStatement = statement.findContinuedStatement();
+    if (continuedStatement == null) {
+      return;
+    }
+    createJump(continueJumps.get(continuedStatement));
   }
 
   List<Pair> getBlocks() {
