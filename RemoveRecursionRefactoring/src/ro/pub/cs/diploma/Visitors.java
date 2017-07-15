@@ -27,6 +27,14 @@ class Visitors {
         }
         calls.add(expression);
       }
+
+      @Override
+      public void visitClass(PsiClass aClass) {
+      }
+
+      @Override
+      public void visitLambdaExpression(PsiLambdaExpression expression) {
+      }
     });
     return calls;
   }
@@ -39,6 +47,14 @@ class Visitors {
         super.visitDeclarationStatement(statement);
         declarations.add(statement);
       }
+
+      @Override
+      public void visitClass(PsiClass aClass) {
+      }
+
+      @Override
+      public void visitLambdaExpression(PsiLambdaExpression expression) {
+      }
     });
     return declarations;
   }
@@ -50,6 +66,14 @@ class Visitors {
       public void visitReturnStatement(PsiReturnStatement statement) {
         super.visitReturnStatement(statement);
         returnStatements.add(statement);
+      }
+
+      @Override
+      public void visitClass(PsiClass aClass) {
+      }
+
+      @Override
+      public void visitLambdaExpression(PsiLambdaExpression expression) {
       }
     });
     return returnStatements;

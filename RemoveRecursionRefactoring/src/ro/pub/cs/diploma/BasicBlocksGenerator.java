@@ -10,6 +10,14 @@ import java.util.List;
 import java.util.Map;
 
 class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
+  @Override
+  public void visitLambdaExpression(PsiLambdaExpression expression) {
+  }
+
+  @Override
+  public void visitClass(PsiClass aClass) {
+  }
+
   class Pair {
     private final PsiCodeBlock block;
     private final int id;
