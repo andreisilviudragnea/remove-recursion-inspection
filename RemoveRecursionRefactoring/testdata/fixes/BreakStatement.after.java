@@ -30,20 +30,12 @@ public class BreakStatement {
                 case 4: {
                     frame.list.add(frame.iter);
                     frame.count--;
-                    frame.block = frame.count == 0 ? 6 : 7;
+                    frame.block = frame.count == 0 ? 5 : 3;
                     break;
                 }
                 case 5: {
                     stack.add(new BreakStatementFrame(frame.iter - 1, frame.list));
                     frame.block = 8;
-                    break;
-                }
-                case 6: {
-                    frame.block = 5;
-                    break;
-                }
-                case 7: {
-                    frame.block = 3;
                     break;
                 }
                 case 8: {

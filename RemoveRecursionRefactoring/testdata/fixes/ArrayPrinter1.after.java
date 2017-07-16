@@ -37,10 +37,6 @@ public class ArrayPrinter1 {
                 }
                 case 4: {
                     stack.add(new DisplayArray1Frame(frame.mid + 1, frame.last));
-                    frame.block = 5;
-                    break;
-                }
-                case 5: {
                     frame.block = 2;
                     break;
                 }

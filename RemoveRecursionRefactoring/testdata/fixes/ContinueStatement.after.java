@@ -29,7 +29,7 @@ public class ContinueStatement {
                 }
                 case 4: {
                     frame.count--;
-                    frame.block = frame.count > 2 ? 6 : 7;
+                    frame.block = frame.count > 2 ? 3 : 7;
                     break;
                 }
                 case 5: {
@@ -37,21 +37,9 @@ public class ContinueStatement {
                     frame.block = 10;
                     break;
                 }
-                case 6: {
-                    frame.block = 3;
-                    break;
-                }
                 case 7: {
                     frame.list.add(frame.iter);
-                    frame.block = frame.count == 0 ? 8 : 9;
-                    break;
-                }
-                case 8: {
-                    frame.block = 5;
-                    break;
-                }
-                case 9: {
-                    frame.block = 3;
+                    frame.block = frame.count == 0 ? 5 : 3;
                     break;
                 }
                 case 10: {

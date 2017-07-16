@@ -1,7 +1,6 @@
 package ro.pub.cs.diploma;
 
 import com.intellij.psi.*;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -18,6 +17,9 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   class Pair {
     private final PsiCodeBlock block;
     private final int id;
+    private JumpBase jump;
+    private final List<Reference> references = new ArrayList<>();
+    private boolean isFinished = false;
 
     Pair(final PsiCodeBlock block, final int id) {
       this.block = block;
@@ -30,6 +32,69 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
 
     int getId() {
       return id;
+    }
+
+    public void setJump(JumpBase jump) {
+      this.jump = jump;
+    }
+
+    void addReference(Reference reference) {
+      references.add(reference);
+    }
+  }
+
+  private class JumpBase {
+
+  }
+
+  private class Jump extends JumpBase {
+    private Reference ref;
+
+    private Jump(Reference ref) {
+      this.ref = ref;
+    }
+
+    @Override
+    public String toString() {
+      return ref.toString();
+    }
+  }
+
+  private class ConditionalJump extends JumpBase {
+    private String condition;
+    private Reference ref1;
+    private Reference ref2;
+
+    private ConditionalJump(String condition, Reference ref1, Reference ref2) {
+      this.condition = condition;
+      this.ref1 = ref1;
+      this.ref2 = ref2;
+    }
+
+    @Override
+    public String toString() {
+      return condition + " ? " + ref1 + " : " + ref2;
+    }
+  }
+
+  private class Reference {
+    private int value;
+
+    Reference(int value) {
+      this.value = value;
+    }
+
+    public int getValue() {
+      return value;
+    }
+
+    public void setValue(int value) {
+      this.value = value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
     }
   }
 
@@ -59,38 +124,35 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     return factory.createStatementFromText(text, null);
   }
 
-  @Contract(pure = true)
-  private static boolean breakOrReturnStatement(@NotNull final PsiStatement statement) {
-    return statement instanceof PsiBreakStatement || statement instanceof PsiReturnStatement;
-  }
-
-  private boolean isJumpNecessary() {
-    final PsiStatement[] statements = currentPair.getBlock().getStatements();
-    return statements.length == 0 || !breakOrReturnStatement(statements[statements.length - 1]);
-  }
-
-  private boolean createJumpCommon(String indexExpression) {
-    if (!isJumpNecessary()) {
-      return false;
-    }
-    final PsiCodeBlock block = currentPair.getBlock();
-    block.add(createStatement(frameVarName + "." + blockFieldName + " = " + indexExpression + ";"));
-    block.add(createStatement("break;"));
-    return true;
-  }
-
   private void createJump(int index) {
-    final boolean jumped = createJumpCommon(Integer.toString(index));
-    if (jumped && theBlocks.contains(currentPair)) {
-      theBlocks.add(blocksMap.get(index));
+    if (currentPair.isFinished) {
+      return;
+    }
+    currentPair.isFinished = true;
+    if (theBlocks.contains(currentPair)) {
+      final Reference ref = new Reference(index);
+      currentPair.setJump(new Jump(ref));
+      final Pair pair = blocksMap.get(index);
+      pair.addReference(ref);
+      theBlocks.add(pair);
     }
   }
 
   private void createConditionalJump(PsiExpression condition, int thenIndex, int elseIndex) {
-    final boolean jumped = createJumpCommon(condition.getText() + " ? " + thenIndex + " : " + elseIndex);
-    if (jumped && theBlocks.contains(currentPair)) {
-      theBlocks.add(blocksMap.get(thenIndex));
-      theBlocks.add(blocksMap.get(elseIndex));
+    if (currentPair.isFinished) {
+      return;
+    }
+    currentPair.isFinished = true;
+    if (theBlocks.contains(currentPair)) {
+      final Reference ref1 = new Reference(thenIndex);
+      final Reference ref2 = new Reference(elseIndex);
+      currentPair.setJump(new ConditionalJump(condition.getText(), ref1, ref2));
+      final Pair thenPair = blocksMap.get(thenIndex);
+      thenPair.addReference(ref1);
+      theBlocks.add(thenPair);
+      final Pair elsePair = blocksMap.get(elseIndex);
+      elsePair.addReference(ref2);
+      theBlocks.add(elsePair);
     }
   }
 
@@ -218,6 +280,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   public void visitReturnStatement(PsiReturnStatement statement) {
     //        super.visitReturnStatement(statement);
     currentPair.getBlock().add(statement);
+    currentPair.isFinished = true;
   }
 
   @Override
@@ -267,6 +330,25 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   }
 
   List<Pair> getBlocks() {
-    return new ArrayList<>(theBlocks);
+    final List<Pair> pairs = new ArrayList<>();
+    for (Pair theBlock : theBlocks) {
+      if (theBlock.block.getStatements().length == 0 && theBlock.jump instanceof Jump) {
+        Jump jump = (Jump)theBlock.jump;
+        for (Reference reference : theBlock.references) {
+          reference.setValue(jump.ref.getValue());
+        }
+        continue;
+      }
+      pairs.add(theBlock);
+    }
+
+    for (Pair pair : pairs) {
+      if (pair.jump != null) {
+        pair.block.add(createStatement(frameVarName + "." + blockFieldName + " = " + pair.jump.toString() + ";"));
+        pair.block.add(createStatement("break;"));
+      }
+    }
+
+    return pairs;
   }
 }

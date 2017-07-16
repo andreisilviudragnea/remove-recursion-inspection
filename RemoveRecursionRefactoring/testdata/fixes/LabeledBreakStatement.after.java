@@ -24,11 +24,7 @@ public class LabeledBreakStatement {
                     break;
                 }
                 case 3: {
-                    frame.block = true ? 4 : 5;
-                    break;
-                }
-                case 4: {
-                    frame.block = 6;
+                    frame.block = true ? 6 : 5;
                     break;
                 }
                 case 5: {
@@ -37,25 +33,13 @@ public class LabeledBreakStatement {
                     break;
                 }
                 case 6: {
-                    frame.block = true ? 7 : 8;
+                    frame.block = true ? 7 : 3;
                     break;
                 }
                 case 7: {
                     frame.list.add(frame.iter);
                     frame.count--;
-                    frame.block = frame.count == 0 ? 9 : 10;
-                    break;
-                }
-                case 8: {
-                    frame.block = 3;
-                    break;
-                }
-                case 9: {
-                    frame.block = 5;
-                    break;
-                }
-                case 10: {
-                    frame.block = 6;
+                    frame.block = frame.count == 0 ? 5 : 6;
                     break;
                 }
                 case 11: {

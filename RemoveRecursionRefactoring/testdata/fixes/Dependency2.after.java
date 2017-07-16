@@ -42,7 +42,7 @@ class Dependency2 {
                 }
                 case 5: {
                     frame.id = frame.iterator.next();
-                    frame.block = frame.ids2.contains(frame.id) ? 7 : 8;
+                    frame.block = frame.ids2.contains(frame.id) ? 7 : 4;
                     break;
                 }
                 case 6: {
@@ -57,10 +57,6 @@ class Dependency2 {
                     if (stack.size() == 1)
                         return ret;
                     stack.remove(stack.size() - 1);
-                    break;
-                }
-                case 8: {
-                    frame.block = 4;
                     break;
                 }
             }
