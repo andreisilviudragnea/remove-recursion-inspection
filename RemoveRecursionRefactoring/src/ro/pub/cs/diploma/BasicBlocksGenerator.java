@@ -34,7 +34,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
       return id;
     }
 
-    public void setJump(JumpBase jump) {
+    void setJump(JumpBase jump) {
       this.jump = jump;
     }
 
@@ -84,11 +84,11 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
       this.value = value;
     }
 
-    public int getValue() {
+    int getValue() {
       return value;
     }
 
-    public void setValue(int value) {
+    void setValue(int value) {
       this.value = value;
     }
 
