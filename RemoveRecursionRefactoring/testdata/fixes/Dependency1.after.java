@@ -24,8 +24,6 @@ class Dependency1 {
                     stack.remove(stack.size() - 1);
                     break;
                 }
-                case 2: {
-                }
                 case 3: {
                     stack.add(new FactorialFrame(frame.val - 1, frame.runningVal * frame.val));
                     frame.block = 4;

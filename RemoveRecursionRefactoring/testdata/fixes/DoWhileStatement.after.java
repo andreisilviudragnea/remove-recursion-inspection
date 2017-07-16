@@ -23,14 +23,14 @@ public class DoWhileStatement {
                     frame.block = 4;
                     break;
                 }
-                case 3: {
-                    frame.block = frame.count > 1 ? 4 : 5;
-                    break;
-                }
                 case 4: {
                     frame.list.add(frame.iter);
                     frame.count--;
                     frame.block = 3;
+                    break;
+                }
+                case 3: {
+                    frame.block = frame.count > 1 ? 4 : 5;
                     break;
                 }
                 case 5: {

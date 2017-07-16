@@ -20,8 +20,6 @@ public class Factorial1 {
                     stack.remove(stack.size() - 1);
                     break;
                 }
-                case 2: {
-                }
                 case 3: {
                     stack.add(new Factorial1Frame(frame.n - 1));
                     frame.block = 4;

@@ -4,10 +4,7 @@ import com.intellij.psi.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   @Override
@@ -36,7 +33,6 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     }
   }
 
-  private final List<Pair> blocks = new ArrayList<>();
   private Pair currentPair;
   private PsiStatement currentStatement;
   private final PsiElementFactory factory;
@@ -49,10 +45,12 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   private final String retVarName;
   private final Map<PsiStatement, Integer> breakJumps = new HashMap<>();
   private final Map<PsiStatement, Integer> continueJumps = new HashMap<>();
+  private final Map<Integer, Pair> blocksMap = new HashMap<>();
+  private final Set<Pair> theBlocks = new LinkedHashSet<>();
 
   private Pair newPair() {
     final Pair pair = new Pair(factory.createCodeBlock(), blockCounter++);
-    blocks.add(pair);
+    blocksMap.put(pair.getId(), pair);
     return pair;
   }
 
@@ -71,21 +69,29 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     return statements.length == 0 || !breakOrReturnStatement(statements[statements.length - 1]);
   }
 
-  private void createJumpCommon(String indexExpression) {
+  private boolean createJumpCommon(String indexExpression) {
     if (!isJumpNecessary()) {
-      return;
+      return false;
     }
     final PsiCodeBlock block = currentPair.getBlock();
     block.add(createStatement(frameVarName + "." + blockFieldName + " = " + indexExpression + ";"));
     block.add(createStatement("break;"));
+    return true;
   }
 
   private void createJump(int index) {
-    createJumpCommon(Integer.toString(index));
+    final boolean jumped = createJumpCommon(Integer.toString(index));
+    if (jumped && theBlocks.contains(currentPair)) {
+      theBlocks.add(blocksMap.get(index));
+    }
   }
 
   private void createConditionalJump(PsiExpression condition, int thenIndex, int elseIndex) {
-    createJumpCommon(condition.getText() + "? " + thenIndex + " : " + elseIndex);
+    final boolean jumped = createJumpCommon(condition.getText() + " ? " + thenIndex + " : " + elseIndex);
+    if (jumped && theBlocks.contains(currentPair)) {
+      theBlocks.add(blocksMap.get(thenIndex));
+      theBlocks.add(blocksMap.get(elseIndex));
+    }
   }
 
   BasicBlocksGenerator(final PsiElementFactory factory,
@@ -97,6 +103,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
                        final String retVarName) {
     this.factory = factory;
     currentPair = newPair();
+    theBlocks.add(currentPair);
     this.frameClassName = frameClassName;
     this.frameVarName = frameVarName;
     this.blockFieldName = blockFieldName;
@@ -260,6 +267,6 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   }
 
   List<Pair> getBlocks() {
-    return blocks;
+    return new ArrayList<>(theBlocks);
   }
 }

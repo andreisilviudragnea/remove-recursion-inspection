@@ -23,16 +23,16 @@ public class ArrayPrinter1 {
                     frame.block = 2;
                     break;
                 }
-                case 2: {
-                    if (stack.size() == 1)
-                        return;
-                    stack.remove(stack.size() - 1);
-                    break;
-                }
                 case 3: {
                     frame.mid = frame.first + (frame.last - frame.first) / 2;
                     stack.add(new DisplayArray1Frame(frame.first, frame.mid));
                     frame.block = 4;
+                    break;
+                }
+                case 2: {
+                    if (stack.size() == 1)
+                        return;
+                    stack.remove(stack.size() - 1);
                     break;
                 }
                 case 4: {

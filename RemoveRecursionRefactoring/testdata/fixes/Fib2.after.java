@@ -20,8 +20,6 @@ public class Fib2 {
                     stack.remove(stack.size() - 1);
                     break;
                 }
-                case 2: {
-                }
                 case 3: {
                     frame.block = frame.n == 1 ? 4 : 6;
                     break;
@@ -31,10 +29,6 @@ public class Fib2 {
                     if (stack.size() == 1)
                         return ret;
                     stack.remove(stack.size() - 1);
-                    break;
-                }
-                case 5: {
-                    frame.block = 2;
                     break;
                 }
                 case 6: {
