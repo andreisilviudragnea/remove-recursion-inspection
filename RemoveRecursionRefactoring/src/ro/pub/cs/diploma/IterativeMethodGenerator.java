@@ -2,12 +2,15 @@ package ro.pub.cs.diploma;
 
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
+import com.intellij.psi.search.LocalSearchScope;
+import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.siyeh.ig.psiutils.MethodUtils;
 import com.siyeh.ig.psiutils.ParenthesesUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
@@ -78,7 +81,7 @@ class IterativeMethodGenerator {
       }
     });
 
-    replaceIdentifierWithFrameAccess(factory, frameVarName, variables, body);
+    replaceIdentifierWithFrameAccess(factory, frameVarName, stackVarName, method, body);
     replaceDeclarationsWithInitializersWithAssignments(factory, frameVarName, body);
 
     final BasicBlocksGenerator basicBlocksGenerator =
@@ -99,13 +102,39 @@ class IterativeMethodGenerator {
   // TODO: FIX BUG
   private static void replaceIdentifierWithFrameAccess(@NotNull final PsiElementFactory factory,
                                                        @NotNull final String frameVarName,
-                                                       @NotNull final List<Variable> variables,
-                                                       @NotNull final PsiCodeBlock block) {
-    for (final PsiReferenceExpression expression : Visitors.extractReferenceExpressions(block)) {
-      final PsiElement element = expression.resolve();
-      if (element instanceof PsiLocalVariable || element instanceof PsiParameter) {
-        final PsiNamedElement namedElement = (PsiNamedElement)element;
-        if (variables.stream().anyMatch(variable -> variable.getName().equals(namedElement.getName()))) {
+                                                       @NotNull final String stackVarName,
+                                                       @NotNull final PsiMethod method,
+                                                       @NotNull final PsiCodeBlock body) {
+    List<PsiVariable> theVariables = new ArrayList<>();
+    method.accept(new JavaRecursiveElementVisitor() {
+      @Override
+      public void visitParameter(PsiParameter parameter) {
+        super.visitParameter(parameter);
+        theVariables.add(parameter);
+      }
+
+      @Override
+      public void visitLocalVariable(PsiLocalVariable variable) {
+        super.visitLocalVariable(variable);
+        final String name = variable.getName();
+        if (stackVarName.equals(name) || frameVarName.equals(name))
+          return;
+        theVariables.add(variable);
+      }
+
+      @Override
+      public void visitClass(PsiClass aClass) {
+      }
+
+      @Override
+      public void visitLambdaExpression(PsiLambdaExpression expression) {
+      }
+    });
+
+    for (PsiVariable variable : theVariables) {
+      for (PsiReference reference : ReferencesSearch.search(variable, new LocalSearchScope(body))) {
+        if (reference instanceof PsiReferenceExpression) {
+          PsiReferenceExpression expression = (PsiReferenceExpression)reference;
           expression.setQualifierExpression(factory.createExpressionFromText(frameVarName, null));
         }
       }
