@@ -3,18 +3,9 @@ package ro.pub.cs.diploma;
 import com.intellij.psi.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 class Visitors {
-  static List<Variable> extractVariables(PsiMethod method) {
-    return Arrays
-      .stream(method.getParameterList().getParameters())
-      .map(parameter -> new Variable(parameter.getName(), parameter.getType().getPresentableText()))
-      .collect(Collectors.toList());
-  }
-
   static List<PsiMethodCallExpression> extractRecursiveCalls(PsiCodeBlock block) {
     final List<PsiMethodCallExpression> calls = new ArrayList<>();
     block.accept(new JavaRecursiveElementWalkingVisitor() {
@@ -77,18 +68,6 @@ class Visitors {
       }
     });
     return returnStatements;
-  }
-
-  static List<PsiReferenceExpression> extractReferenceExpressions(PsiCodeBlock block) {
-    final List<PsiReferenceExpression> expressions = new ArrayList<>();
-    block.accept(new JavaRecursiveElementWalkingVisitor() {
-      @Override
-      public void visitReferenceExpression(PsiReferenceExpression expression) {
-        super.visitReferenceExpression(expression);
-        expressions.add(expression);
-      }
-    });
-    return expressions;
   }
 
   static void replaceSingleStatementsWithBlockStatements(PsiElementFactory factory, PsiCodeBlock block) {
