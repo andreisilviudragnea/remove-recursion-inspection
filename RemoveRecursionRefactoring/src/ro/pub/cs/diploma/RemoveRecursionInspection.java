@@ -68,7 +68,7 @@ public class RemoveRecursionInspection extends BaseInspection {
       if (method == null) {
         return;
       }
-      RemoveRecursionRefactoringAction.removeRecursion(method, project, true);
+      IterativeMethodGenerator.createIterativeBody(method, project, true);
     }
   }
 

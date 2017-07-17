@@ -48,11 +48,11 @@ public class NameClash {
     }
 
     private static class NameClashFrame {
-        int frame;
-        int stack;
-        int block;
-        int ret;
-        int temp;
+        private int frame;
+        private int stack;
+        private int ret;
+        private int temp;
+        private int block;
 
         private NameClashFrame(int frame, int stack) {
             this.frame = frame;

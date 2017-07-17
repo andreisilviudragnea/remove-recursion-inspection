@@ -27,11 +27,11 @@ class Dependency3 {
     }
 
     private static class CalculateFrame {
-        int one;
-        int two;
-        int three;
-        int block;
-        int temp;
+        private int one;
+        private int two;
+        private int three;
+        private int temp;
+        private int block;
 
         private CalculateFrame(int one, int two, int three) {
             this.one = one;

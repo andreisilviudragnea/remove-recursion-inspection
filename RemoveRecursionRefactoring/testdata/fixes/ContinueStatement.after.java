@@ -53,10 +53,10 @@ public class ContinueStatement {
     }
 
     private static class ContFrame {
-        int iter;
-        List<Integer> list;
-        int block;
-        int count;
+        private int iter;
+        private List<Integer> list;
+        private int count;
+        private int block;
 
         private ContFrame(int iter, List<Integer> list) {
             this.iter = iter;

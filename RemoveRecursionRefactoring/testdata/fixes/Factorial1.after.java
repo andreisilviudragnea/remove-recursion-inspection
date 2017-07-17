@@ -38,9 +38,9 @@ public class Factorial1 {
     }
 
     private static class Factorial1Frame {
-        int n;
-        int block;
-        int temp;
+        private int n;
+        private int temp;
+        private int block;
 
         private Factorial1Frame(int n) {
             this.n = n;

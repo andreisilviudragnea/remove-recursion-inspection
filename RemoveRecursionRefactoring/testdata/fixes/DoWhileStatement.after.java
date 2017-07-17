@@ -49,10 +49,10 @@ public class DoWhileStatement {
     }
 
     private static class DoWhileStatementFrame {
-        int iter;
-        List<Integer> list;
-        int block;
-        int count;
+        private int iter;
+        private List<Integer> list;
+        private int count;
+        private int block;
 
         private DoWhileStatementFrame(int iter, List<Integer> list) {
             this.iter = iter;

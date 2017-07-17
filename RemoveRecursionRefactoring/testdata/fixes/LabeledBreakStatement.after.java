@@ -53,10 +53,10 @@ public class LabeledBreakStatement {
     }
 
     private static class LabeledBreakStatementFrame {
-        int iter;
-        List<Integer> list;
-        int block;
-        int count;
+        private int iter;
+        private List<Integer> list;
+        private int count;
+        private int block;
 
         private LabeledBreakStatementFrame(int iter, List<Integer> list) {
             this.iter = iter;

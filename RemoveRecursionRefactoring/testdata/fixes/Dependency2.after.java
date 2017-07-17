@@ -64,12 +64,12 @@ class Dependency2 {
     }
 
     private static class IntersectFrame {
-        Set<String> ids1;
-        Set<String> ids2;
-        int block;
-        boolean temp;
-        Iterator<String> iterator;
-        String id;
+        private Set<String> ids1;
+        private Set<String> ids2;
+        private boolean temp;
+        private Iterator<String> iterator;
+        private String id;
+        private int block;
 
         private IntersectFrame(Set<String> ids1, Set<String> ids2) {
             this.ids1 = ids1;

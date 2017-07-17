@@ -1,5 +1,6 @@
 package ro.pub.cs.diploma;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.psi.search.LocalSearchScope;
@@ -17,21 +18,49 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 class IterativeMethodGenerator {
-  static void createIterativeBody(@NotNull final JavaCodeStyleManager styleManager,
-                                  @NotNull final PsiElementFactory factory,
-                                  @NotNull final String frameClassName,
-                                  @NotNull final PsiMethod method,
-                                  @NotNull final List<Variable> variables) {
-    final String blockFieldName = styleManager.suggestUniqueVariableName(Constants.BLOCK_FIELD_NAME, method, true);
-    variables.add(new Variable(blockFieldName, PsiType.INT.getPresentableText()));
+  static void createIterativeBody(PsiMethod oldMethod, Project project, boolean replaceOriginalMethod) {
+    final PsiClass psiClass = PsiTreeUtil.getParentOfType(oldMethod, PsiClass.class, true);
+    if (psiClass == null) {
+      return;
+    }
+    final PsiElementFactory factory = JavaPsiFacade.getElementFactory(project);
+    final JavaCodeStyleManager styleManager = JavaCodeStyleManager.getInstance(project);
+    final PsiMethod method;
+    if (replaceOriginalMethod) {
+      method = oldMethod;
+    }
+    else {
+      method = (PsiMethod)psiClass.addAfter(oldMethod, oldMethod);
+      method.setName(styleManager.suggestUniqueVariableName(oldMethod.getName() + Constants.ITERATIVE, psiClass, true));
+    }
 
     PsiCodeBlock body = method.getBody();
     if (body == null) {
       return;
     }
 
-    final String frameVarName = styleManager.suggestUniqueVariableName(Constants.FRAME_VAR_NAME, body, true);
-    final String stackVarName = styleManager.suggestUniqueVariableName(Constants.STACK_VAR_NAME, body, true);
+    Visitors.replaceForEachStatementsWithForStatements(body);
+    Visitors.replaceForStatementsWithWhileStatements(body);
+    Visitors.replaceSingleStatementsWithBlockStatements(factory, body);
+
+    final PsiType returnType = method.getReturnType();
+    if (returnType == null) {
+      return;
+    }
+    extractRecursiveCallsToStatements(factory, styleManager, body, returnType);
+
+    final String frameClassName =
+      styleManager.suggestUniqueVariableName(Utilities.capitalize(oldMethod.getName()) + Constants.FRAME, psiClass, true);
+    final String blockFieldName = styleManager.suggestUniqueVariableName(Constants.BLOCK_FIELD_NAME, method, true);
+
+    final PsiClass frameClass = FrameClassGenerator.createFrameClass(factory, method, frameClassName, blockFieldName);
+    if (frameClass == null) {
+      return;
+    }
+    psiClass.addAfter(frameClass, method);
+
+    final String frameVarName = styleManager.suggestUniqueVariableName(Constants.FRAME_VAR_NAME, method, true);
+    final String stackVarName = styleManager.suggestUniqueVariableName(Constants.STACK_VAR_NAME, method, true);
 
     PsiWhileStatement whileStatement = (PsiWhileStatement)factory.createStatementFromText(
       "while (true) {" +
@@ -45,11 +74,7 @@ class IterativeMethodGenerator {
       "java.util.List<" + frameClassName + "> " + stackVarName + " = new java.util.ArrayList<>();", null)));
     body
       .add(createAddStatement(factory, frameClassName, stackVarName, method.getParameterList().getParameters(), PsiNamedElement::getName));
-    final PsiType returnType = method.getReturnType();
-    if (returnType == null) {
-      return;
-    }
-    final String retVarName = styleManager.suggestUniqueVariableName(Constants.RET_VAR_NAME, body, true);
+    final String retVarName = styleManager.suggestUniqueVariableName(Constants.RET_VAR_NAME, method, true);
     if (!(returnType instanceof PsiPrimitiveType) || !(PsiPrimitiveType.VOID.equals(returnType))) {
       body.add(factory.createStatementFromText(
         returnType.getPresentableText() + " " + retVarName + " = " + getInitialValue(returnType) + ";", null));
@@ -66,20 +91,6 @@ class IterativeMethodGenerator {
       return;
     }
     body = lastBodyStatement.getCodeBlock();
-
-    Visitors.replaceForEachStatementsWithForStatements(body);
-    Visitors.replaceForStatementsWithWhileStatements(body);
-    Visitors.replaceSingleStatementsWithBlockStatements(factory, body);
-
-    extractRecursiveCallsToStatements(factory, styleManager, body, returnType);
-
-    body.accept(new JavaRecursiveElementVisitor() {
-      @Override
-      public void visitLocalVariable(PsiLocalVariable variable) {
-        super.visitLocalVariable(variable);
-        variables.add(new Variable(variable.getName(), variable.getType().getPresentableText()));
-      }
-    });
 
     replaceIdentifierWithFrameAccess(factory, frameVarName, stackVarName, method, body);
     replaceDeclarationsWithInitializersWithAssignments(factory, frameVarName, body);
@@ -99,27 +110,27 @@ class IterativeMethodGenerator {
       "switch (" + frameVarName + "." + blockFieldName + ") {" + casesString + "}", null));
   }
 
-  // TODO: FIX BUG
   private static void replaceIdentifierWithFrameAccess(@NotNull final PsiElementFactory factory,
                                                        @NotNull final String frameVarName,
                                                        @NotNull final String stackVarName,
                                                        @NotNull final PsiMethod method,
                                                        @NotNull final PsiCodeBlock body) {
-    List<PsiVariable> theVariables = new ArrayList<>();
+    List<PsiVariable> variables = new ArrayList<>();
     method.accept(new JavaRecursiveElementVisitor() {
       @Override
       public void visitParameter(PsiParameter parameter) {
         super.visitParameter(parameter);
-        theVariables.add(parameter);
+        variables.add(parameter);
       }
 
       @Override
       public void visitLocalVariable(PsiLocalVariable variable) {
         super.visitLocalVariable(variable);
         final String name = variable.getName();
-        if (stackVarName.equals(name) || frameVarName.equals(name))
+        if (frameVarName.equals(name) || stackVarName.equals(name)) {
           return;
-        theVariables.add(variable);
+        }
+        variables.add(variable);
       }
 
       @Override
@@ -131,7 +142,7 @@ class IterativeMethodGenerator {
       }
     });
 
-    for (PsiVariable variable : theVariables) {
+    for (PsiVariable variable : variables) {
       for (PsiReference reference : ReferencesSearch.search(variable, new LocalSearchScope(body))) {
         if (reference instanceof PsiReferenceExpression) {
           PsiReferenceExpression expression = (PsiReferenceExpression)reference;

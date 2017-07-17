@@ -49,10 +49,10 @@ public class BreakStatement {
     }
 
     private static class BreakStatementFrame {
-        int iter;
-        List<Integer> list;
-        int block;
-        int count;
+        private int iter;
+        private List<Integer> list;
+        private int count;
+        private int block;
 
         private BreakStatementFrame(int iter, List<Integer> list) {
             this.iter = iter;

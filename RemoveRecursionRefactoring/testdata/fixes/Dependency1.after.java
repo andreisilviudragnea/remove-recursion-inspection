@@ -42,10 +42,10 @@ class Dependency1 {
     }
 
     private static class FactorialFrame {
-        int val;
-        int runningVal;
-        int block;
-        int temp;
+        private int val;
+        private int runningVal;
+        private int temp;
+        private int block;
 
         private FactorialFrame(int val, int runningVal) {
             this.val = val;

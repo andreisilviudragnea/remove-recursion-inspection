@@ -45,10 +45,10 @@ public class ArrayPrinter1 {
     }
 
     private static class DisplayArray1Frame {
-        int first;
-        int last;
-        int block;
-        int mid;
+        private int first;
+        private int last;
+        private int mid;
+        private int block;
 
         private DisplayArray1Frame(int first, int last) {
             this.first = first;

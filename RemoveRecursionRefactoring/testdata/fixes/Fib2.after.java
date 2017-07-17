@@ -55,10 +55,10 @@ public class Fib2 {
     }
 
     private static class Fib2Frame {
-        int n;
-        int block;
-        int temp;
-        int temp1;
+        private int n;
+        private int temp;
+        private int temp1;
+        private int block;
 
         private Fib2Frame(int n) {
             this.n = n;

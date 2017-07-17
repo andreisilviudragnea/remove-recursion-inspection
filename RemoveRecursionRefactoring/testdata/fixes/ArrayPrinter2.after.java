@@ -48,11 +48,11 @@ public class ArrayPrinter2 {
     }
 
     private static class DisplayArray2Frame {
-        int first;
-        int last;
-        int block;
-        int mid;
-        int mid1;
+        private int first;
+        private int last;
+        private int mid;
+        private int mid1;
+        private int block;
 
         private DisplayArray2Frame(int first, int last) {
             this.first = first;
