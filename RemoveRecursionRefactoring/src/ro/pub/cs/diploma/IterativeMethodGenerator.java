@@ -95,19 +95,21 @@ class IterativeMethodGenerator {
     replaceIdentifierWithFrameAccess(factory, frameVarName, stackVarName, method, body);
     replaceDeclarationsWithInitializersWithAssignments(factory, frameVarName, body);
 
+    final String switchLabelName = styleManager.suggestUniqueVariableName(Constants.SWITCH_LABEL, method, true);
+
     final BasicBlocksGenerator basicBlocksGenerator =
-      new BasicBlocksGenerator(factory, frameClassName, frameVarName, blockFieldName, stackVarName, returnType, retVarName);
+      new BasicBlocksGenerator(factory, frameClassName, frameVarName, blockFieldName, stackVarName, returnType, retVarName, switchLabelName);
     body.accept(basicBlocksGenerator);
     final List<BasicBlocksGenerator.Pair> blocks = basicBlocksGenerator.getBlocks();
 
-    blocks.forEach(codeBlock -> replaceReturnStatements(factory, codeBlock.getBlock(), stackVarName, retVarName));
+    blocks.forEach(codeBlock -> replaceReturnStatements(factory, codeBlock.getBlock(), stackVarName, retVarName, switchLabelName));
 
     final String casesString = blocks.stream()
       .map(section -> "case " + section.getId() + ": " + section.getBlock().getText())
       .collect(Collectors.joining(""));
 
     body.replace(factory.createStatementFromText(
-      "switch (" + frameVarName + "." + blockFieldName + ") {" + casesString + "}", null));
+      switchLabelName + ": switch (" + frameVarName + "." + blockFieldName + ") {" + casesString + "}", null));
   }
 
   private static void replaceIdentifierWithFrameAccess(@NotNull final PsiElementFactory factory,
@@ -155,7 +157,8 @@ class IterativeMethodGenerator {
   private static void replaceReturnStatements(@NotNull final PsiElementFactory factory,
                                               @NotNull final PsiCodeBlock block,
                                               @NotNull final String stackVarName,
-                                              @NotNull final String retVarName) {
+                                              @NotNull final String retVarName,
+                                              @NotNull final String switchLabelName) {
     for (final PsiReturnStatement statement : Visitors.extractReturnStatements(block)) {
       final PsiExpression returnValue = statement.getReturnValue();
       final boolean hasExpression = returnValue != null;
@@ -172,7 +175,7 @@ class IterativeMethodGenerator {
         "if (" + stackVarName + ".size() == 1)\n" + "return " + (hasExpression ? retVarName : "") + ";\n", null), anchor);
       anchor = parentBlock.addAfter(factory.createStatementFromText(
         stackVarName + ".remove(" + stackVarName + ".size() - 1);", null), anchor);
-      parentBlock.addAfter(factory.createStatementFromText("break;", null), anchor);
+      parentBlock.addAfter(factory.createStatementFromText("break " + switchLabelName + ";", null), anchor);
 
       statement.delete();
     }

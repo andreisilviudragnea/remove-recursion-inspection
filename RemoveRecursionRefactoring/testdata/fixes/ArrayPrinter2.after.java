@@ -13,35 +13,32 @@ public class ArrayPrinter2 {
         stack.add(new DisplayArray2Frame(first, last));
         while (true) {
             DisplayArray2Frame frame = stack.get(stack.size() - 1);
+            switchLabel:
             switch (frame.block) {
                 case 0: {
-                    frame.block = frame.first == frame.last ? 1 : 2;
-                    break;
-                }
-                case 1: {
-                    System.out.print(array[frame.first] + " ");
-                    if (stack.size() == 1)
-                        return;
-                    stack.remove(stack.size() - 1);
-                    break;
-                }
-                case 2: {
+                    if (frame.first == frame.last) {
+                        System.out.print(array[frame.first] + " ");
+                        if (stack.size() == 1)
+                            return;
+                        stack.remove(stack.size() - 1);
+                        break switchLabel;
+                    }
                     frame.mid = frame.first + (frame.last - frame.first) / 2;
                     frame.mid1 = frame.first + (frame.last - frame.first) / 2;
                     stack.add(new DisplayArray2Frame(frame.first, frame.mid));
-                    frame.block = 3;
-                    break;
+                    frame.block = 1;
+                    break switchLabel;
                 }
-                case 3: {
+                case 1: {
                     stack.add(new DisplayArray2Frame(frame.mid1 + 1, frame.last));
-                    frame.block = 4;
-                    break;
+                    frame.block = 2;
+                    break switchLabel;
                 }
-                case 4: {
+                case 2: {
                     if (stack.size() == 1)
                         return;
                     stack.remove(stack.size() - 1);
-                    break;
+                    break switchLabel;
                 }
             }
         }

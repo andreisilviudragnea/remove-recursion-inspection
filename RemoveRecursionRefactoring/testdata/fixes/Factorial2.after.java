@@ -8,30 +8,27 @@ class Factorial2 {
         int ret = 0;
         while (true) {
             Factorial2Frame frame = stack.get(stack.size() - 1);
+            switchLabel:
             switch (frame.block) {
                 case 0: {
-                    frame.block = frame.n == 0 ? 1 : 2;
-                    break;
+                    if (frame.n == 0) {
+                        ret = 1;
+                        if (stack.size() == 1)
+                            return ret;
+                        stack.remove(stack.size() - 1);
+                        break switchLabel;
+                    }
+                    stack.add(new Factorial2Frame(frame.n - 1));
+                    frame.block = 1;
+                    break switchLabel;
                 }
                 case 1: {
-                    ret = 1;
-                    if (stack.size() == 1)
-                        return ret;
-                    stack.remove(stack.size() - 1);
-                    break;
-                }
-                case 2: {
-                    stack.add(new Factorial2Frame(frame.n - 1));
-                    frame.block = 3;
-                    break;
-                }
-                case 3: {
                     frame.temp = ret;
                     ret = frame.n * frame.temp;
                     if (stack.size() == 1)
                         return ret;
                     stack.remove(stack.size() - 1);
-                    break;
+                    break switchLabel;
                 }
             }
         }

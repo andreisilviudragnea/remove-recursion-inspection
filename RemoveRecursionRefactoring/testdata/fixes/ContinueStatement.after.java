@@ -7,46 +7,35 @@ public class ContinueStatement {
         stack.add(new ContFrame(iter, list));
         while (true) {
             ContFrame frame = stack.get(stack.size() - 1);
+            switchLabel:
             switch (frame.block) {
                 case 0: {
-                    frame.block = frame.iter == 0 ? 1 : 2;
-                    break;
+                    if (frame.iter == 0) {
+                        if (stack.size() == 1)
+                            return;
+                        stack.remove(stack.size() - 1);
+                        break switchLabel;
+                    }
+                    frame.count = frame.iter;
+                    while (true) {
+                        frame.count--;
+                        if (frame.count > 2) {
+                            continue;
+                        }
+                        frame.list.add(frame.iter);
+                        if (frame.count == 0) {
+                            break;
+                        }
+                    }
+                    stack.add(new ContFrame(frame.iter - 1, frame.list));
+                    frame.block = 1;
+                    break switchLabel;
                 }
                 case 1: {
                     if (stack.size() == 1)
                         return;
                     stack.remove(stack.size() - 1);
-                    break;
-                }
-                case 2: {
-                    frame.count = frame.iter;
-                    frame.block = 3;
-                    break;
-                }
-                case 3: {
-                    frame.block = true ? 4 : 5;
-                    break;
-                }
-                case 4: {
-                    frame.count--;
-                    frame.block = frame.count > 2 ? 3 : 7;
-                    break;
-                }
-                case 5: {
-                    stack.add(new ContFrame(frame.iter - 1, frame.list));
-                    frame.block = 10;
-                    break;
-                }
-                case 7: {
-                    frame.list.add(frame.iter);
-                    frame.block = frame.count == 0 ? 5 : 3;
-                    break;
-                }
-                case 10: {
-                    if (stack.size() == 1)
-                        return;
-                    stack.remove(stack.size() - 1);
-                    break;
+                    break switchLabel;
                 }
             }
         }

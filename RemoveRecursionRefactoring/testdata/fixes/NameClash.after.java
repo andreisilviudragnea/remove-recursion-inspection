@@ -13,35 +13,32 @@ public class NameClash {
         stack1.add(new NameClashFrame(frame, stack));
         while (true) {
             NameClashFrame frame1 = stack1.get(stack1.size() - 1);
+            switchLabel:
             switch (frame1.block) {
                 case 0: {
-                    frame1.block = frame1.frame == frame1.stack ? 1 : 2;
-                    break;
-                }
-                case 1: {
-                    System.out.print(array[frame1.frame] + " ");
-                    if (stack1.size() == 1)
-                        return;
-                    stack1.remove(stack1.size() - 1);
-                    break;
-                }
-                case 2: {
+                    if (frame1.frame == frame1.stack) {
+                        System.out.print(array[frame1.frame] + " ");
+                        if (stack1.size() == 1)
+                            return;
+                        stack1.remove(stack1.size() - 1);
+                        break switchLabel;
+                    }
                     frame1.ret = frame1.frame + (frame1.stack - frame1.frame) / 2;
                     frame1.temp = frame1.frame + (frame1.stack - frame1.frame) / 2;
                     stack1.add(new NameClashFrame(frame1.frame, frame1.ret));
-                    frame1.block = 3;
-                    break;
+                    frame1.block = 1;
+                    break switchLabel;
                 }
-                case 3: {
+                case 1: {
                     stack1.add(new NameClashFrame(frame1.temp + 1, frame1.stack));
-                    frame1.block = 4;
-                    break;
+                    frame1.block = 2;
+                    break switchLabel;
                 }
-                case 4: {
+                case 2: {
                     if (stack1.size() == 1)
                         return;
                     stack1.remove(stack1.size() - 1);
-                    break;
+                    break switchLabel;
                 }
             }
         }

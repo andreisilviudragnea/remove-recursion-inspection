@@ -8,11 +8,12 @@ class Dependency4 {
         int ret = 0;
         while (true) {
             CalculateFrame frame = stack.get(stack.size() - 1);
+            switchLabel:
             switch (frame.block) {
                 case 0: {
                     stack.add(new CalculateFrame(frame.one ^ 2, frame.one * frame.two, frame.one + frame.two + frame.three));
                     frame.block = 1;
-                    break;
+                    break switchLabel;
                 }
                 case 1: {
                     frame.temp = ret;
@@ -20,7 +21,7 @@ class Dependency4 {
                     if (stack.size() == 1)
                         return ret;
                     stack.remove(stack.size() - 1);
-                    break;
+                    break switchLabel;
                 }
             }
         }

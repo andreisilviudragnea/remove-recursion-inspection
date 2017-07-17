@@ -8,22 +8,23 @@ public class Factorial1 {
         int ret = 0;
         while (true) {
             Factorial1Frame frame = stack.get(stack.size() - 1);
+            switchLabel:
             switch (frame.block) {
                 case 0: {
                     frame.block = frame.n == 0 ? 1 : 3;
-                    break;
+                    break switchLabel;
                 }
                 case 1: {
                     ret = 1;
                     if (stack.size() == 1)
                         return ret;
                     stack.remove(stack.size() - 1);
-                    break;
+                    break switchLabel;
                 }
                 case 3: {
                     stack.add(new Factorial1Frame(frame.n - 1));
                     frame.block = 4;
-                    break;
+                    break switchLabel;
                 }
                 case 4: {
                     frame.temp = ret;
@@ -31,7 +32,7 @@ public class Factorial1 {
                     if (stack.size() == 1)
                         return ret;
                     stack.remove(stack.size() - 1);
-                    break;
+                    break switchLabel;
                 }
             }
         }

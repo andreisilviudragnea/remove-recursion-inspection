@@ -12,22 +12,23 @@ class Dependency1 {
         int ret = 0;
         while (true) {
             FactorialFrame frame = stack.get(stack.size() - 1);
+            switchLabel:
             switch (frame.block) {
                 case 0: {
                     frame.block = frame.val == 1 ? 1 : 3;
-                    break;
+                    break switchLabel;
                 }
                 case 1: {
                     ret = frame.runningVal;
                     if (stack.size() == 1)
                         return ret;
                     stack.remove(stack.size() - 1);
-                    break;
+                    break switchLabel;
                 }
                 case 3: {
                     stack.add(new FactorialFrame(frame.val - 1, frame.runningVal * frame.val));
                     frame.block = 4;
-                    break;
+                    break switchLabel;
                 }
                 case 4: {
                     frame.temp = ret;
@@ -35,7 +36,7 @@ class Dependency1 {
                     if (stack.size() == 1)
                         return ret;
                     stack.remove(stack.size() - 1);
-                    break;
+                    break switchLabel;
                 }
             }
         }

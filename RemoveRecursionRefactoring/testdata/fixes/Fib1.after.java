@@ -8,47 +8,40 @@ public class Fib1 {
         int ret = 0;
         while (true) {
             Fib1Frame frame = stack.get(stack.size() - 1);
+            switchLabel:
             switch (frame.block) {
                 case 0: {
-                    frame.block = frame.n == 0 ? 1 : 2;
-                    break;
+                    if (frame.n == 0) {
+                        ret = 0;
+                        if (stack.size() == 1)
+                            return ret;
+                        stack.remove(stack.size() - 1);
+                        break switchLabel;
+                    }
+                    if (frame.n == 1) {
+                        ret = 1;
+                        if (stack.size() == 1)
+                            return ret;
+                        stack.remove(stack.size() - 1);
+                        break switchLabel;
+                    }
+                    stack.add(new Fib1Frame(frame.n - 1));
+                    frame.block = 1;
+                    break switchLabel;
                 }
                 case 1: {
-                    ret = 0;
-                    if (stack.size() == 1)
-                        return ret;
-                    stack.remove(stack.size() - 1);
-                    break;
-                }
-                case 2: {
-                    frame.block = frame.n == 1 ? 3 : 4;
-                    break;
-                }
-                case 3: {
-                    ret = 1;
-                    if (stack.size() == 1)
-                        return ret;
-                    stack.remove(stack.size() - 1);
-                    break;
-                }
-                case 4: {
-                    stack.add(new Fib1Frame(frame.n - 1));
-                    frame.block = 5;
-                    break;
-                }
-                case 5: {
                     frame.temp = ret;
                     stack.add(new Fib1Frame(frame.n - 2));
-                    frame.block = 6;
-                    break;
+                    frame.block = 2;
+                    break switchLabel;
                 }
-                case 6: {
+                case 2: {
                     frame.temp1 = ret;
                     ret = frame.temp + frame.temp1;
                     if (stack.size() == 1)
                         return ret;
                     stack.remove(stack.size() - 1);
-                    break;
+                    break switchLabel;
                 }
             }
         }

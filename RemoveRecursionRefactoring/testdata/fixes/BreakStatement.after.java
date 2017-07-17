@@ -7,42 +7,32 @@ public class BreakStatement {
         stack.add(new BreakStatementFrame(iter, list));
         while (true) {
             BreakStatementFrame frame = stack.get(stack.size() - 1);
+            switchLabel:
             switch (frame.block) {
                 case 0: {
-                    frame.block = frame.iter == 0 ? 1 : 2;
-                    break;
+                    if (frame.iter == 0) {
+                        if (stack.size() == 1)
+                            return;
+                        stack.remove(stack.size() - 1);
+                        break switchLabel;
+                    }
+                    frame.count = frame.iter;
+                    while (true) {
+                        frame.list.add(frame.iter);
+                        frame.count--;
+                        if (frame.count == 0) {
+                            break;
+                        }
+                    }
+                    stack.add(new BreakStatementFrame(frame.iter - 1, frame.list));
+                    frame.block = 1;
+                    break switchLabel;
                 }
                 case 1: {
                     if (stack.size() == 1)
                         return;
                     stack.remove(stack.size() - 1);
-                    break;
-                }
-                case 2: {
-                    frame.count = frame.iter;
-                    frame.block = 3;
-                    break;
-                }
-                case 3: {
-                    frame.block = true ? 4 : 5;
-                    break;
-                }
-                case 4: {
-                    frame.list.add(frame.iter);
-                    frame.count--;
-                    frame.block = frame.count == 0 ? 5 : 3;
-                    break;
-                }
-                case 5: {
-                    stack.add(new BreakStatementFrame(frame.iter - 1, frame.list));
-                    frame.block = 8;
-                    break;
-                }
-                case 8: {
-                    if (stack.size() == 1)
-                        return;
-                    stack.remove(stack.size() - 1);
-                    break;
+                    break switchLabel;
                 }
             }
         }

@@ -13,20 +13,34 @@ class Dependency2 {
         boolean ret = false;
         while (true) {
             IntersectFrame frame = stack.get(stack.size() - 1);
+            switchLabel:
             switch (frame.block) {
                 case 0: {
                     frame.block = frame.ids1.size() > frame.ids2.size() ? 1 : 2;
-                    break;
+                    break switchLabel;
                 }
                 case 1: {
                     stack.add(new IntersectFrame(frame.ids2, frame.ids1));
                     frame.block = 3;
-                    break;
+                    break switchLabel;
                 }
                 case 2: {
                     frame.iterator = frame.ids1.iterator();
-                    frame.block = 4;
-                    break;
+                    while (frame.iterator.hasNext()) {
+                        frame.id = frame.iterator.next();
+                        if (frame.ids2.contains(frame.id)) {
+                            ret = true;
+                            if (stack.size() == 1)
+                                return ret;
+                            stack.remove(stack.size() - 1);
+                            break switchLabel;
+                        }
+                    }
+                    ret = false;
+                    if (stack.size() == 1)
+                        return ret;
+                    stack.remove(stack.size() - 1);
+                    break switchLabel;
                 }
                 case 3: {
                     frame.temp = ret;
@@ -34,30 +48,7 @@ class Dependency2 {
                     if (stack.size() == 1)
                         return ret;
                     stack.remove(stack.size() - 1);
-                    break;
-                }
-                case 4: {
-                    frame.block = frame.iterator.hasNext() ? 5 : 6;
-                    break;
-                }
-                case 5: {
-                    frame.id = frame.iterator.next();
-                    frame.block = frame.ids2.contains(frame.id) ? 7 : 4;
-                    break;
-                }
-                case 6: {
-                    ret = false;
-                    if (stack.size() == 1)
-                        return ret;
-                    stack.remove(stack.size() - 1);
-                    break;
-                }
-                case 7: {
-                    ret = true;
-                    if (stack.size() == 1)
-                        return ret;
-                    stack.remove(stack.size() - 1);
-                    break;
+                    break switchLabel;
                 }
             }
         }

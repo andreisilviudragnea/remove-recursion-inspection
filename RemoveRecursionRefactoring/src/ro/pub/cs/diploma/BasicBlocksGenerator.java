@@ -88,6 +88,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   private final String stackVarName;
   private final PsiType returnType;
   private final String retVarName;
+  private final String switchLabelName;
   private final Map<PsiStatement, Integer> breakJumps = new HashMap<>();
   private final Map<PsiStatement, Integer> continueJumps = new HashMap<>();
   private final Map<Integer, Pair> blocksMap = new HashMap<>();
@@ -142,7 +143,8 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
                        final String blockFieldName,
                        final String stackVarName,
                        final PsiType returnType,
-                       final String retVarName) {
+                       final String retVarName,
+                       final String switchLabelName) {
     this.factory = factory;
     currentPair = newPair();
     theBlocks.add(currentPair);
@@ -152,11 +154,12 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     this.stackVarName = stackVarName;
     this.returnType = returnType;
     this.retVarName = retVarName;
+    this.switchLabelName = switchLabelName;
   }
 
   @Override
   public void visitCodeBlock(PsiCodeBlock block) {
-    super.visitCodeBlock(block);
+    Arrays.stream(block.getStatements()).forEach(this::processStatement);
 
     final PsiStatement[] statements = block.getStatements();
     // This is a hack, this method gets called only for the method block, not for blocks of block statements.
@@ -249,18 +252,24 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   }
 
   @Override
-  public void visitBlockStatement(PsiBlockStatement statement) {
-    //        super.visitBlockStatement(statement);
-    for (PsiStatement statement1 : statement.getCodeBlock().getStatements()) {
-      statement1.accept(this);
+  public void visitBlockStatement(PsiBlockStatement blockStatement) {
+    Arrays.stream(blockStatement.getCodeBlock().getStatements()).forEach(this::processStatement);
+  }
+
+  private void processStatement(PsiStatement statement) {
+    if (Visitors.containsRecursiveCalls(statement)) {
+      statement.accept(this);
+    } else {
+      currentPair.getBlock().add(statement);
+    }
+    if (statement instanceof PsiReturnStatement) {
+      currentPair.isFinished = true;
     }
   }
 
   @Override
   public void visitReturnStatement(PsiReturnStatement statement) {
-    //        super.visitReturnStatement(statement);
     currentPair.getBlock().add(statement);
-    currentPair.isFinished = true;
   }
 
   @Override
@@ -327,7 +336,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     for (Pair pair : pairs) {
       if (pair.jump != null) {
         pair.block.add(createStatement(frameVarName + "." + blockFieldName + " = " + pair.jump.toString() + ";"));
-        pair.block.add(createStatement("break;"));
+        pair.block.add(createStatement("break " + switchLabelName + ";"));
       }
     }
 

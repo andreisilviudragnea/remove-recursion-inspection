@@ -11,4 +11,5 @@ class Constants {
   @NonNls static final String STACK_VAR_NAME = "stack";
   @NonNls static final String RET_VAR_NAME = "ret";
   @NonNls static final String ITERATIVE = "Iterative";
+  @NonNls static final String SWITCH_LABEL = "switchLabel";
 }

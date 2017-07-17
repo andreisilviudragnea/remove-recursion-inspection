@@ -1,5 +1,6 @@
 package ro.pub.cs.diploma;
 
+import com.intellij.openapi.util.Ref;
 import com.intellij.psi.*;
 
 import java.util.ArrayList;
@@ -68,6 +69,31 @@ class Visitors {
       }
     });
     return returnStatements;
+  }
+
+  static boolean containsRecursiveCalls(PsiStatement statement) {
+    final Ref<Boolean> contains = new Ref<>(false);
+    statement.accept(new JavaRecursiveElementWalkingVisitor() {
+      @Override
+      public void visitMethodCallExpression(PsiMethodCallExpression expression) {
+        super.visitMethodCallExpression(expression);
+        final PsiMethod containingMethod = IterativeMethodGenerator.isRecursiveMethodCall(expression);
+        if (containingMethod == null) {
+          return;
+        }
+        contains.set(true);
+        stopWalking();
+      }
+
+      @Override
+      public void visitClass(PsiClass aClass) {
+      }
+
+      @Override
+      public void visitLambdaExpression(PsiLambdaExpression expression) {
+      }
+    });
+    return contains.get();
   }
 
   static void replaceSingleStatementsWithBlockStatements(PsiElementFactory factory, PsiCodeBlock block) {
