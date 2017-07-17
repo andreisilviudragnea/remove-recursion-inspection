@@ -1,5 +1,6 @@
 package ro.pub.cs.diploma;
 
+import com.intellij.openapi.util.Ref;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,7 +19,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     private final PsiCodeBlock block;
     private final int id;
     private JumpBase jump;
-    private final List<Reference> references = new ArrayList<>();
+    private final List<Ref<Integer>> references = new ArrayList<>();
     private boolean isFinished = false;
 
     Pair(final PsiCodeBlock block, final int id) {
@@ -38,7 +39,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
       this.jump = jump;
     }
 
-    void addReference(Reference reference) {
+    void addReference(Ref<Integer> reference) {
       references.add(reference);
     }
   }
@@ -48,9 +49,9 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   }
 
   private class Jump extends JumpBase {
-    private Reference ref;
+    private Ref<Integer> ref;
 
-    private Jump(Reference ref) {
+    private Jump(Ref<Integer> ref) {
       this.ref = ref;
     }
 
@@ -62,10 +63,10 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
 
   private class ConditionalJump extends JumpBase {
     private String condition;
-    private Reference ref1;
-    private Reference ref2;
+    private Ref<Integer> ref1;
+    private Ref<Integer> ref2;
 
-    private ConditionalJump(String condition, Reference ref1, Reference ref2) {
+    private ConditionalJump(String condition, Ref<Integer> ref1, Ref<Integer> ref2) {
       this.condition = condition;
       this.ref1 = ref1;
       this.ref2 = ref2;
@@ -74,27 +75,6 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     @Override
     public String toString() {
       return condition + " ? " + ref1 + " : " + ref2;
-    }
-  }
-
-  private class Reference {
-    private int value;
-
-    Reference(int value) {
-      this.value = value;
-    }
-
-    int getValue() {
-      return value;
-    }
-
-    void setValue(int value) {
-      this.value = value;
-    }
-
-    @Override
-    public String toString() {
-      return String.valueOf(value);
     }
   }
 
@@ -130,7 +110,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     }
     currentPair.isFinished = true;
     if (theBlocks.contains(currentPair)) {
-      final Reference ref = new Reference(index);
+      final Ref<Integer> ref = new Ref<>(index);
       currentPair.setJump(new Jump(ref));
       final Pair pair = blocksMap.get(index);
       pair.addReference(ref);
@@ -144,8 +124,8 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     }
     currentPair.isFinished = true;
     if (theBlocks.contains(currentPair)) {
-      final Reference ref1 = new Reference(thenIndex);
-      final Reference ref2 = new Reference(elseIndex);
+      final Ref<Integer> ref1 = new Ref<>(thenIndex);
+      final Ref<Integer> ref2 = new Ref<>(elseIndex);
       currentPair.setJump(new ConditionalJump(condition.getText(), ref1, ref2));
       final Pair thenPair = blocksMap.get(thenIndex);
       thenPair.addReference(ref1);
@@ -336,8 +316,8 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     for (Pair theBlock : theBlocks) {
       if (theBlock.block.getStatements().length == 0 && theBlock.jump instanceof Jump) {
         Jump jump = (Jump)theBlock.jump;
-        for (Reference reference : theBlock.references) {
-          reference.setValue(jump.ref.getValue());
+        for (Ref<Integer> reference : theBlock.references) {
+          reference.set(jump.ref.get());
         }
         continue;
       }
