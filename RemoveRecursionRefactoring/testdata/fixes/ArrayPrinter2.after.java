@@ -1,5 +1,4 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Deque;
 
 public class ArrayPrinter2 {
     private Object[] array;
@@ -9,35 +8,31 @@ public class ArrayPrinter2 {
     }
 
     void displayArray2(int first, int last) {
-        List<DisplayArray2Frame> stack = new ArrayList<>();
-        stack.add(new DisplayArray2Frame(first, last));
-        while (true) {
-            DisplayArray2Frame frame = stack.get(stack.size() - 1);
+        Deque<DisplayArray2Frame> stack = new java.util.ArrayDeque<>();
+        stack.push(new DisplayArray2Frame(first, last));
+        while (!stack.isEmpty()) {
+            DisplayArray2Frame frame = stack.peek();
             switchLabel:
             switch (frame.block) {
                 case 0: {
                     if (frame.first == frame.last) {
                         System.out.print(array[frame.first] + " ");
-                        if (stack.size() == 1)
-                            return;
-                        stack.remove(stack.size() - 1);
+                        stack.pop();
                         break switchLabel;
                     }
                     frame.mid = frame.first + (frame.last - frame.first) / 2;
                     frame.mid1 = frame.first + (frame.last - frame.first) / 2;
-                    stack.add(new DisplayArray2Frame(frame.first, frame.mid));
+                    stack.push(new DisplayArray2Frame(frame.first, frame.mid));
                     frame.block = 1;
                     break switchLabel;
                 }
                 case 1: {
-                    stack.add(new DisplayArray2Frame(frame.mid1 + 1, frame.last));
+                    stack.push(new DisplayArray2Frame(frame.mid1 + 1, frame.last));
                     frame.block = 2;
                     break switchLabel;
                 }
                 case 2: {
-                    if (stack.size() == 1)
-                        return;
-                    stack.remove(stack.size() - 1);
+                    stack.pop();
                     break switchLabel;
                 }
             }

@@ -1,30 +1,28 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Deque;
 
 class Dependency4 {
     int calculate(int one, int two, int three) {
-        List<CalculateFrame> stack = new ArrayList<>();
-        stack.add(new CalculateFrame(one, two, three));
+        Deque<CalculateFrame> stack = new java.util.ArrayDeque<>();
+        stack.push(new CalculateFrame(one, two, three));
         int ret = 0;
-        while (true) {
-            CalculateFrame frame = stack.get(stack.size() - 1);
+        while (!stack.isEmpty()) {
+            CalculateFrame frame = stack.peek();
             switchLabel:
             switch (frame.block) {
                 case 0: {
-                    stack.add(new CalculateFrame(frame.one ^ 2, frame.one * frame.two, frame.one + frame.two + frame.three));
+                    stack.push(new CalculateFrame(frame.one ^ 2, frame.one * frame.two, frame.one + frame.two + frame.three));
                     frame.block = 1;
                     break switchLabel;
                 }
                 case 1: {
                     frame.temp = ret;
                     ret = frame.temp;
-                    if (stack.size() == 1)
-                        return ret;
-                    stack.remove(stack.size() - 1);
+                    stack.pop();
                     break switchLabel;
                 }
             }
         }
+        return ret;
     }
 
     private static class CalculateFrame {

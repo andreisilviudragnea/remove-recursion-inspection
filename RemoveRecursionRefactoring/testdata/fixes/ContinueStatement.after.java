@@ -1,19 +1,18 @@
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 public class ContinueStatement {
     static void cont(int iter, List<Integer> list) {
-        List<ContFrame> stack = new ArrayList<>();
-        stack.add(new ContFrame(iter, list));
-        while (true) {
-            ContFrame frame = stack.get(stack.size() - 1);
+        Deque<ContFrame> stack = new java.util.ArrayDeque<>();
+        stack.push(new ContFrame(iter, list));
+        while (!stack.isEmpty()) {
+            ContFrame frame = stack.peek();
             switchLabel:
             switch (frame.block) {
                 case 0: {
                     if (frame.iter == 0) {
-                        if (stack.size() == 1)
-                            return;
-                        stack.remove(stack.size() - 1);
+                        stack.pop();
                         break switchLabel;
                     }
                     frame.count = frame.iter;
@@ -27,14 +26,12 @@ public class ContinueStatement {
                             break;
                         }
                     }
-                    stack.add(new ContFrame(frame.iter - 1, frame.list));
+                    stack.push(new ContFrame(frame.iter - 1, frame.list));
                     frame.block = 1;
                     break switchLabel;
                 }
                 case 1: {
-                    if (stack.size() == 1)
-                        return;
-                    stack.remove(stack.size() - 1);
+                    stack.pop();
                     break switchLabel;
                 }
             }

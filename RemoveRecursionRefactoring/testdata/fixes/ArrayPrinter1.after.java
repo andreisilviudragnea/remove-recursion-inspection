@@ -1,5 +1,4 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Deque;
 
 public class ArrayPrinter1 {
     private Object[] array;
@@ -9,10 +8,10 @@ public class ArrayPrinter1 {
     }
 
     void displayArray1(int first, int last) {
-        List<DisplayArray1Frame> stack = new ArrayList<>();
-        stack.add(new DisplayArray1Frame(first, last));
-        while (true) {
-            DisplayArray1Frame frame = stack.get(stack.size() - 1);
+        Deque<DisplayArray1Frame> stack = new java.util.ArrayDeque<>();
+        stack.push(new DisplayArray1Frame(first, last));
+        while (!stack.isEmpty()) {
+            DisplayArray1Frame frame = stack.peek();
             switchLabel:
             switch (frame.block) {
                 case 0: {
@@ -26,18 +25,16 @@ public class ArrayPrinter1 {
                 }
                 case 3: {
                     frame.mid = frame.first + (frame.last - frame.first) / 2;
-                    stack.add(new DisplayArray1Frame(frame.first, frame.mid));
+                    stack.push(new DisplayArray1Frame(frame.first, frame.mid));
                     frame.block = 4;
                     break switchLabel;
                 }
                 case 2: {
-                    if (stack.size() == 1)
-                        return;
-                    stack.remove(stack.size() - 1);
+                    stack.pop();
                     break switchLabel;
                 }
                 case 4: {
-                    stack.add(new DisplayArray1Frame(frame.mid + 1, frame.last));
+                    stack.push(new DisplayArray1Frame(frame.mid + 1, frame.last));
                     frame.block = 2;
                     break switchLabel;
                 }

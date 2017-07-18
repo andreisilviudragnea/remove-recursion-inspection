@@ -176,7 +176,6 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
 
   @Override
   public void visitExpressionStatement(PsiExpressionStatement statement) {
-    //        super.visitExpressionStatement(statement);
     currentStatement = (PsiStatement)currentPair.getBlock().add(statement);
     statement.getExpression().accept(this);
   }
@@ -274,7 +273,6 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
 
   @Override
   public void visitMethodCallExpression(PsiMethodCallExpression expression) {
-    //        super.visitMethodCallExpression(expression);
     final PsiMethod method = IterativeMethodGenerator.isRecursiveMethodCall(expression);
     if (method == null) {
       return;
@@ -283,8 +281,8 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     final Pair newPair = newPair();
 
     currentPair.getBlock().add(IterativeMethodGenerator
-                                 .createAddStatement(factory, frameClassName, stackVarName, expression.getArgumentList().getExpressions(),
-                                                     PsiElement::getText));
+                                 .createPushStatement(factory, frameClassName, stackVarName, expression.getArgumentList().getExpressions(),
+                                                      PsiElement::getText));
     createJump(newPair.getId());
 
     currentStatement.delete();

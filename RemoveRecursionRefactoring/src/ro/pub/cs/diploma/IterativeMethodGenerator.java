@@ -63,24 +63,28 @@ class IterativeMethodGenerator {
     final String stackVarName = styleManager.suggestUniqueVariableName(Constants.STACK_VAR_NAME, method, true);
 
     PsiWhileStatement whileStatement = (PsiWhileStatement)factory.createStatementFromText(
-      "while (true) {" +
-      frameClassName + " " + frameVarName + " = " + stackVarName + ".get(" + stackVarName + ".size() - 1);" +
+      "while (!" + stackVarName + ".isEmpty()) {" +
+      frameClassName + " " + frameVarName + " = " + stackVarName + ".peek();" +
       body.getText() +
       "}", null);
 
     body = (PsiCodeBlock)body.replace(factory.createCodeBlock());
 
     body.add(styleManager.shortenClassReferences(factory.createStatementFromText(
-      "java.util.List<" + frameClassName + "> " + stackVarName + " = new java.util.ArrayList<>();", null)));
+      "java.util.Deque<" + frameClassName + "> " + stackVarName + " = new java.util.ArrayDeque<>();", null)));
     body
-      .add(createAddStatement(factory, frameClassName, stackVarName, method.getParameterList().getParameters(), PsiNamedElement::getName));
+      .add(createPushStatement(factory, frameClassName, stackVarName, method.getParameterList().getParameters(), PsiNamedElement::getName));
     final String retVarName = styleManager.suggestUniqueVariableName(Constants.RET_VAR_NAME, method, true);
-    if (!(returnType instanceof PsiPrimitiveType) || !(PsiPrimitiveType.VOID.equals(returnType))) {
+    if (isNotVoid(returnType)) {
       body.add(factory.createStatementFromText(
         returnType.getPresentableText() + " " + retVarName + " = " + getInitialValue(returnType) + ";", null));
     }
 
     whileStatement = (PsiWhileStatement)body.add(whileStatement);
+
+    if (isNotVoid(returnType)) {
+      body.addAfter(factory.createStatementFromText("return " + retVarName + ";", null), whileStatement);
+    }
 
     final PsiBlockStatement whileStatementBody = (PsiBlockStatement)whileStatement.getBody();
     if (whileStatementBody == null) {
@@ -98,7 +102,8 @@ class IterativeMethodGenerator {
     final String switchLabelName = styleManager.suggestUniqueVariableName(Constants.SWITCH_LABEL, method, true);
 
     final BasicBlocksGenerator basicBlocksGenerator =
-      new BasicBlocksGenerator(factory, frameClassName, frameVarName, blockFieldName, stackVarName, returnType, retVarName, switchLabelName);
+      new BasicBlocksGenerator(factory, frameClassName, frameVarName, blockFieldName, stackVarName, returnType, retVarName,
+                               switchLabelName);
     body.accept(basicBlocksGenerator);
     final List<BasicBlocksGenerator.Pair> blocks = basicBlocksGenerator.getBlocks();
 
@@ -110,6 +115,10 @@ class IterativeMethodGenerator {
 
     body.replace(factory.createStatementFromText(
       switchLabelName + ": switch (" + frameVarName + "." + blockFieldName + ") {" + casesString + "}", null));
+  }
+
+  private static boolean isNotVoid(PsiType returnType) {
+    return !(returnType instanceof PsiPrimitiveType) || !(PsiPrimitiveType.VOID.equals(returnType));
   }
 
   private static void replaceIdentifierWithFrameAccess(@NotNull final PsiElementFactory factory,
@@ -171,10 +180,7 @@ class IterativeMethodGenerator {
         anchor = parentBlock.addAfter(factory.createStatementFromText(
           retVarName + " = " + returnValue.getText() + ";", null), anchor);
       }
-      anchor = parentBlock.addAfter(factory.createStatementFromText(
-        "if (" + stackVarName + ".size() == 1)\n" + "return " + (hasExpression ? retVarName : "") + ";\n", null), anchor);
-      anchor = parentBlock.addAfter(factory.createStatementFromText(
-        stackVarName + ".remove(" + stackVarName + ".size() - 1);", null), anchor);
+      anchor = parentBlock.addAfter(factory.createStatementFromText(stackVarName + ".pop();", null), anchor);
       parentBlock.addAfter(factory.createStatementFromText("break " + switchLabelName + ";", null), anchor);
 
       statement.delete();
@@ -273,12 +279,12 @@ class IterativeMethodGenerator {
   }
 
   @NotNull
-  static <T extends PsiElement> PsiStatement createAddStatement(@NotNull final PsiElementFactory factory,
-                                                                @NotNull final String frameClassName,
-                                                                @NotNull final String stackVarName,
-                                                                @NotNull final T[] arguments,
-                                                                @NotNull Function<T, String> function) {
+  static <T extends PsiElement> PsiStatement createPushStatement(@NotNull final PsiElementFactory factory,
+                                                                 @NotNull final String frameClassName,
+                                                                 @NotNull final String stackVarName,
+                                                                 @NotNull final T[] arguments,
+                                                                 @NotNull Function<T, String> function) {
     final String argumentsString = Arrays.stream(arguments).map(function).collect(Collectors.joining(","));
-    return factory.createStatementFromText(stackVarName + ".add(new " + frameClassName + "(" + argumentsString + "));", null);
+    return factory.createStatementFromText(stackVarName + ".push(new " + frameClassName + "(" + argumentsString + "));", null);
   }
 }

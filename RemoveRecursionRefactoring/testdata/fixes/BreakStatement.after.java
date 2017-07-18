@@ -1,19 +1,18 @@
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 public class BreakStatement {
     static void breakStatement(int iter, List<Integer> list) {
-        List<BreakStatementFrame> stack = new ArrayList<>();
-        stack.add(new BreakStatementFrame(iter, list));
-        while (true) {
-            BreakStatementFrame frame = stack.get(stack.size() - 1);
+        Deque<BreakStatementFrame> stack = new java.util.ArrayDeque<>();
+        stack.push(new BreakStatementFrame(iter, list));
+        while (!stack.isEmpty()) {
+            BreakStatementFrame frame = stack.peek();
             switchLabel:
             switch (frame.block) {
                 case 0: {
                     if (frame.iter == 0) {
-                        if (stack.size() == 1)
-                            return;
-                        stack.remove(stack.size() - 1);
+                        stack.pop();
                         break switchLabel;
                     }
                     frame.count = frame.iter;
@@ -24,14 +23,12 @@ public class BreakStatement {
                             break;
                         }
                     }
-                    stack.add(new BreakStatementFrame(frame.iter - 1, frame.list));
+                    stack.push(new BreakStatementFrame(frame.iter - 1, frame.list));
                     frame.block = 1;
                     break switchLabel;
                 }
                 case 1: {
-                    if (stack.size() == 1)
-                        return;
-                    stack.remove(stack.size() - 1);
+                    stack.pop();
                     break switchLabel;
                 }
             }

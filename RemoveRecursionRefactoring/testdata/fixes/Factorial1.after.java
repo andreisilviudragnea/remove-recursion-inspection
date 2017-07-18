@@ -1,13 +1,12 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Deque;
 
 public class Factorial1 {
     static int factorial1(int n) {
-        List<Factorial1Frame> stack = new ArrayList<>();
-        stack.add(new Factorial1Frame(n));
+        Deque<Factorial1Frame> stack = new java.util.ArrayDeque<>();
+        stack.push(new Factorial1Frame(n));
         int ret = 0;
-        while (true) {
-            Factorial1Frame frame = stack.get(stack.size() - 1);
+        while (!stack.isEmpty()) {
+            Factorial1Frame frame = stack.peek();
             switchLabel:
             switch (frame.block) {
                 case 0: {
@@ -16,26 +15,23 @@ public class Factorial1 {
                 }
                 case 1: {
                     ret = 1;
-                    if (stack.size() == 1)
-                        return ret;
-                    stack.remove(stack.size() - 1);
+                    stack.pop();
                     break switchLabel;
                 }
                 case 3: {
-                    stack.add(new Factorial1Frame(frame.n - 1));
+                    stack.push(new Factorial1Frame(frame.n - 1));
                     frame.block = 4;
                     break switchLabel;
                 }
                 case 4: {
                     frame.temp = ret;
                     ret = frame.n * frame.temp;
-                    if (stack.size() == 1)
-                        return ret;
-                    stack.remove(stack.size() - 1);
+                    stack.pop();
                     break switchLabel;
                 }
             }
         }
+        return ret;
     }
 
     private static class Factorial1Frame {

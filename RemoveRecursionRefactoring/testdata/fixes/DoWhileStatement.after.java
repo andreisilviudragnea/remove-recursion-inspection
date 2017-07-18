@@ -1,19 +1,18 @@
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 public class DoWhileStatement {
     static void doWhileStatement(int iter, List<Integer> list) {
-        List<DoWhileStatementFrame> stack = new ArrayList<>();
-        stack.add(new DoWhileStatementFrame(iter, list));
-        while (true) {
-            DoWhileStatementFrame frame = stack.get(stack.size() - 1);
+        Deque<DoWhileStatementFrame> stack = new java.util.ArrayDeque<>();
+        stack.push(new DoWhileStatementFrame(iter, list));
+        while (!stack.isEmpty()) {
+            DoWhileStatementFrame frame = stack.peek();
             switchLabel:
             switch (frame.block) {
                 case 0: {
                     if (frame.iter == 0) {
-                        if (stack.size() == 1)
-                            return;
-                        stack.remove(stack.size() - 1);
+                        stack.pop();
                         break switchLabel;
                     }
                     frame.count = frame.iter;
@@ -21,14 +20,12 @@ public class DoWhileStatement {
                         frame.list.add(frame.iter);
                         frame.count--;
                     } while (frame.count > 1);
-                    stack.add(new DoWhileStatementFrame(frame.iter - 1, frame.list));
+                    stack.push(new DoWhileStatementFrame(frame.iter - 1, frame.list));
                     frame.block = 1;
                     break switchLabel;
                 }
                 case 1: {
-                    if (stack.size() == 1)
-                        return;
-                    stack.remove(stack.size() - 1);
+                    stack.pop();
                     break switchLabel;
                 }
             }

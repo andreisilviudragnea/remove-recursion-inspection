@@ -1,5 +1,4 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Deque;
 
 class Dependency1 {
     public int factorial(int val) {
@@ -7,11 +6,11 @@ class Dependency1 {
     }
 
     private int factorial(int val, int runningVal) {
-        List<FactorialFrame> stack = new ArrayList<>();
-        stack.add(new FactorialFrame(val, runningVal));
+        Deque<FactorialFrame> stack = new java.util.ArrayDeque<>();
+        stack.push(new FactorialFrame(val, runningVal));
         int ret = 0;
-        while (true) {
-            FactorialFrame frame = stack.get(stack.size() - 1);
+        while (!stack.isEmpty()) {
+            FactorialFrame frame = stack.peek();
             switchLabel:
             switch (frame.block) {
                 case 0: {
@@ -20,26 +19,23 @@ class Dependency1 {
                 }
                 case 1: {
                     ret = frame.runningVal;
-                    if (stack.size() == 1)
-                        return ret;
-                    stack.remove(stack.size() - 1);
+                    stack.pop();
                     break switchLabel;
                 }
                 case 3: {
-                    stack.add(new FactorialFrame(frame.val - 1, frame.runningVal * frame.val));
+                    stack.push(new FactorialFrame(frame.val - 1, frame.runningVal * frame.val));
                     frame.block = 4;
                     break switchLabel;
                 }
                 case 4: {
                     frame.temp = ret;
                     ret = (frame.temp);
-                    if (stack.size() == 1)
-                        return ret;
-                    stack.remove(stack.size() - 1);
+                    stack.pop();
                     break switchLabel;
                 }
             }
         }
+        return ret;
     }
 
     private static class FactorialFrame {
