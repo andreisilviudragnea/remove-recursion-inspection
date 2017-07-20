@@ -1,0 +1,8 @@
+make build-p1 
+make run-p1   
+
+make build-p2	
+make run-p2
+
+make build-bonus
+make run-bonus
