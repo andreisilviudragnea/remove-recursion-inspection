@@ -7,23 +7,22 @@ class Factorial2 {
         int ret = 0;
         while (!stack.isEmpty()) {
             Factorial2Frame frame = stack.peek();
-            switchLabel:
             switch (frame.block) {
                 case 0: {
                     if (frame.n == 0) {
                         ret = 1;
                         stack.pop();
-                        break switchLabel;
+                        break;
                     }
                     stack.push(new Factorial2Frame(frame.n - 1));
                     frame.block = 1;
-                    break switchLabel;
+                    break;
                 }
                 case 1: {
                     frame.temp = ret;
                     ret = frame.n * frame.temp;
                     stack.pop();
-                    break switchLabel;
+                    break;
                 }
             }
         }

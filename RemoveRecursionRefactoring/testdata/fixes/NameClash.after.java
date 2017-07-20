@@ -12,28 +12,27 @@ public class NameClash {
         stack1.push(new NameClashFrame(frame, stack));
         while (!stack1.isEmpty()) {
             NameClashFrame frame1 = stack1.peek();
-            switchLabel:
             switch (frame1.block) {
                 case 0: {
                     if (frame1.frame == frame1.stack) {
                         System.out.print(array[frame1.frame] + " ");
                         stack1.pop();
-                        break switchLabel;
+                        break;
                     }
                     frame1.ret = frame1.frame + (frame1.stack - frame1.frame) / 2;
                     frame1.temp = frame1.frame + (frame1.stack - frame1.frame) / 2;
                     stack1.push(new NameClashFrame(frame1.frame, frame1.ret));
                     frame1.block = 1;
-                    break switchLabel;
+                    break;
                 }
                 case 1: {
                     stack1.push(new NameClashFrame(frame1.temp + 1, frame1.stack));
                     frame1.block = 2;
-                    break switchLabel;
+                    break;
                 }
                 case 2: {
                     stack1.pop();
-                    break switchLabel;
+                    break;
                 }
             }
         }

@@ -7,18 +7,17 @@ class Dependency3 {
         int ret = 0;
         while (!stack.isEmpty()) {
             CalculateFrame frame = stack.peek();
-            switchLabel:
             switch (frame.block) {
                 case 0: {
                     stack.push(new CalculateFrame(frame.three + frame.two, frame.two + frame.one, frame.one));
                     frame.block = 1;
-                    break switchLabel;
+                    break;
                 }
                 case 1: {
                     frame.temp = ret;
                     ret = frame.temp;
                     stack.pop();
-                    break switchLabel;
+                    break;
                 }
             }
         }

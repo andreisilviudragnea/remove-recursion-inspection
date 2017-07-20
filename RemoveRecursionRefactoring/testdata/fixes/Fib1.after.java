@@ -7,34 +7,33 @@ public class Fib1 {
         int ret = 0;
         while (!stack.isEmpty()) {
             Fib1Frame frame = stack.peek();
-            switchLabel:
             switch (frame.block) {
                 case 0: {
                     if (frame.n == 0) {
                         ret = 0;
                         stack.pop();
-                        break switchLabel;
+                        break;
                     }
                     if (frame.n == 1) {
                         ret = 1;
                         stack.pop();
-                        break switchLabel;
+                        break;
                     }
                     stack.push(new Fib1Frame(frame.n - 1));
                     frame.block = 1;
-                    break switchLabel;
+                    break;
                 }
                 case 1: {
                     frame.temp = ret;
                     stack.push(new Fib1Frame(frame.n - 2));
                     frame.block = 2;
-                    break switchLabel;
+                    break;
                 }
                 case 2: {
                     frame.temp1 = ret;
                     ret = frame.temp + frame.temp1;
                     stack.pop();
-                    break switchLabel;
+                    break;
                 }
             }
         }

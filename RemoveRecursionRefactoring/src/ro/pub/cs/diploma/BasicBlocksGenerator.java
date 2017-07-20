@@ -88,7 +88,6 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   private final String stackVarName;
   private final PsiType returnType;
   private final String retVarName;
-  private final String switchLabelName;
   private final Map<PsiStatement, Integer> breakJumps = new HashMap<>();
   private final Map<PsiStatement, Integer> continueJumps = new HashMap<>();
   private final Map<Integer, Pair> blocksMap = new HashMap<>();
@@ -143,8 +142,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
                        final String blockFieldName,
                        final String stackVarName,
                        final PsiType returnType,
-                       final String retVarName,
-                       final String switchLabelName) {
+                       final String retVarName) {
     this.factory = factory;
     currentPair = newPair();
     theBlocks.add(currentPair);
@@ -154,7 +152,6 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     this.stackVarName = stackVarName;
     this.returnType = returnType;
     this.retVarName = retVarName;
-    this.switchLabelName = switchLabelName;
   }
 
   @Override
@@ -334,7 +331,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     for (Pair pair : pairs) {
       if (pair.jump != null) {
         pair.block.add(createStatement(frameVarName + "." + blockFieldName + " = " + pair.jump.toString() + ";"));
-        pair.block.add(createStatement("break " + switchLabelName + ";"));
+        pair.block.add(createStatement("break;"));
       }
     }
 

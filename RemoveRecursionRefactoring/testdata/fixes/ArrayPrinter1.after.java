@@ -13,31 +13,30 @@ class ArrayPrinter1 {
         stack.push(new DisplayArrayFrame(first, last, result));
         while (!stack.isEmpty()) {
             DisplayArrayFrame frame = stack.peek();
-            switchLabel:
             switch (frame.block) {
                 case 0: {
                     frame.block = frame.first == frame.last ? 1 : 3;
-                    break switchLabel;
+                    break;
                 }
                 case 1: {
                     frame.result.add(array[frame.first]);
                     frame.block = 2;
-                    break switchLabel;
+                    break;
                 }
                 case 3: {
                     frame.mid = frame.first + (frame.last - frame.first) / 2;
                     stack.push(new DisplayArrayFrame(frame.first, frame.mid, frame.result));
                     frame.block = 4;
-                    break switchLabel;
+                    break;
                 }
                 case 2: {
                     stack.pop();
-                    break switchLabel;
+                    break;
                 }
                 case 4: {
                     stack.push(new DisplayArrayFrame(frame.mid + 1, frame.last, frame.result));
                     frame.block = 2;
-                    break switchLabel;
+                    break;
                 }
             }
         }

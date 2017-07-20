@@ -8,12 +8,11 @@ public class DoWhileStatement {
         stack.push(new DoWhileStatementFrame(iter, list));
         while (!stack.isEmpty()) {
             DoWhileStatementFrame frame = stack.peek();
-            switchLabel:
             switch (frame.block) {
                 case 0: {
                     if (frame.iter == 0) {
                         stack.pop();
-                        break switchLabel;
+                        break;
                     }
                     frame.count = frame.iter;
                     do {
@@ -22,11 +21,11 @@ public class DoWhileStatement {
                     } while (frame.count > 1);
                     stack.push(new DoWhileStatementFrame(frame.iter - 1, frame.list));
                     frame.block = 1;
-                    break switchLabel;
+                    break;
                 }
                 case 1: {
                     stack.pop();
-                    break switchLabel;
+                    break;
                 }
             }
         }

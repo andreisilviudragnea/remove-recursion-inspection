@@ -8,12 +8,11 @@ public class ContinueStatement {
         stack.push(new ContFrame(iter, list));
         while (!stack.isEmpty()) {
             ContFrame frame = stack.peek();
-            switchLabel:
             switch (frame.block) {
                 case 0: {
                     if (frame.iter == 0) {
                         stack.pop();
-                        break switchLabel;
+                        break;
                     }
                     frame.count = frame.iter;
                     while (true) {
@@ -28,11 +27,11 @@ public class ContinueStatement {
                     }
                     stack.push(new ContFrame(frame.iter - 1, frame.list));
                     frame.block = 1;
-                    break switchLabel;
+                    break;
                 }
                 case 1: {
                     stack.pop();
-                    break switchLabel;
+                    break;
                 }
             }
         }

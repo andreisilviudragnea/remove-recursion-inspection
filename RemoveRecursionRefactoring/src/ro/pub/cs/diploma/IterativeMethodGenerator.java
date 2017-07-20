@@ -1,6 +1,7 @@
 package ro.pub.cs.diploma;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Ref;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.psi.search.LocalSearchScope;
@@ -102,19 +103,21 @@ class IterativeMethodGenerator {
     final String switchLabelName = styleManager.suggestUniqueVariableName(Constants.SWITCH_LABEL, method, true);
 
     final BasicBlocksGenerator basicBlocksGenerator =
-      new BasicBlocksGenerator(factory, frameClassName, frameVarName, blockFieldName, stackVarName, returnType, retVarName,
-                               switchLabelName);
+      new BasicBlocksGenerator(factory, frameClassName, frameVarName, blockFieldName, stackVarName, returnType, retVarName);
     body.accept(basicBlocksGenerator);
     final List<BasicBlocksGenerator.Pair> blocks = basicBlocksGenerator.getBlocks();
 
-    blocks.forEach(codeBlock -> replaceReturnStatements(factory, codeBlock.getBlock(), stackVarName, retVarName, switchLabelName));
+    final Ref<Boolean> atLeastOneLabeledBreak = new Ref<>(false);
+    blocks.forEach(codeBlock -> replaceReturnStatements(factory, codeBlock.getBlock(), stackVarName, retVarName, switchLabelName,
+                                                        atLeastOneLabeledBreak));
 
     final String casesString = blocks.stream()
       .map(section -> "case " + section.getId() + ": " + section.getBlock().getText())
       .collect(Collectors.joining(""));
 
     body.replace(factory.createStatementFromText(
-      switchLabelName + ": switch (" + frameVarName + "." + blockFieldName + ") {" + casesString + "}", null));
+      (atLeastOneLabeledBreak.get() ? switchLabelName + ": " : "") +
+      "switch (" + frameVarName + "." + blockFieldName + ") {" + casesString + "}", null));
   }
 
   private static boolean isNotVoid(PsiType returnType) {
@@ -167,7 +170,8 @@ class IterativeMethodGenerator {
                                               @NotNull final PsiCodeBlock block,
                                               @NotNull final String stackVarName,
                                               @NotNull final String retVarName,
-                                              @NotNull final String switchLabelName) {
+                                              @NotNull final String switchLabelName,
+                                              @NotNull final Ref<Boolean> atLeastOneLabeledBreak) {
     for (final PsiReturnStatement statement : Visitors.extractReturnStatements(block)) {
       final PsiExpression returnValue = statement.getReturnValue();
       final boolean hasExpression = returnValue != null;
@@ -181,7 +185,9 @@ class IterativeMethodGenerator {
           retVarName + " = " + returnValue.getText() + ";", null), anchor);
       }
       anchor = parentBlock.addAfter(factory.createStatementFromText(stackVarName + ".pop();", null), anchor);
-      parentBlock.addAfter(factory.createStatementFromText("break " + switchLabelName + ";", null), anchor);
+      final boolean inLoop = PsiTreeUtil.getParentOfType(statement, PsiLoopStatement.class, true, PsiClass.class) != null;
+      atLeastOneLabeledBreak.set(atLeastOneLabeledBreak.get() || inLoop);
+      parentBlock.addAfter(factory.createStatementFromText("break " + (inLoop ? switchLabelName : "") + ";", null), anchor);
 
       statement.delete();
     }

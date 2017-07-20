@@ -8,12 +8,11 @@ public class LabeledBreakStatement {
         stack.push(new LabeledBreakStatementFrame(iter, list));
         while (!stack.isEmpty()) {
             LabeledBreakStatementFrame frame = stack.peek();
-            switchLabel:
             switch (frame.block) {
                 case 0: {
                     if (frame.iter == 0) {
                         stack.pop();
-                        break switchLabel;
+                        break;
                     }
                     frame.count = frame.iter;
                     here:
@@ -28,11 +27,11 @@ public class LabeledBreakStatement {
                     }
                     stack.push(new LabeledBreakStatementFrame(frame.iter - 1, frame.list));
                     frame.block = 1;
-                    break switchLabel;
+                    break;
                 }
                 case 1: {
                     stack.pop();
-                    break switchLabel;
+                    break;
                 }
             }
         }
