@@ -1,17 +1,18 @@
 import java.util.Deque;
+import java.util.List;
 
-public class ArrayPrinter1 {
-    private Object[] array;
+class ArrayPrinter1 {
+    private Integer[] array;
 
-    ArrayPrinter1(Object[] array) {
+    ArrayPrinter1(Integer[] array) {
         this.array = array;
     }
 
-    void displayArray1(int first, int last) {
-        Deque<DisplayArray1Frame> stack = new java.util.ArrayDeque<>();
-        stack.push(new DisplayArray1Frame(first, last));
+    void displayArray(int first, int last, List<Integer> result) {
+        Deque<DisplayArrayFrame> stack = new java.util.ArrayDeque<>();
+        stack.push(new DisplayArrayFrame(first, last, result));
         while (!stack.isEmpty()) {
-            DisplayArray1Frame frame = stack.peek();
+            DisplayArrayFrame frame = stack.peek();
             switchLabel:
             switch (frame.block) {
                 case 0: {
@@ -19,13 +20,13 @@ public class ArrayPrinter1 {
                     break switchLabel;
                 }
                 case 1: {
-                    System.out.print(array[frame.first] + " ");
+                    frame.result.add(array[frame.first]);
                     frame.block = 2;
                     break switchLabel;
                 }
                 case 3: {
                     frame.mid = frame.first + (frame.last - frame.first) / 2;
-                    stack.push(new DisplayArray1Frame(frame.first, frame.mid));
+                    stack.push(new DisplayArrayFrame(frame.first, frame.mid, frame.result));
                     frame.block = 4;
                     break switchLabel;
                 }
@@ -34,7 +35,7 @@ public class ArrayPrinter1 {
                     break switchLabel;
                 }
                 case 4: {
-                    stack.push(new DisplayArray1Frame(frame.mid + 1, frame.last));
+                    stack.push(new DisplayArrayFrame(frame.mid + 1, frame.last, frame.result));
                     frame.block = 2;
                     break switchLabel;
                 }
@@ -42,21 +43,17 @@ public class ArrayPrinter1 {
         }
     }
 
-    private static class DisplayArray1Frame {
+    private static class DisplayArrayFrame {
         private int first;
         private int last;
+        private List<Integer> result;
         private int mid;
         private int block;
 
-        private DisplayArray1Frame(int first, int last) {
+        private DisplayArrayFrame(int first, int last, List<Integer> result) {
             this.first = first;
             this.last = last;
+            this.result = result;
         }
-    }
-
-    public static void main(String[] args) {
-        Object[] array = {1, 2, 3, 4, 5};
-        ArrayPrinter1 arrayPrinter = new ArrayPrinter1(array);
-        arrayPrinter.displayArray1(0, array.length - 1);
     }
 }

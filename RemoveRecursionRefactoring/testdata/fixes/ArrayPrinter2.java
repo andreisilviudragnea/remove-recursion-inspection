@@ -1,23 +1,19 @@
-public class ArrayPrinter2 {
-    private Object[] array;
+import java.util.List;
 
-    ArrayPrinter2(Object[] array) {
+class ArrayPrinter2 {
+    private Integer[] array;
+
+    ArrayPrinter2(Integer[] array) {
         this.array = array;
     }
 
-    void displayArray2(int first, int last) {
+    void displayArray(int first, int last, List<Integer> result) {
         if (first == last) {
-            System.out.print(array[first] + " ");
+            result.add(array[first]);
             return;
         }
         int mid = first + (last - first) / 2, mid1 = first + (last - first) / 2;
-        <caret>displayArray2(first, mid);
-        displayArray2(mid1 + 1, last);
-    }
-
-    public static void main(String[] args) {
-        Object[] array = {1, 2, 3, 4};
-        ArrayPrinter2 arrayPrinter = new ArrayPrinter2(array);
-        arrayPrinter.displayArray2(0, array.length - 1);
+        <caret>displayArray(first, mid, result);
+        displayArray(mid1 + 1, last, result);
     }
 }

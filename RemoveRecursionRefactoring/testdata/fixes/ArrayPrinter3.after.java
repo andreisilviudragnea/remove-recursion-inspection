@@ -1,10 +1,10 @@
 import java.util.Deque;
 import java.util.List;
 
-class ArrayPrinter2 {
+class ArrayPrinter3 {
     private Integer[] array;
 
-    ArrayPrinter2(Integer[] array) {
+    ArrayPrinter3(Integer[] array) {
         this.array = array;
     }
 
@@ -16,24 +16,35 @@ class ArrayPrinter2 {
             switchLabel:
             switch (frame.block) {
                 case 0: {
-                    if (frame.first == frame.last) {
-                        frame.result.add(array[frame.first]);
-                        stack.pop();
-                        break switchLabel;
-                    }
-                    frame.mid = frame.first + (frame.last - frame.first) / 2;
-                    frame.mid1 = frame.first + (frame.last - frame.first) / 2;
-                    stack.push(new DisplayArrayFrame(frame.first, frame.mid, frame.result));
                     frame.block = 1;
                     break switchLabel;
                 }
                 case 1: {
-                    stack.push(new DisplayArrayFrame(frame.mid1 + 1, frame.last, frame.result));
-                    frame.block = 2;
+                    frame.block = true ? 2 : 3;
                     break switchLabel;
                 }
                 case 2: {
+                    frame.block = frame.first == frame.last ? 4 : 6;
+                    break switchLabel;
+                }
+                case 3: {
                     stack.pop();
+                    break switchLabel;
+                }
+                case 4: {
+                    frame.result.add(array[frame.first]);
+                    stack.pop();
+                    break switchLabel;
+                }
+                case 6: {
+                    frame.mid = frame.first + (frame.last - frame.first) / 2;
+                    stack.push(new DisplayArrayFrame(frame.first, frame.mid, frame.result));
+                    frame.block = 7;
+                    break switchLabel;
+                }
+                case 7: {
+                    frame.first = frame.mid + 1;
+                    frame.block = 1;
                     break switchLabel;
                 }
             }
@@ -45,7 +56,6 @@ class ArrayPrinter2 {
         private int last;
         private List<Integer> result;
         private int mid;
-        private int mid1;
         private int block;
 
         private DisplayArrayFrame(int first, int last, List<Integer> result) {

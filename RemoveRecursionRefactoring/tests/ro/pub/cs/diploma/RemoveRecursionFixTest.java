@@ -57,6 +57,10 @@ public class RemoveRecursionFixTest extends IGQuickFixesTestCase {
     doTest();
   }
 
+  public void testArrayPrinter3() {
+    doTest();
+  }
+
   public void testFib1() {
     doTest();
   }

@@ -321,7 +321,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
 
     // Remove trivial blocks (which contain only an unconditional jump)
     for (Pair theBlock : theBlocks) {
-      if (theBlock.block.getStatements().length == 0 && theBlock.jump instanceof Jump) {
+      if (theBlock.id != 0 && theBlock.block.getStatements().length == 0 && theBlock.jump instanceof Jump) {
         Jump jump = (Jump)theBlock.jump;
         for (Ref<Integer> reference : theBlock.references) {
           reference.set(jump.ref.get());
