@@ -8,18 +8,13 @@
  * @email  mandrei.dinu@gmail.com
  */
 
-package lab7;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-import graph.Graph;
-import graph.Node;
-
 public class P2 {
 
-    static void DfsArticulationPoints(Graph g, Node node, int father) {
+    static void DfsArticulationPoints(P1.Graph g, P1.Node node, int father) {
         // TODO
     }
 
@@ -35,7 +30,7 @@ public class P2 {
      * M - numarul de muchii          </br>
      * @param g
      */
-    static void ArticulationPoints(Graph g) {
+    static void ArticulationPoints(P1.Graph g) {
         g.reset();
 
         // TODO
@@ -46,7 +41,7 @@ public class P2 {
 
     // ********************************************************************** //
         
-    static void DfsCriticalEdges(Graph g, Node node, int father) {
+    static void DfsCriticalEdges(P1.Graph g, P1.Node node, int father) {
         // TODO
     }
 
@@ -63,7 +58,7 @@ public class P2 {
      * 
      * @param g
      */
-    static void CriticalEdges(Graph g) {
+    static void CriticalEdges(P1.Graph g) {
         g.reset();
 
         // TODO
@@ -81,7 +76,7 @@ public class P2 {
         for (int i = 1; i <= test_count; ++i) {
             System.out.println("TEST " + i + "\n");
 
-            Graph g = new Graph(Graph.GraphType.UNDIRECTED);
+            P1.Graph g = new P1.Graph(P1.Graph.GraphType.UNDIRECTED);
             g.readData(scanner);
 
             System.out.println(g);

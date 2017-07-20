@@ -1,12 +1,7 @@
-package lab7;
-
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
-
-import graph.Graph;
-import graph.Node;
 
 public class Bonus {
 
@@ -23,30 +18,30 @@ public class Bonus {
     * N - numarul de noduri
     * M - numarul de muchii
     */
-    
-    public static int bonus(Graph g) {        
+
+    public static int bonus(P1.Graph g) {
         return 0;
     }
-    
+
     public static void main(String... args) throws FileNotFoundException {
         Scanner scanner = new Scanner(new File(PATH));
 
-        Graph g = new Graph(Graph.GraphType.UNDIRECTED);
+        P1.Graph g = new P1.Graph(P1.Graph.GraphType.UNDIRECTED);
         g.readData(scanner);
 
-        ArrayList<Node> nodes = g.getNodes();
+        List<P1.Node> nodes = g.getNodes();
         for (int i = 0; i < g.getNodeCount(); ++i) {
-            Node node = nodes.get(i);            
+            P1.Node node = nodes.get(i);
             node.setValue(scanner.nextInt());
         }
-        
+
         if (bonus(g) != 27) {
             System.out.println("Wrong value, expected 27");
         } else {
             System.out.println("Correct!");
         }
-               
+
         scanner.close();
     }
-    
+
 }
