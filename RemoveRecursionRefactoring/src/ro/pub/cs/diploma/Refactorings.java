@@ -85,7 +85,7 @@ class Refactorings {
   /**
    * @see com.siyeh.ipp.forloop.ReplaceForEachLoopWithIteratorForLoopIntention#processIntention(PsiElement)
    */
-  static void replaceForEachStatementWithIteratorForLoopStatement(PsiForeachStatement statement) {
+  static void replaceForEachStatementWithIteratorForLoopStatement(PsiForeachStatement statement, PsiMethod method) {
     final PsiExpression iteratedValue = statement.getIteratedValue();
     if (iteratedValue == null) {
       return;
@@ -112,7 +112,7 @@ class Refactorings {
     @NonNls final StringBuilder newStatement = new StringBuilder();
     newStatement.append("for(").append(variableType.getCanonicalText()).append(' ');
     final JavaCodeStyleManager codeStyleManager = JavaCodeStyleManager.getInstance(project);
-    final String iterator = codeStyleManager.suggestUniqueVariableName("iterator", statement, true);
+    final String iterator = codeStyleManager.suggestUniqueVariableName("iterator", method, true);
     newStatement.append(iterator).append("=").append(iteratorCall.getText()).append(';');
     newStatement.append(iterator).append(".hasNext();) {");
     final CodeStyleSettings codeStyleSettings = CodeStyleSettingsManager.getSettings(project);

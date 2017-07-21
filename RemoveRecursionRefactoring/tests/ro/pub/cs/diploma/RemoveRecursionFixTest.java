@@ -96,4 +96,12 @@ public class RemoveRecursionFixTest extends IGQuickFixesTestCase {
   public void testDoWhileStatement() {
     doTest();
   }
+
+  public void testP1() {
+    doTest();
+  }
+
+  public void testLocalVariableSameName() {
+    doTest();
+  }
 }

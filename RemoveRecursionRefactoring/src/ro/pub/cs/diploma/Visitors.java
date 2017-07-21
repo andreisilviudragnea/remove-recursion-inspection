@@ -96,8 +96,8 @@ class Visitors {
     return contains.get();
   }
 
-  static void replaceSingleStatementsWithBlockStatements(PsiElementFactory factory, PsiCodeBlock block) {
-    block.accept(new JavaRecursiveElementWalkingVisitor() {
+  static void replaceSingleStatementsWithBlockStatements(PsiElementFactory factory, PsiMethod method) {
+    method.accept(new JavaRecursiveElementWalkingVisitor() {
       private void replaceStatement(PsiStatement statement) {
         if (!(statement instanceof PsiBlockStatement)) {
           statement.replace(factory.createStatementFromText("{" + statement.getText() + "}", null));
@@ -140,23 +140,29 @@ class Visitors {
     });
   }
 
-  static void replaceForEachStatementsWithForStatements(PsiCodeBlock block) {
-    block.accept(new JavaRecursiveElementVisitor() {
+  static void replaceForEachStatementsWithForStatements(PsiMethod method) {
+    final List<PsiForeachStatement> foreachStatements = new ArrayList<>();
+    method.accept(new JavaRecursiveElementVisitor() {
       @Override
       public void visitForeachStatement(PsiForeachStatement statement) {
         super.visitForeachStatement(statement);
-        Refactorings.replaceForEachStatementWithIteratorForLoopStatement(statement);
+        foreachStatements.add(statement);
       }
     });
+    for (PsiForeachStatement foreachStatement : foreachStatements) {
+      Refactorings.replaceForEachStatementWithIteratorForLoopStatement(foreachStatement, method);
+    }
   }
 
-  static void replaceForStatementsWithWhileStatements(PsiCodeBlock block) {
-    block.accept(new JavaRecursiveElementVisitor() {
+  static void replaceForStatementsWithWhileStatements(PsiMethod method) {
+    final List<PsiForStatement> forStatements = new ArrayList<>();
+    method.accept(new JavaRecursiveElementVisitor() {
       @Override
       public void visitForStatement(PsiForStatement statement) {
         super.visitForStatement(statement);
-        Refactorings.replaceForStatementWithWhileStatement(statement);
+        forStatements.add(statement);
       }
     });
+    forStatements.forEach(Refactorings::replaceForStatementWithWhileStatement);
   }
 }

@@ -7,14 +7,13 @@ import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.psi.search.LocalSearchScope;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.refactoring.util.RefactoringUtil;
 import com.siyeh.ig.psiutils.MethodUtils;
 import com.siyeh.ig.psiutils.ParenthesesUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -35,15 +34,16 @@ class IterativeMethodGenerator {
       method.setName(styleManager.suggestUniqueVariableName(oldMethod.getName() + Constants.ITERATIVE, psiClass, true));
     }
 
+    renameVariablesToUniqueNames(styleManager, method);
+
+    Visitors.replaceForEachStatementsWithForStatements(method);
+    Visitors.replaceForStatementsWithWhileStatements(method);
+    Visitors.replaceSingleStatementsWithBlockStatements(factory, method);
+
     PsiCodeBlock body = method.getBody();
     if (body == null) {
       return;
     }
-
-    Visitors.replaceForEachStatementsWithForStatements(body);
-    Visitors.replaceForStatementsWithWhileStatements(body);
-    Visitors.replaceSingleStatementsWithBlockStatements(factory, body);
-
     final PsiType returnType = method.getReturnType();
     if (returnType == null) {
       return;
@@ -118,6 +118,32 @@ class IterativeMethodGenerator {
     body.replace(factory.createStatementFromText(
       (atLeastOneLabeledBreak.get() ? switchLabelName + ": " : "") +
       "switch (" + frameVarName + "." + blockFieldName + ") {" + casesString + "}", null));
+  }
+
+  /**
+   * Rename all the variables (parameters and local variables) to unique names at method level (if necessary),
+   * in order to avoid name clashes when generating the Frame class.
+   */
+  private static void renameVariablesToUniqueNames(JavaCodeStyleManager styleManager, PsiMethod method) {
+    method.accept(new JavaRecursiveElementVisitor() {
+      private Set<String> previousNames = new HashSet<>();
+
+      @Override
+      public void visitVariable(PsiVariable variable) {
+        super.visitVariable(variable);
+        final String oldName = variable.getName();
+        if (oldName == null) {
+          return;
+        }
+        if (!previousNames.contains(oldName)) {
+          previousNames.add(oldName);
+          return;
+        }
+        final String newName = styleManager.suggestUniqueVariableName(oldName, method, true);
+        RefactoringUtil.renameVariableReferences(variable, newName, new LocalSearchScope(method));
+        variable.setName(newName);
+      }
+    });
   }
 
   private static boolean isNotVoid(PsiType returnType) {
