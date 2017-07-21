@@ -12,7 +12,9 @@ public class LocalVariableSameNameTest {
         List<Number> result = new ArrayList<>();
         LocalVariableSameName.recursive(3, result);
         System.out.println(result);
-        assertEquals(Arrays.asList(0, 1, 0.0, 1.0, 2.0, 0, 1, 0.0, 1.0, 2.0, 0, 1, 0.0, 1.0, 2.0), result);
+        assertEquals(Arrays.asList(
+                0, 1, 0.0, 0, 1.0, 0, 2.0, 0, 0, 1, 0, 1, 2, 1, 1, 2, 0, 1, 0.0, 0, 1.0, 0, 2.0,
+                0, 0, 1, 0, 1, 2, 1, 1, 2, 0, 1, 0.0, 0, 1.0, 0, 2.0, 0, 0, 1, 0, 1, 2, 1, 1, 2), result);
     }
 
 }
