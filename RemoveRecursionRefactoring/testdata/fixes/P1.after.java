@@ -78,10 +78,10 @@ public class P1 {
                     if (frame.node.getLowLink() == frame.node.getIndex()) {
                         frame.ctc = new ArrayList<>();
                         do {
-                            frame.n1 = frame.g.stack.pop();
-                            frame.n1.setInStack(false);
-                            frame.ctc.add(frame.n1);
-                        } while (!frame.n1.equals(frame.node));
+                            frame.n = frame.g.stack.pop();
+                            frame.n.setInStack(false);
+                            frame.ctc.add(frame.n);
+                        } while (!frame.n.equals(frame.node));
                         frame.g.ctc.add(frame.ctc);
                     }
                     stack.pop();
@@ -114,7 +114,6 @@ public class P1 {
         private Iterator<Node> iterator;
         private Node n;
         private List<Node> ctc;
-        private Node n1;
         private int block;
 
         private DfsCTCFrame(Graph g, Node node) {

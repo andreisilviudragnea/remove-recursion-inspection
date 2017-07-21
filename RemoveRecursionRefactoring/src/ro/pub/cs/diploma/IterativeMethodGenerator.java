@@ -125,25 +125,46 @@ class IterativeMethodGenerator {
    * in order to avoid name clashes when generating the Frame class.
    */
   private static void renameVariablesToUniqueNames(JavaCodeStyleManager styleManager, PsiMethod method) {
+    final Map<String, Map<String, List<PsiVariable>>> names = new LinkedHashMap<>();
     method.accept(new JavaRecursiveElementVisitor() {
-      private Set<String> previousNames = new HashSet<>();
-
       @Override
       public void visitVariable(PsiVariable variable) {
         super.visitVariable(variable);
-        final String oldName = variable.getName();
-        if (oldName == null) {
+        final String name = variable.getName();
+        if (name == null) {
           return;
         }
-        if (!previousNames.contains(oldName)) {
-          previousNames.add(oldName);
-          return;
+        if (!names.containsKey(name)) {
+          names.put(name, new LinkedHashMap<>());
         }
-        final String newName = styleManager.suggestUniqueVariableName(oldName, method, true);
-        RefactoringUtil.renameVariableReferences(variable, newName, new LocalSearchScope(method));
-        variable.setName(newName);
+        final Map<String, List<PsiVariable>> typesMap = names.get(name);
+        final String typeText = variable.getType().getCanonicalText();
+        if (!typesMap.containsKey(typeText)) {
+          typesMap.put(typeText, new ArrayList<>());
+        }
+        final List<PsiVariable> variables = typesMap.get(typeText);
+        variables.add(variable);
       }
     });
+    for (Map.Entry<String, Map<String, List<PsiVariable>>> entry : names.entrySet()) {
+      final Map<String, List<PsiVariable>> typesMap = entry.getValue();
+      if (typesMap.size() <= 1) {
+        continue;
+      }
+      boolean first = true;
+      for (List<PsiVariable> variables : typesMap.values()) {
+        if (first) {
+          first = false;
+          continue;
+        }
+        final String oldName = entry.getKey();
+        final String newName = styleManager.suggestUniqueVariableName(oldName, method, true);
+        for (PsiVariable variable : variables) {
+          RefactoringUtil.renameVariableReferences(variable, newName, new LocalSearchScope(method));
+          variable.setName(newName);
+        }
+      }
+    }
   }
 
   private static boolean isNotVoid(PsiType returnType) {

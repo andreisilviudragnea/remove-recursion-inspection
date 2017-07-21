@@ -4,8 +4,8 @@ import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 class FrameClassGenerator {
   @Nullable
@@ -21,30 +21,26 @@ class FrameClassGenerator {
     modifierList.setModifierProperty(PsiModifier.STATIC, true);
 
     // Add fields
-    List<PsiVariable> variables = new ArrayList<>();
+    final Map<String, String> variables = new LinkedHashMap<>();
     method.accept(new JavaRecursiveElementVisitor() {
       @Override
-      public void visitParameter(PsiParameter parameter) {
-        super.visitParameter(parameter);
-        variables.add(parameter);
-      }
-
-      @Override
-      public void visitLocalVariable(PsiLocalVariable variable) {
-        super.visitLocalVariable(variable);
-        variables.add(variable);
-      }
-
-      @Override
-      public void visitClass(PsiClass aClass) {
-      }
-
-      @Override
-      public void visitLambdaExpression(PsiLambdaExpression expression) {
+      public void visitVariable(PsiVariable variable) {
+        super.visitVariable(variable);
+        final String name = variable.getName();
+        if (name == null) {
+          return;
+        }
+        final String typeText = variable.getType().getCanonicalText();
+        if (variables.containsKey(name) && variables.get(name).equals(typeText)) {
+          return;
+        }
+        variables.put(name, typeText);
       }
     });
 
-    variables.stream().map(variable -> factory.createField(variable.getName(), variable.getType())).forEach(psiClass::add);
+    variables.entrySet().stream()
+      .map(variable -> factory.createFieldFromText("private " + variable.getValue() + " " + variable.getKey() + ";", null))
+      .forEach(psiClass::add);
     psiClass.add(factory.createField(blockFieldName, PsiPrimitiveType.INT));
 
     // Create constructor
