@@ -9,20 +9,19 @@ public class Factorial1 {
             Factorial1Frame frame = stack.peek();
             switch (frame.block) {
                 case 0: {
-                    frame.block = frame.n == 0 ? 1 : 3;
-                    break;
+                    if (frame.n == 0) {
+                        ret = 1;
+                        stack.pop();
+                        break;
+                    } else {
+                        stack.push(new Factorial1Frame(frame.n - 1));
+                        frame.block = 2;
+                        break;
+                    }
                 }
                 case 1: {
-                    ret = 1;
-                    stack.pop();
-                    break;
                 }
-                case 3: {
-                    stack.push(new Factorial1Frame(frame.n - 1));
-                    frame.block = 4;
-                    break;
-                }
-                case 4: {
+                case 2: {
                     frame.temp = ret;
                     ret = frame.n * frame.temp;
                     stack.pop();

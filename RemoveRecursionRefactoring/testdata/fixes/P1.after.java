@@ -66,15 +66,25 @@ public class P1 {
                     break;
                 }
                 case 1: {
-                    frame.block = frame.iterator.hasNext() ? 2 : 3;
-                    break;
+                    if (frame.iterator.hasNext()) {
+                        frame.n = frame.iterator.next();
+                        if (!frame.n.wasVisited()) {
+                            stack.push(new DfsCTCFrame(frame.g, frame.n));
+                            frame.block = 4;
+                            break;
+                        } else {
+                            if (frame.n.isInStack()) {
+                                frame.node.setLowLink(Math.min(frame.node.getLowLink(), frame.n.getIndex()));
+                            }
+                            frame.block = 3;
+                            break;
+                        }
+                    } else {
+                        frame.block = 2;
+                        break;
+                    }
                 }
                 case 2: {
-                    frame.n = frame.iterator.next();
-                    frame.block = !frame.n.wasVisited() ? 4 : 6;
-                    break;
-                }
-                case 3: {
                     if (frame.node.getLowLink() == frame.node.getIndex()) {
                         frame.ctc = new ArrayList<>();
                         do {
@@ -87,21 +97,13 @@ public class P1 {
                     stack.pop();
                     break;
                 }
+                case 3: {
+                    frame.block = 1;
+                    break;
+                }
                 case 4: {
-                    stack.push(new DfsCTCFrame(frame.g, frame.n));
-                    frame.block = 7;
-                    break;
-                }
-                case 6: {
-                    if (frame.n.isInStack()) {
-                        frame.node.setLowLink(Math.min(frame.node.getLowLink(), frame.n.getIndex()));
-                    }
-                    frame.block = 1;
-                    break;
-                }
-                case 7: {
                     frame.node.setLowLink(Math.min(frame.node.getLowLink(), frame.n.getLowLink()));
-                    frame.block = 1;
+                    frame.block = 3;
                     break;
                 }
             }

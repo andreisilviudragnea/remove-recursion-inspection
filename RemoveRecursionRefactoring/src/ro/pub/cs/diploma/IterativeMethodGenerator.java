@@ -102,10 +102,10 @@ class IterativeMethodGenerator {
 
     final String switchLabelName = styleManager.suggestUniqueVariableName(Constants.SWITCH_LABEL, method, true);
 
-    final BasicBlocksGenerator basicBlocksGenerator =
-      new BasicBlocksGenerator(factory, frameClassName, frameVarName, blockFieldName, stackVarName, returnType, retVarName);
+    final NewBlocksGenerator basicBlocksGenerator =
+      new NewBlocksGenerator(factory, frameClassName, frameVarName, blockFieldName, stackVarName, returnType, retVarName);
     body.accept(basicBlocksGenerator);
-    final List<BasicBlocksGenerator.Pair> blocks = basicBlocksGenerator.getBlocks();
+    final List<NewBlocksGenerator.Pair> blocks = basicBlocksGenerator.getBlocks();
 
     final Ref<Boolean> atLeastOneLabeledBreak = new Ref<>(false);
     blocks.forEach(codeBlock -> replaceReturnStatements(factory, codeBlock.getBlock(), stackVarName, retVarName, switchLabelName,

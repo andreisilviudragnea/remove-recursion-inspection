@@ -15,27 +15,28 @@ class ArrayPrinter1 {
             DisplayArrayFrame frame = stack.peek();
             switch (frame.block) {
                 case 0: {
-                    frame.block = frame.first == frame.last ? 1 : 3;
-                    break;
+                    if (frame.first == frame.last) {
+                        frame.result.add(array[frame.first]);
+                        frame.block = 1;
+                        break;
+                    } else {
+                        frame.mid = frame.first + (frame.last - frame.first) / 2;
+                        stack.push(new DisplayArrayFrame(frame.first, frame.mid, frame.result));
+                        frame.block = 2;
+                        break;
+                    }
                 }
                 case 1: {
-                    frame.result.add(array[frame.first]);
-                    frame.block = 2;
-                    break;
-                }
-                case 3: {
-                    frame.mid = frame.first + (frame.last - frame.first) / 2;
-                    stack.push(new DisplayArrayFrame(frame.first, frame.mid, frame.result));
-                    frame.block = 4;
-                    break;
-                }
-                case 2: {
                     stack.pop();
                     break;
                 }
-                case 4: {
+                case 2: {
                     stack.push(new DisplayArrayFrame(frame.mid + 1, frame.last, frame.result));
-                    frame.block = 2;
+                    frame.block = 3;
+                    break;
+                }
+                case 3: {
+                    frame.block = 1;
                     break;
                 }
             }

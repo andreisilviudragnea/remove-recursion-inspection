@@ -15,15 +15,13 @@ class Dependency2 {
             switchLabel:
             switch (frame.block) {
                 case 0: {
-                    frame.block = frame.ids1.size() > frame.ids2.size() ? 1 : 2;
-                    break;
+                    if (frame.ids1.size() > frame.ids2.size()) {
+                        stack.push(new IntersectFrame(frame.ids2, frame.ids1));
+                        frame.block = 2;
+                        break;
+                    }
                 }
                 case 1: {
-                    stack.push(new IntersectFrame(frame.ids2, frame.ids1));
-                    frame.block = 3;
-                    break;
-                }
-                case 2: {
                     frame.iterator = frame.ids1.iterator();
                     while (frame.iterator.hasNext()) {
                         frame.id = frame.iterator.next();
@@ -37,7 +35,7 @@ class Dependency2 {
                     stack.pop();
                     break;
                 }
-                case 3: {
+                case 2: {
                     frame.temp = ret;
                     ret = frame.temp;
                     stack.pop();

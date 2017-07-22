@@ -19,31 +19,33 @@ class ArrayPrinter3 {
                     break;
                 }
                 case 1: {
-                    frame.block = true ? 2 : 3;
-                    break;
+                    if (true) {
+                        if (frame.first == frame.last) {
+                            frame.result.add(array[frame.first]);
+                            stack.pop();
+                            break;
+                        } else {
+                            frame.mid = frame.first + (frame.last - frame.first) / 2;
+                            stack.push(new DisplayArrayFrame(frame.first, frame.mid, frame.result));
+                            frame.block = 4;
+                            break;
+                        }
+                    } else {
+                        frame.block = 2;
+                        break;
+                    }
                 }
                 case 2: {
-                    frame.block = frame.first == frame.last ? 4 : 6;
+                    stack.pop();
                     break;
                 }
                 case 3: {
-                    stack.pop();
+                    frame.block = 1;
                     break;
                 }
                 case 4: {
-                    frame.result.add(array[frame.first]);
-                    stack.pop();
-                    break;
-                }
-                case 6: {
-                    frame.mid = frame.first + (frame.last - frame.first) / 2;
-                    stack.push(new DisplayArrayFrame(frame.first, frame.mid, frame.result));
-                    frame.block = 7;
-                    break;
-                }
-                case 7: {
                     frame.first = frame.mid + 1;
-                    frame.block = 1;
+                    frame.block = 3;
                     break;
                 }
             }

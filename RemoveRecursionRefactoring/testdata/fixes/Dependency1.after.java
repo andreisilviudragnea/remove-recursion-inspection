@@ -13,20 +13,19 @@ class Dependency1 {
             FactorialFrame frame = stack.peek();
             switch (frame.block) {
                 case 0: {
-                    frame.block = frame.val == 1 ? 1 : 3;
-                    break;
+                    if (frame.val == 1) {
+                        ret = frame.runningVal;
+                        stack.pop();
+                        break;
+                    } else {
+                        stack.push(new FactorialFrame(frame.val - 1, frame.runningVal * frame.val));
+                        frame.block = 2;
+                        break;
+                    }
                 }
                 case 1: {
-                    ret = frame.runningVal;
-                    stack.pop();
-                    break;
                 }
-                case 3: {
-                    stack.push(new FactorialFrame(frame.val - 1, frame.runningVal * frame.val));
-                    frame.block = 4;
-                    break;
-                }
-                case 4: {
+                case 2: {
                     frame.temp = ret;
                     ret = (frame.temp);
                     stack.pop();

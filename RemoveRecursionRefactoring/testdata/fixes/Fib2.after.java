@@ -9,35 +9,35 @@ public class Fib2 {
             Fib2Frame frame = stack.peek();
             switch (frame.block) {
                 case 0: {
-                    frame.block = frame.n == 0 ? 1 : 3;
-                    break;
+                    if (frame.n == 0) {
+                        ret = 0;
+                        stack.pop();
+                        break;
+                    } else {
+                        if (frame.n == 1) {
+                            ret = 1;
+                            stack.pop();
+                            break;
+                        } else {
+                            stack.push(new Fib2Frame(frame.n - 1));
+                            frame.block = 3;
+                            break;
+                        }
+                    }
                 }
                 case 1: {
-                    ret = 0;
-                    stack.pop();
+                }
+                case 2: {
+                    frame.block = 1;
                     break;
                 }
                 case 3: {
-                    frame.block = frame.n == 1 ? 4 : 6;
+                    frame.temp = ret;
+                    stack.push(new Fib2Frame(frame.n - 2));
+                    frame.block = 4;
                     break;
                 }
                 case 4: {
-                    ret = 1;
-                    stack.pop();
-                    break;
-                }
-                case 6: {
-                    stack.push(new Fib2Frame(frame.n - 1));
-                    frame.block = 7;
-                    break;
-                }
-                case 7: {
-                    frame.temp = ret;
-                    stack.push(new Fib2Frame(frame.n - 2));
-                    frame.block = 8;
-                    break;
-                }
-                case 8: {
                     frame.temp1 = ret;
                     ret = frame.temp + frame.temp1;
                     stack.pop();
