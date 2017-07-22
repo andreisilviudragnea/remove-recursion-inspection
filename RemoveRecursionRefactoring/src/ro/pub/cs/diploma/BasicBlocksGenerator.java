@@ -88,15 +88,12 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   private final String stackVarName;
   private final PsiType returnType;
   private final String retVarName;
-  private final Map<PsiStatement, Integer> breakJumps = new HashMap<>();
-  private final Map<PsiStatement, Integer> continueJumps = new HashMap<>();
-  private final Map<Integer, Pair> blocksMap = new HashMap<>();
-  private final Set<Pair> theBlocks = new LinkedHashSet<>();
+  private final Map<PsiStatement, Pair> breakJumps = new HashMap<>();
+  private final Map<PsiStatement, Pair> continueJumps = new HashMap<>();
+  private final Set<Pair> reachableBlocks = new LinkedHashSet<>();
 
   private Pair newPair() {
-    final Pair pair = new Pair(factory.createCodeBlock(), blockCounter++);
-    blocksMap.put(pair.getId(), pair);
-    return pair;
+    return new Pair(factory.createCodeBlock(), blockCounter++);
   }
 
   @NotNull
@@ -104,35 +101,32 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     return factory.createStatementFromText(text, null);
   }
 
-  private void createJump(int index) {
+  private void createJump(Pair pair) {
     if (currentPair.isFinished) {
       return;
     }
     currentPair.isFinished = true;
-    if (theBlocks.contains(currentPair)) {
-      final Ref<Integer> ref = new Ref<>(index);
+    if (reachableBlocks.contains(currentPair)) {
+      final Ref<Integer> ref = new Ref<>(pair.getId());
       currentPair.setJump(new Jump(ref));
-      final Pair pair = blocksMap.get(index);
       pair.addReference(ref);
-      theBlocks.add(pair);
+      reachableBlocks.add(pair);
     }
   }
 
-  private void createConditionalJump(PsiExpression condition, int thenIndex, int elseIndex) {
+  private void createConditionalJump(PsiExpression condition, Pair thenPair, Pair elsePair) {
     if (currentPair.isFinished) {
       return;
     }
     currentPair.isFinished = true;
-    if (theBlocks.contains(currentPair)) {
-      final Ref<Integer> ref1 = new Ref<>(thenIndex);
-      final Ref<Integer> ref2 = new Ref<>(elseIndex);
+    if (reachableBlocks.contains(currentPair)) {
+      final Ref<Integer> ref1 = new Ref<>(thenPair.getId());
+      final Ref<Integer> ref2 = new Ref<>(elsePair.getId());
       currentPair.setJump(new ConditionalJump(condition.getText(), ref1, ref2));
-      final Pair thenPair = blocksMap.get(thenIndex);
       thenPair.addReference(ref1);
-      theBlocks.add(thenPair);
-      final Pair elsePair = blocksMap.get(elseIndex);
+      reachableBlocks.add(thenPair);
       elsePair.addReference(ref2);
-      theBlocks.add(elsePair);
+      reachableBlocks.add(elsePair);
     }
   }
 
@@ -145,7 +139,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
                        final String retVarName) {
     this.factory = factory;
     currentPair = newPair();
-    theBlocks.add(currentPair);
+    reachableBlocks.add(currentPair);
     this.frameClassName = frameClassName;
     this.frameVarName = frameVarName;
     this.blockFieldName = blockFieldName;
@@ -181,25 +175,25 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   public void visitIfStatement(PsiIfStatement statement) {
     final Pair thenPair = newPair();
     final Pair mergePair = newPair();
-    int index = mergePair.getId();
+    Pair jumpPair = mergePair;
     Pair elsePair = null;
 
     final PsiStatement elseBranch = statement.getElseBranch();
     if (elseBranch != null) {
       elsePair = newPair();
-      index = elsePair.getId();
+      jumpPair = elsePair;
     }
 
-    createConditionalJump(statement.getCondition(), thenPair.getId(), index);
+    createConditionalJump(statement.getCondition(), thenPair, jumpPair);
 
     currentPair = thenPair;
     statement.getThenBranch().accept(this);
-    createJump(mergePair.getId());
+    createJump(mergePair);
 
     if (elseBranch != null) {
       currentPair = elsePair;
       elseBranch.accept(this);
-      createJump(mergePair.getId());
+      createJump(mergePair);
     }
 
     currentPair = mergePair;
@@ -211,17 +205,17 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     final Pair bodyPair = newPair();
     final Pair mergePair = newPair();
 
-    breakJumps.put(statement, mergePair.getId());
-    continueJumps.put(statement, conditionPair.getId());
+    breakJumps.put(statement, mergePair);
+    continueJumps.put(statement, conditionPair);
 
-    createJump(conditionPair.getId());
+    createJump(conditionPair);
 
     currentPair = conditionPair;
-    createConditionalJump(statement.getCondition(), bodyPair.getId(), mergePair.getId());
+    createConditionalJump(statement.getCondition(), bodyPair, mergePair);
 
     currentPair = bodyPair;
     statement.getBody().accept(this);
-    createJump(conditionPair.getId());
+    createJump(conditionPair);
 
     currentPair = mergePair;
   }
@@ -232,17 +226,17 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     final Pair bodyPair = newPair();
     final Pair mergePair = newPair();
 
-    breakJumps.put(statement, mergePair.getId());
-    continueJumps.put(statement, conditionPair.getId());
+    breakJumps.put(statement, mergePair);
+    continueJumps.put(statement, conditionPair);
 
-    createJump(bodyPair.getId());
+    createJump(bodyPair);
 
     currentPair = bodyPair;
     statement.getBody().accept(this);
-    createJump(conditionPair.getId());
+    createJump(conditionPair);
 
     currentPair = conditionPair;
-    createConditionalJump(statement.getCondition(), bodyPair.getId(), mergePair.getId());
+    createConditionalJump(statement.getCondition(), bodyPair, mergePair);
 
     currentPair = mergePair;
   }
@@ -280,7 +274,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     currentPair.getBlock().add(IterativeMethodGenerator
                                  .createPushStatement(factory, frameClassName, stackVarName, expression.getArgumentList().getExpressions(),
                                                       PsiElement::getText));
-    createJump(newPair.getId());
+    createJump(newPair);
 
     currentStatement.delete();
 
@@ -317,7 +311,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     final List<Pair> pairs = new ArrayList<>();
 
     // Remove trivial blocks (which contain only an unconditional jump)
-    for (Pair theBlock : theBlocks) {
+    for (Pair theBlock : reachableBlocks) {
       if (theBlock.id != 0 && theBlock.block.getStatements().length == 0 && theBlock.jump instanceof Jump) {
         Jump jump = (Jump)theBlock.jump;
         for (Ref<Integer> reference : theBlock.references) {
