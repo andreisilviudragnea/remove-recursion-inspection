@@ -1,14 +1,16 @@
 package ro.pub.cs.diploma.ir;
 
-public class UnconditionalJumpStatement implements TerminatorStatement {
-  private final Block block;
+import com.intellij.openapi.util.Ref;
 
-  public UnconditionalJumpStatement(Block block) {
-    this.block = block;
+public class UnconditionalJumpStatement implements TerminatorStatement {
+  private final Ref<Block> blockRef;
+
+  public UnconditionalJumpStatement(Ref<Block> blockRef) {
+    this.blockRef = blockRef;
   }
 
   public Block getBlock() {
-    return block;
+    return blockRef.get();
   }
 
   @Override

@@ -1,16 +1,17 @@
 package ro.pub.cs.diploma.ir;
 
+import com.intellij.openapi.util.Ref;
 import com.intellij.psi.PsiExpression;
 
 public class ConditionalJumpStatement implements TerminatorStatement {
   private final PsiExpression condition;
-  private final Block thenBlock;
-  private final Block elseBlock;
+  private final Ref<Block> thenBlockRef;
+  private final Ref<Block> elseBlockRef;
 
-  public ConditionalJumpStatement(PsiExpression condition, Block thenBlock, Block elseBlock) {
+  public ConditionalJumpStatement(PsiExpression condition, Ref<Block> thenBlockRef, Ref<Block> elseBlockRef) {
     this.condition = condition;
-    this.thenBlock = thenBlock;
-    this.elseBlock = elseBlock;
+    this.thenBlockRef = thenBlockRef;
+    this.elseBlockRef = elseBlockRef;
   }
 
   @Override
@@ -23,10 +24,10 @@ public class ConditionalJumpStatement implements TerminatorStatement {
   }
 
   public Block getThenBlock() {
-    return thenBlock;
+    return thenBlockRef.get();
   }
 
   public Block getElseBlock() {
-    return elseBlock;
+    return elseBlockRef.get();
   }
 }

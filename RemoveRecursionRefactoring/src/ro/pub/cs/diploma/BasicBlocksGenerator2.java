@@ -1,11 +1,13 @@
 package ro.pub.cs.diploma;
 
+import com.intellij.openapi.util.Ref;
 import com.intellij.psi.*;
 import ro.pub.cs.diploma.ir.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
   private final PsiElementFactory factory;
@@ -50,16 +52,19 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
   private void addUnconditionalJumpStatement(Block block) {
     if (currentBlock.isFinished())
       return;
-    currentBlock.add(new UnconditionalJumpStatement(block));
-    block.addReference(currentBlock);
+    final Ref<Block> blockRef = Ref.create(block);
+    currentBlock.add(new UnconditionalJumpStatement(blockRef));
+    block.addReference(blockRef);
   }
 
   private void addConditionalJumpStatement(PsiExpression condition, Block thenBlock, Block jumpBlock) {
     if (currentBlock.isFinished())
       return;
-    currentBlock.add(new ConditionalJumpStatement(condition, thenBlock, jumpBlock));
-    thenBlock.addReference(currentBlock);
-    jumpBlock.addReference(currentBlock);
+    final Ref<Block> thenBlockRef = Ref.create(thenBlock);
+    final Ref<Block> jumpBlockRef = Ref.create(jumpBlock);
+    currentBlock.add(new ConditionalJumpStatement(condition, thenBlockRef, jumpBlockRef));
+    thenBlock.addReference(thenBlockRef);
+    jumpBlock.addReference(jumpBlockRef);
   }
 
   private void addReturnStatement(PsiReturnStatement statement) {
@@ -206,12 +211,15 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
   }
 
   List<Pair> getBlocks() {
-    for (Block block : blocks) {
-      block.checkInline();
+    final List<Block> nonTrivialReachableBlocks = blocks.stream().
+      filter(Block::isReachable).filter(Block::inlineIfTrivial).collect(Collectors.toList());
+
+    for (Block block : nonTrivialReachableBlocks) {
+      block.setInline();
     }
 
     List<Pair> pairs = new ArrayList<>();
-    for (Block block : blocks) {
+    for (Block block : nonTrivialReachableBlocks) {
       if (block.isInline())
         continue;
       ConcreteVisitor concreteVisitor = new ConcreteVisitor(factory, frameVarName, blockFieldName);

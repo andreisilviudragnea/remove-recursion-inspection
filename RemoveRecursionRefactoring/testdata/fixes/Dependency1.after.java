@@ -19,13 +19,11 @@ class Dependency1 {
                         break;
                     } else {
                         stack.push(new FactorialFrame(frame.val - 1, frame.runningVal * frame.val));
-                        frame.block = 2;
+                        frame.block = 4;
                         break;
                     }
                 }
-                case 1: {
-                }
-                case 2: {
+                case 4: {
                     frame.temp = ret;
                     ret = (frame.temp);
                     stack.pop();

@@ -27,25 +27,17 @@ class ArrayPrinter3 {
                         } else {
                             frame.mid = frame.first + (frame.last - frame.first) / 2;
                             stack.push(new DisplayArrayFrame(frame.first, frame.mid, frame.result));
-                            frame.block = 4;
+                            frame.block = 7;
                             break;
                         }
                     } else {
-                        frame.block = 2;
+                        stack.pop();
                         break;
                     }
                 }
-                case 2: {
-                    stack.pop();
-                    break;
-                }
-                case 3: {
-                    frame.block = 1;
-                    break;
-                }
-                case 4: {
+                case 7: {
                     frame.first = frame.mid + 1;
-                    frame.block = 3;
+                    frame.block = 1;
                     break;
                 }
             }

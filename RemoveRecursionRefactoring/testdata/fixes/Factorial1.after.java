@@ -15,13 +15,11 @@ public class Factorial1 {
                         break;
                     } else {
                         stack.push(new Factorial1Frame(frame.n - 1));
-                        frame.block = 2;
+                        frame.block = 4;
                         break;
                     }
                 }
-                case 1: {
-                }
-                case 2: {
+                case 4: {
                     frame.temp = ret;
                     ret = frame.n * frame.temp;
                     stack.pop();

@@ -1,5 +1,6 @@
 package ro.pub.cs.diploma.ir;
 
+import com.intellij.openapi.util.Ref;
 import com.intellij.psi.PsiStatement;
 
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ public class Block implements Statement {
   private boolean inline;
   private boolean afterRecursiveCall;
   private final List<Statement> statements = new ArrayList<>();
-  private final List<Block> references = new ArrayList<>();
+  private final List<Ref<Block>> references = new ArrayList<>();
 
   public Block(int id) {
     this.id = id;
@@ -24,8 +25,8 @@ public class Block implements Statement {
     statements.add(new NormalStatement(statement));
   }
 
-  public void addReference(Block block) {
-    references.add(block);
+  public void addReference(Ref<Block> blockRef) {
+    references.add(blockRef);
   }
 
   public boolean isFinished() {
@@ -40,18 +41,29 @@ public class Block implements Statement {
     return statements;
   }
 
-  public void checkInline() {
+  public void setInline() {
     if (references.size() == 1 && !afterRecursiveCall) {
       inline = true;
     }
+  }
+
+  public boolean inlineIfTrivial() {
+    if (id != 0 && statements.size() == 1 && statements.get(0) instanceof UnconditionalJumpStatement) {
+      final Block jumpBlock = ((UnconditionalJumpStatement) statements.get(0)).getBlock();
+      for (Ref<Block> reference : references) {
+        reference.set(jumpBlock);
+      }
+      return false;
+    }
+    return true;
   }
 
   public boolean isInline() {
     return inline;
   }
 
-  public boolean isAfterRecursiveCall() {
-    return afterRecursiveCall;
+  public boolean isReachable() {
+    return id == 0 || references.size() > 0;
   }
 
   public void setAfterRecursiveCall(boolean afterRecursiveCall) {

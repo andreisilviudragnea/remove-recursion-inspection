@@ -17,25 +17,24 @@ class Dependency2 {
                 case 0: {
                     if (frame.ids1.size() > frame.ids2.size()) {
                         stack.push(new IntersectFrame(frame.ids2, frame.ids1));
-                        frame.block = 2;
+                        frame.block = 3;
+                        break;
+                    } else {
+                        frame.iterator = frame.ids1.iterator();
+                        while (frame.iterator.hasNext()) {
+                            frame.id = frame.iterator.next();
+                            if (frame.ids2.contains(frame.id)) {
+                                ret = true;
+                                stack.pop();
+                                break switchLabel;
+                            }
+                        }
+                        ret = false;
+                        stack.pop();
                         break;
                     }
                 }
-                case 1: {
-                    frame.iterator = frame.ids1.iterator();
-                    while (frame.iterator.hasNext()) {
-                        frame.id = frame.iterator.next();
-                        if (frame.ids2.contains(frame.id)) {
-                            ret = true;
-                            stack.pop();
-                            break switchLabel;
-                        }
-                    }
-                    ret = false;
-                    stack.pop();
-                    break;
-                }
-                case 2: {
+                case 3: {
                     frame.temp = ret;
                     ret = frame.temp;
                     stack.pop();

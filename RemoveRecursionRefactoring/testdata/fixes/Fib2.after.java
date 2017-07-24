@@ -20,24 +20,18 @@ public class Fib2 {
                             break;
                         } else {
                             stack.push(new Fib2Frame(frame.n - 1));
-                            frame.block = 3;
+                            frame.block = 7;
                             break;
                         }
                     }
                 }
-                case 1: {
-                }
-                case 2: {
-                    frame.block = 1;
-                    break;
-                }
-                case 3: {
+                case 7: {
                     frame.temp = ret;
                     stack.push(new Fib2Frame(frame.n - 2));
-                    frame.block = 4;
+                    frame.block = 8;
                     break;
                 }
-                case 4: {
+                case 8: {
                     frame.temp1 = ret;
                     ret = frame.temp + frame.temp1;
                     stack.pop();
