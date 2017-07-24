@@ -3,6 +3,8 @@ package ro.pub.cs.diploma.ir;
 import com.intellij.psi.PsiCodeBlock;
 import com.intellij.psi.PsiElementFactory;
 import com.intellij.psi.PsiStatement;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ConcreteVisitor implements Visitor {
   private final PsiElementFactory factory;
@@ -19,7 +21,8 @@ public class ConcreteVisitor implements Visitor {
     currentBlock.add(factory.createStatementFromText(text, null));
   }
 
-  private void newBreakStatement() {
+  private void newBlockSet(String val) {
+    newStatement(blockSet + val + ";");
     newStatement("break;");
   }
 
@@ -42,57 +45,52 @@ public class ConcreteVisitor implements Visitor {
     }
   }
 
+  @Nullable
+  private PsiCodeBlock inline(Block block) {
+    final PsiCodeBlock oldCurrentBlock = currentBlock;
+    PsiCodeBlock psiBlock = null;
+    if (block.isInline()) {
+      psiBlock = newBlock();
+      currentBlock = psiBlock;
+      block.accept(this);
+      currentBlock = oldCurrentBlock;
+    }
+    return psiBlock;
+  }
+
+  @NotNull
+  private PsiCodeBlock getConcreteBlock(Block block, PsiCodeBlock psiBlock) {
+    PsiCodeBlock concretePsiBlock;
+    if (psiBlock != null) {
+      concretePsiBlock = psiBlock;
+    }
+    else {
+      concretePsiBlock = newBlock();
+      final PsiCodeBlock oldCurrentBlock = currentBlock;
+      currentBlock = concretePsiBlock;
+      newBlockSet(String.valueOf(block.getId()));
+      currentBlock = oldCurrentBlock;
+    }
+    return concretePsiBlock;
+  }
+
   @Override
   public void visit(ConditionalJumpStatement conditionalJumpStatement) {
-    final PsiCodeBlock oldCurrentBlock = currentBlock;
-
     final Block thenBlock = conditionalJumpStatement.getThenBlock();
-    PsiCodeBlock thenPsiBlock = null;
-    if (thenBlock.isInline()) {
-      thenPsiBlock = newBlock();
-      currentBlock = thenPsiBlock;
-      thenBlock.accept(this);
-    }
+    final PsiCodeBlock thenPsiBlock = inline(thenBlock);
 
     final Block elseBlock = conditionalJumpStatement.getElseBlock();
-    PsiCodeBlock elsePsiBlock = null;
-    if (elseBlock.isInline()) {
-      elsePsiBlock = newBlock();
-      currentBlock = elsePsiBlock;
-      elseBlock.accept(this);
-    }
+    final PsiCodeBlock elsePsiBlock = inline(elseBlock);
 
-    currentBlock = oldCurrentBlock;
     final String conditionText = conditionalJumpStatement.getCondition().getText();
+
     if (thenPsiBlock == null && elsePsiBlock == null) {
-      newStatement(blockSet + conditionText + " ? " + thenBlock.getId() + " : " + elseBlock.getId() + ";");
-      newBreakStatement();
+      newBlockSet(conditionText + " ? " + thenBlock.getId() + " : " + elseBlock.getId());
       return;
     }
 
-    final PsiCodeBlock concreteThenPsiBlock;
-    if (thenPsiBlock != null) {
-      concreteThenPsiBlock = thenPsiBlock;
-    }
-    else {
-      concreteThenPsiBlock = newBlock();
-      currentBlock = concreteThenPsiBlock;
-      newStatement(blockSet + thenBlock.getId() + ";");
-      newBreakStatement();
-      currentBlock = oldCurrentBlock;
-    }
-
-    final PsiCodeBlock concreteElsePsiBlock;
-    if (elsePsiBlock != null) {
-      concreteElsePsiBlock = elsePsiBlock;
-    }
-    else {
-      concreteElsePsiBlock = newBlock();
-      currentBlock = concreteElsePsiBlock;
-      newStatement(blockSet + elseBlock.getId() + ";");
-      newBreakStatement();
-      currentBlock = oldCurrentBlock;
-    }
+    final PsiCodeBlock concreteThenPsiBlock = getConcreteBlock(thenBlock, thenPsiBlock);
+    final PsiCodeBlock concreteElsePsiBlock = getConcreteBlock(elseBlock, elsePsiBlock);
 
     newStatement("if (" + conditionText + ")" + concreteThenPsiBlock.getText() + " else " + concreteElsePsiBlock.getText());
   }
@@ -109,26 +107,17 @@ public class ConcreteVisitor implements Visitor {
 
   @Override
   public void visit(UnconditionalJumpStatement unconditionalJumpStatement) {
-    final PsiCodeBlock oldCurrentBlock = currentBlock;
-
     final Block block = unconditionalJumpStatement.getBlock();
 
-    PsiCodeBlock newBlock = null;
-    if (block.isInline()) {
-      newBlock = newBlock();
-      currentBlock = newBlock;
-      block.accept(this);
-      currentBlock = oldCurrentBlock;
-    }
+    final PsiCodeBlock psiBlock = inline(block);
 
-    if (newBlock != null) {
-      for (PsiStatement statement : newBlock.getStatements()) {
+    if (psiBlock != null) {
+      for (PsiStatement statement : psiBlock.getStatements()) {
         currentBlock.add(statement);
       }
       return;
     }
 
-    newStatement(blockSet + block.getId() + ";");
-    newBreakStatement();
+    newBlockSet(String.valueOf(block.getId()));
   }
 }
