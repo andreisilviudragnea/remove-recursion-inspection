@@ -42,10 +42,14 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     void addReference(Ref<Integer> reference) {
       references.add(reference);
     }
+
+    void terminate() {
+      jump.terminatePair(this);
+    }
   }
 
-  private class JumpBase {
-
+  private abstract class JumpBase {
+    abstract void terminatePair(Pair pair);
   }
 
   private class Jump extends JumpBase {
@@ -56,8 +60,9 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     }
 
     @Override
-    public String toString() {
-      return ref.toString();
+    void terminatePair(Pair pair) {
+      pair.block.add(createStatement(frameVarName + "." + blockFieldName + " = " + ref + ";"));
+      pair.block.add(createStatement("break;"));
     }
   }
 
@@ -73,13 +78,14 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     }
 
     @Override
-    public String toString() {
-      return condition + " ? " + ref1 + " : " + ref2;
+    void terminatePair(Pair pair) {
+      pair.block.add(createStatement("if (" + condition + ") {" +
+                                     frameVarName + "." + blockFieldName + " = " + ref1 + ";break;} else {" +
+                                     frameVarName + "." + blockFieldName + "=" + ref2 + ";break;}"));
     }
   }
 
   private Pair currentPair;
-  private PsiStatement currentStatement;
   private final PsiElementFactory factory;
   private int blockCounter;
   private final String frameClassName;
@@ -107,7 +113,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     }
     currentPair.isFinished = true;
     if (reachableBlocks.contains(currentPair)) {
-      final Ref<Integer> ref = new Ref<>(pair.getId());
+      final Ref<Integer> ref = new Ref<>(pair.id);
       currentPair.setJump(new Jump(ref));
       pair.addReference(ref);
       reachableBlocks.add(pair);
@@ -120,8 +126,8 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     }
     currentPair.isFinished = true;
     if (reachableBlocks.contains(currentPair)) {
-      final Ref<Integer> ref1 = new Ref<>(thenPair.getId());
-      final Ref<Integer> ref2 = new Ref<>(elsePair.getId());
+      final Ref<Integer> ref1 = new Ref<>(thenPair.id);
+      final Ref<Integer> ref2 = new Ref<>(elsePair.id);
       currentPair.setJump(new ConditionalJump(condition.getText(), ref1, ref2));
       thenPair.addReference(ref1);
       reachableBlocks.add(thenPair);
@@ -148,6 +154,24 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     this.retVarName = retVarName;
   }
 
+
+  private void processStatement(PsiStatement statement) {
+    if (Visitors.containsRecursiveCalls(statement)) {
+      statement.accept(this);
+    }
+    else {
+      currentPair.block.add(statement);
+    }
+    if (statement instanceof PsiReturnStatement) {
+      currentPair.isFinished = true;
+    }
+  }
+
+  @Override
+  public void visitBlockStatement(PsiBlockStatement blockStatement) {
+    Arrays.stream(blockStatement.getCodeBlock().getStatements()).forEach(this::processStatement);
+  }
+
   @Override
   public void visitCodeBlock(PsiCodeBlock block) {
     Arrays.stream(block.getStatements()).forEach(this::processStatement);
@@ -155,20 +179,8 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     final PsiStatement[] statements = block.getStatements();
     // This is a hack, this method gets called only for the method block, not for blocks of block statements.
     if (PsiPrimitiveType.VOID.equals(returnType) && !(statements[statements.length - 1] instanceof PsiReturnStatement)) {
-      currentPair.getBlock().add(createStatement("return;"));
+      currentPair.block.add(createStatement("return;"));
     }
-  }
-
-  @Override
-  public void visitDeclarationStatement(PsiDeclarationStatement statement) {
-    currentStatement = (PsiStatement)currentPair.getBlock().add(statement);
-    super.visitDeclarationStatement(statement);
-  }
-
-  @Override
-  public void visitExpressionStatement(PsiExpressionStatement statement) {
-    currentStatement = (PsiStatement)currentPair.getBlock().add(statement);
-    statement.getExpression().accept(this);
   }
 
   @Override
@@ -242,48 +254,19 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   }
 
   @Override
-  public void visitBlockStatement(PsiBlockStatement blockStatement) {
-    Arrays.stream(blockStatement.getCodeBlock().getStatements()).forEach(this::processStatement);
-  }
-
-  private void processStatement(PsiStatement statement) {
-    if (Visitors.containsRecursiveCalls(statement)) {
-      statement.accept(this);
-    } else {
-      currentPair.getBlock().add(statement);
-    }
-    if (statement instanceof PsiReturnStatement) {
-      currentPair.isFinished = true;
-    }
-  }
-
-  @Override
-  public void visitReturnStatement(PsiReturnStatement statement) {
-    currentPair.getBlock().add(statement);
-  }
-
-  @Override
   public void visitMethodCallExpression(PsiMethodCallExpression expression) {
-    final PsiMethod method = IterativeMethodGenerator.isRecursiveMethodCall(expression);
-    if (method == null) {
-      return;
-    }
-
-    final Pair newPair = newPair();
-
-    currentPair.getBlock().add(IterativeMethodGenerator
+    currentPair.block.add(IterativeMethodGenerator
                                  .createPushStatement(factory, frameClassName, stackVarName, expression.getArgumentList().getExpressions(),
                                                       PsiElement::getText));
+    final Pair newPair = newPair();
     createJump(newPair);
-
-    currentStatement.delete();
 
     currentPair = newPair;
 
     final PsiElement parent = expression.getParent();
     if (parent instanceof PsiAssignmentExpression) {
       PsiAssignmentExpression assignment = (PsiAssignmentExpression)parent;
-      currentPair.getBlock().add(createStatement(assignment.getLExpression().getText() + " = " + retVarName + ";"));
+      currentPair.block.add(createStatement(assignment.getLExpression().getText() + " = " + retVarName + ";"));
     }
   }
 
@@ -324,8 +307,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
 
     for (Pair pair : pairs) {
       if (pair.jump != null) {
-        pair.block.add(createStatement(frameVarName + "." + blockFieldName + " = " + pair.jump.toString() + ";"));
-        pair.block.add(createStatement("break;"));
+        pair.terminate();
       }
     }
 
