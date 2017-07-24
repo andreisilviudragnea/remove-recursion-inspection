@@ -6,7 +6,7 @@ import com.intellij.psi.PsiStatement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ConcreteVisitor implements Visitor {
+public class InlineVisitor implements Visitor {
   private final PsiElementFactory factory;
   private final String blockSet;
   private final PsiCodeBlock block;
@@ -26,7 +26,7 @@ public class ConcreteVisitor implements Visitor {
     newStatement("break;");
   }
 
-  public ConcreteVisitor(PsiElementFactory factory, String frameVarName, String blockFieldName) {
+  public InlineVisitor(PsiElementFactory factory, String frameVarName, String blockFieldName) {
     this.factory = factory;
     blockSet = frameVarName + "." + blockFieldName + " = ";
     block = newBlock();

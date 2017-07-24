@@ -222,9 +222,9 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
     for (Block block : nonTrivialReachableBlocks) {
       if (block.isInline())
         continue;
-      ConcreteVisitor concreteVisitor = new ConcreteVisitor(factory, frameVarName, blockFieldName);
-      block.accept(concreteVisitor);
-      pairs.add(new Pair(block.getId(), concreteVisitor.getBlock()));
+      InlineVisitor inlineVisitor = new InlineVisitor(factory, frameVarName, blockFieldName);
+      block.accept(inlineVisitor);
+      pairs.add(new Pair(block.getId(), inlineVisitor.getBlock()));
     }
 
     return pairs;
