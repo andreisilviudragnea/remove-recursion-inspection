@@ -44,7 +44,7 @@
 	</target>
 
 	<target name="linux-preview" depends="build" description="preview thesis">
-		<exec executable="kpdf">
+		<exec executable="evince">
 			<arg value="thesis.pdf"/>
 		</exec>
 	</target>
