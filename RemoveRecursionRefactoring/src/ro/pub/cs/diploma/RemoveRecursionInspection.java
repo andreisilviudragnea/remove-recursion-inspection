@@ -2,7 +2,10 @@ package ro.pub.cs.diploma;
 
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiMethodCallExpression;
+import com.intellij.psi.PsiModifier;
+import com.intellij.psi.PsiParameter;
 import com.siyeh.ig.BaseInspection;
 import com.siyeh.ig.BaseInspectionVisitor;
 import com.siyeh.ig.InspectionGadgetsFix;
@@ -14,7 +17,6 @@ import org.jetbrains.annotations.Nullable;
  * @see TailRecursionInspection
  */
 public class RemoveRecursionInspection extends BaseInspection {
-
   @Override
   @NotNull
   public String getDisplayName() {
@@ -34,7 +36,22 @@ public class RemoveRecursionInspection extends BaseInspection {
     if (!mayBeReplacedByIterativeMethod(containingMethod)) {
       return null;
     }
-    return new RemoveTailRecursionFix();
+    return new InspectionGadgetsFix() {
+      @Override
+      @NotNull
+      public String getFamilyName() {
+        return RemoveRecursionBundle.message("remove.recursion.replace.quickfix");
+      }
+
+      @Override
+      public void doFix(Project project, ProblemDescriptor descriptor) {
+        final PsiMethod method = Util.getContainingMethod(descriptor.getPsiElement());
+        if (method == null) {
+          return;
+        }
+        IterativeMethodGenerator.createIterativeBody(method, project, true);
+      }
+    };
   }
 
   private static boolean mayBeReplacedByIterativeMethod(PsiMethod containingMethod) {
@@ -50,41 +67,20 @@ public class RemoveRecursionInspection extends BaseInspection {
     return true;
   }
 
-  private static class RemoveTailRecursionFix extends InspectionGadgetsFix {
-
-    @Override
-    @NotNull
-    public String getFamilyName() {
-      return RemoveRecursionBundle.message("remove.recursion.replace.quickfix");
-    }
-
-    @Override
-    public void doFix(Project project, ProblemDescriptor descriptor) {
-      final PsiElement callToken = descriptor.getPsiElement();
-      final PsiMethod method = Util.getContainingMethod(callToken);
-      if (method == null) {
-        return;
-      }
-      IterativeMethodGenerator.createIterativeBody(method, project, true);
-    }
-  }
-
   @Override
   public BaseInspectionVisitor buildVisitor() {
-    return new RemoveRecursionVisitor();
-  }
-
-  private static class RemoveRecursionVisitor extends BaseInspectionVisitor {
-    @Override
-    public void visitMethodCallExpression(PsiMethodCallExpression expression) {
-      super.visitMethodCallExpression(expression);
-      final PsiMethod method = Util.getContainingMethod(expression);
-      if (method == null) {
-        return;
+    return new BaseInspectionVisitor() {
+      @Override
+      public void visitMethodCallExpression(PsiMethodCallExpression expression) {
+        super.visitMethodCallExpression(expression);
+        final PsiMethod method = Util.getContainingMethod(expression);
+        if (method == null) {
+          return;
+        }
+        if (Util.isRecursive(expression, method)) {
+          registerMethodCallError(expression, method);
+        }
       }
-      if (Util.isRecursive(expression, method)) {
-        registerMethodCallError(expression, method);
-      }
-    }
+    };
   }
 }

@@ -12,9 +12,9 @@ import java.util.ResourceBundle;
 /**
  * @see com.siyeh.InspectionGadgetsBundle
  */
-public class RemoveRecursionBundle {
-
-  public static String message(@NotNull @PropertyKey(resourceBundle = BUNDLE) String key, @NotNull Object... params) {
+class RemoveRecursionBundle {
+  @NotNull
+  static String message(@NotNull @PropertyKey(resourceBundle = BUNDLE) String key, @NotNull Object... params) {
     return CommonBundle.message(getBundle(), key, params);
   }
 

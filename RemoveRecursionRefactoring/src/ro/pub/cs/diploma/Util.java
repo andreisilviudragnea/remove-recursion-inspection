@@ -5,13 +5,25 @@ import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.siyeh.ig.performance.TailRecursionInspection;
 import com.siyeh.ig.psiutils.ParenthesesUtils;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 class Util {
+  @NotNull
+  static PsiElementFactory getFactory(@NotNull final PsiElement element) {
+    return JavaPsiFacade.getElementFactory(element.getProject());
+  }
+
   @Nullable
   static PsiMethod getContainingMethod(@NotNull final PsiElement element) {
     return PsiTreeUtil.getParentOfType(element, PsiMethod.class, true, PsiClass.class, PsiLambdaExpression.class);
+  }
+
+  @NotNull
+  @Contract(pure = true)
+  static String getFrameClassName(@NotNull final String methodName) {
+    return Utilities.capitalize(methodName) + Constants.FRAME;
   }
 
   /**

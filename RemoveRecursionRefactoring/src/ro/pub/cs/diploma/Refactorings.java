@@ -19,7 +19,7 @@ class Refactorings {
    */
   static void replaceForStatementWithWhileStatement(PsiForStatement forStatement) {
     PsiStatement initialization = forStatement.getInitialization();
-    final PsiElementFactory factory = JavaPsiFacade.getElementFactory(forStatement.getProject());
+    final PsiElementFactory factory = Util.getFactory(forStatement);
     final PsiWhileStatement whileStatement = (PsiWhileStatement)
       factory.createStatementFromText("while(true) {}", forStatement);
     final PsiExpression forCondition = forStatement.getCondition();

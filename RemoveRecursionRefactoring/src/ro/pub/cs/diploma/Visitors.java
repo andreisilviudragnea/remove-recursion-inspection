@@ -94,7 +94,8 @@ class Visitors {
     return contains.get();
   }
 
-  static void replaceSingleStatementsWithBlockStatements(PsiElementFactory factory, PsiMethod method) {
+  static void replaceSingleStatementsWithBlockStatements(PsiMethod method) {
+    final PsiElementFactory factory = Util.getFactory(method);
     method.accept(new JavaRecursiveElementWalkingVisitor() {
       private void replaceStatement(PsiStatement statement) {
         if (!(statement instanceof PsiBlockStatement)) {

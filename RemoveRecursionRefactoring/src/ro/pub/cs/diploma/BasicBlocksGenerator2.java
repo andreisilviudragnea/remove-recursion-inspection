@@ -23,22 +23,20 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
   private Block currentBlock;
   private int counter;
 
-  BasicBlocksGenerator2(final PsiElementFactory factory,
-                        final PsiMethod method,
+  BasicBlocksGenerator2(final PsiMethod method,
                         final String frameClassName,
                         final String frameVarName,
                         final String blockFieldName,
                         final String stackVarName,
-                        final PsiType returnType,
                         final String retVarName) {
-    this.factory = factory;
+    this.factory = Util.getFactory(method);
     this.method = method;
     currentBlock = newBlock();
     this.frameClassName = frameClassName;
     this.frameVarName = frameVarName;
     this.blockFieldName = blockFieldName;
     this.stackVarName = stackVarName;
-    this.returnType = returnType;
+    this.returnType = method.getReturnType();
     this.retVarName = retVarName;
   }
 
