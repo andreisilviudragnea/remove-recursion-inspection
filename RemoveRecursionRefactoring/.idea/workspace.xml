@@ -1,7 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="bbedb9b1-9afe-4a72-b465-f826460d347c" name="Default" comment="" />
+    <list default="true" id="bbedb9b1-9afe-4a72-b465-f826460d347c" name="Default" comment="">
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../eliminare-recursivitate/out/production/eliminare-recursivitate/P1$1.class" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../eliminare-recursivitate/out/production/eliminare-recursivitate/P1$DfsCTCFrame.class" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../eliminare-recursivitate/out/production/eliminare-recursivitate/P1$Graph$GraphType.class" afterPath="$PROJECT_DIR$/../eliminare-recursivitate/out/production/eliminare-recursivitate/P1$Graph$GraphType.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../eliminare-recursivitate/out/production/eliminare-recursivitate/P1$Graph.class" afterPath="$PROJECT_DIR$/../eliminare-recursivitate/out/production/eliminare-recursivitate/P1$Graph.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../eliminare-recursivitate/out/production/eliminare-recursivitate/P1$Node.class" afterPath="$PROJECT_DIR$/../eliminare-recursivitate/out/production/eliminare-recursivitate/P1$Node.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../eliminare-recursivitate/out/production/eliminare-recursivitate/P1$Pair.class" afterPath="$PROJECT_DIR$/../eliminare-recursivitate/out/production/eliminare-recursivitate/P1$Pair.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../eliminare-recursivitate/out/production/eliminare-recursivitate/P1.class" afterPath="$PROJECT_DIR$/../eliminare-recursivitate/out/production/eliminare-recursivitate/P1.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../eliminare-recursivitate/.idea/inspectionProfiles/Project_Default.xml" afterPath="$PROJECT_DIR$/../eliminare-recursivitate/.idea/inspectionProfiles/Project_Default.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../eliminare-recursivitate/.idea/workspace.xml" afterPath="$PROJECT_DIR$/../eliminare-recursivitate/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../eliminare-recursivitate/src/Factorial3.java" afterPath="$PROJECT_DIR$/../eliminare-recursivitate/src/Factorial3.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../templates-master/theses/diploma/src/chapters/algorithm.tex" afterPath="$PROJECT_DIR$/../templates-master/theses/diploma/src/chapters/algorithm.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../templates-master/theses/diploma/src/chapters/my-intro.tex" afterPath="$PROJECT_DIR$/../templates-master/theses/diploma/src/chapters/my-intro.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../templates-master/theses/diploma/src/chapters/prerequisites.tex" afterPath="$PROJECT_DIR$/../templates-master/theses/diploma/src/chapters/prerequisites.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../templates-master/theses/diploma/src/global.tex" afterPath="$PROJECT_DIR$/../templates-master/theses/diploma/src/global.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../templates-master/theses/diploma/src/main.tex" afterPath="$PROJECT_DIR$/../templates-master/theses/diploma/src/main.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../templates-master/theses/diploma/thesis.cs.pub.ro.cls" afterPath="$PROJECT_DIR$/../templates-master/theses/diploma/thesis.cs.pub.ro.cls" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../templates-master/theses/diploma/thesis.tex" afterPath="$PROJECT_DIR$/../templates-master/theses/diploma/thesis.tex" />
+    </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -15,7 +34,120 @@
     <favorites_list name="RemoveRecursionRefactoring" />
   </component>
   <component name="FileEditorManager">
-    <leaf />
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="RemoveRecursionInspection.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/RemoveRecursionInspection.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="126">
+              <caret line="67" column="37" lean-forward="true" selection-start-line="67" selection-start-column="37" selection-end-line="67" selection-end-column="37" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#592#654#0" expanded="true" />
+                <element signature="e#2160#2161#0" expanded="true" />
+                <element signature="e#2205#2206#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ProblemDescriptor.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../community/platform/analysis-api/src/com/intellij/codeInspection/ProblemDescriptor.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="197">
+              <caret line="30" column="13" lean-forward="false" selection-start-line="30" selection-start-column="13" selection-end-line="30" selection-end-column="13" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Util.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/Util.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="252">
+              <caret line="14" column="46" lean-forward="false" selection-start-line="14" selection-start-column="46" selection-end-line="14" selection-end-column="46" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="IterativeMethodGenerator.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/IterativeMethodGenerator.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="160">
+              <caret line="9" column="17" lean-forward="false" selection-start-line="9" selection-start-column="17" selection-end-line="9" selection-end-column="17" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Passes.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/Passes.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="108">
+              <caret line="45" column="7" lean-forward="true" selection-start-line="45" selection-start-column="7" selection-end-line="45" selection-end-column="7" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BaseInspectionVisitor.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../community/plugins/InspectionGadgets/InspectionGadgetsAnalysis/src/com/siyeh/ig/BaseInspectionVisitor.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="241">
+              <caret line="59" column="25" lean-forward="false" selection-start-line="59" selection-start-column="25" selection-end-line="59" selection-end-column="25" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BaseInspection.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../community/plugins/InspectionGadgets/InspectionGadgetsAnalysis/src/com/siyeh/ig/BaseInspection.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="187">
+              <caret line="88" column="35" lean-forward="false" selection-start-line="88" selection-start-column="35" selection-end-line="88" selection-end-column="35" />
+              <folding>
+                <element signature="e#2850#2851#0" expanded="true" />
+                <element signature="e#2871#2872#0" expanded="true" />
+                <element signature="e#2948#2949#0" expanded="true" />
+                <element signature="e#2997#2998#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Visitors.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/Visitors.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="36">
+              <caret line="7" column="22" lean-forward="true" selection-start-line="7" selection-start-column="22" selection-end-line="7" selection-end-column="22" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BasicBlocksGenerator2.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/BasicBlocksGenerator2.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="555">
+              <caret line="73" column="38" lean-forward="false" selection-start-line="73" selection-start-column="38" selection-end-line="73" selection-end-column="38" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BasicBlocksGenerator.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/BasicBlocksGenerator.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="197">
+              <caret line="161" column="53" lean-forward="false" selection-start-line="161" selection-start-column="53" selection-end-line="161" selection-end-column="53" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -58,10 +190,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/tests/ro/pub/cs/diploma/RemoveRecursionFixTest.java" />
-        <option value="$PROJECT_DIR$/testdata/fixes/LocalVariableSameName.java" />
-        <option value="$PROJECT_DIR$/testdata/fixes/LocalVariableSameName.after.java" />
-        <option value="$PROJECT_DIR$/testdata/fixes/Dependency1.after.java" />
         <option value="$PROJECT_DIR$/testdata/fixes/Dependency2.after.java" />
         <option value="$PROJECT_DIR$/testdata/fixes/Fib2.after.java" />
         <option value="$PROJECT_DIR$/testdata/fixes/P1.after.java" />
@@ -70,11 +198,9 @@
         <option value="$PROJECT_DIR$/testdata/fixes/Factorial1.after.java" />
         <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/NewBlocksGenerator.java" />
         <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/ir/TerminatorStatement.java" />
-        <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/BasicBlocksGenerator.java" />
         <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/ir/NormalStatement.java" />
         <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/ir/ReturnStatement.java" />
         <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/ir/ConditionalJumpStatement.java" />
-        <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/BasicBlocksGenerator2.java" />
         <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/ir/Block.java" />
         <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/ir/UnconditionalJumpStatement.java" />
         <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/ir/ConcreteVisitor.java" />
@@ -83,8 +209,6 @@
         <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/ir/TerminatorStatement.kt" />
         <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/ir/Visitor.java" />
         <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/ir/Visitor.kt" />
-        <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/Visitors.java" />
-        <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/IterativeMethodGenerator.java" />
         <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/Constants.kt" />
         <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/Utilities.kt" />
         <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/Visitors.kt" />
@@ -109,6 +233,14 @@
         <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/ir/UnconditionalJumpStatement.kt" />
         <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/IterativeMethodGenerator.kt" />
         <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/BasicBlocksGenerator2.kt" />
+        <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/Passes.java" />
+        <option value="$PROJECT_DIR$/resources/inspectionDescriptions/RemoveRecursion.html" />
+        <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/Util.java" />
+        <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/RemoveRecursionInspection.java" />
+        <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/Visitors.java" />
+        <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/BasicBlocksGenerator.java" />
+        <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/BasicBlocksGenerator2.java" />
+        <option value="$PROJECT_DIR$/src/ro/pub/cs/diploma/IterativeMethodGenerator.java" />
       </list>
     </option>
   </component>
@@ -126,10 +258,10 @@
     <option name="CUSTOM_FILTER" />
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="1431" />
+    <option name="x" value="65" />
     <option name="y" value="-4" />
-    <option name="width" value="1855" />
-    <option name="height" value="1084" />
+    <option name="width" value="1301" />
+    <option name="height" value="772" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -139,116 +271,57 @@
             <id />
           </State>
           <State>
-            <id>Abstraction issuesJava</id>
+            <id>Android</id>
           </State>
           <State>
             <id>Android &gt; Lint &gt; Correctness</id>
           </State>
           <State>
+            <id>Android &gt; Lint &gt; Correctness &gt; Messages</id>
+          </State>
+          <State>
+            <id>Android &gt; Lint &gt; Performance</id>
+          </State>
+          <State>
             <id>Android Lint for Kotlin</id>
           </State>
           <State>
-            <id>Assignment issuesJava</id>
+            <id>CorrectnessLintAndroid</id>
           </State>
           <State>
-            <id>Code style issuesJava</id>
+            <id>GSPGrailsGroovy</id>
           </State>
           <State>
-            <id>Code style issuesJavaScript</id>
+            <id>General</id>
           </State>
           <State>
-            <id>CodeSpring CoreSpring</id>
-          </State>
-          <State>
-            <id>CoffeeScript</id>
-          </State>
-          <State>
-            <id>Control FlowGroovy</id>
-          </State>
-          <State>
-            <id>Control flow issuesJava</id>
-          </State>
-          <State>
-            <id>Control flow issuesJavaScript</id>
-          </State>
-          <State>
-            <id>Data flow issuesJava</id>
-          </State>
-          <State>
-            <id>Declaration redundancyJava</id>
-          </State>
-          <State>
-            <id>Error handlingJava</id>
-          </State>
-          <State>
-            <id>Finalization issuesJava</id>
+            <id>GrailsGroovy</id>
           </State>
           <State>
             <id>Groovy</id>
           </State>
           <State>
-            <id>J2ME issuesJava</id>
-          </State>
-          <State>
-            <id>JUnit issuesJava</id>
-          </State>
-          <State>
             <id>Java</id>
-          </State>
-          <State>
-            <id>Java 7Java language level migration aidsJava</id>
-          </State>
-          <State>
-            <id>Java language level migration aidsJava</id>
-          </State>
-          <State>
-            <id>JavaScript</id>
           </State>
           <State>
             <id>Kotlin</id>
           </State>
           <State>
-            <id>Logging issuesJava</id>
+            <id>LintAndroid</id>
           </State>
           <State>
-            <id>Potentially confusing code constructsGroovy</id>
+            <id>Maven</id>
           </State>
           <State>
-            <id>Potentially confusing code constructsJavaScript</id>
+            <id>Numeric issuesJava</id>
           </State>
           <State>
-            <id>Probable bugsCoffeeScript</id>
+            <id>Plugin DevKit</id>
           </State>
           <State>
-            <id>Probable bugsJava</id>
-          </State>
-          <State>
-            <id>Python</id>
-          </State>
-          <State>
-            <id>Resource management issuesJava</id>
-          </State>
-          <State>
-            <id>SetupSpring CoreSpring</id>
-          </State>
-          <State>
-            <id>Spring</id>
-          </State>
-          <State>
-            <id>Spring CoreSpring</id>
-          </State>
-          <State>
-            <id>Threading issuesGroovy</id>
-          </State>
-          <State>
-            <id>Threading issuesJava</id>
+            <id>XPath</id>
           </State>
         </expanded-state>
-        <selected-state>
-          <State>
-            <id>NestedSynchronizedStatement</id>
-          </State>
-        </selected-state>
       </profile-state>
     </entry>
   </component>
@@ -269,7 +342,6 @@
     </navigator>
     <panes>
       <pane id="PackagesPane" />
-      <pane id="AndroidView" />
       <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
@@ -281,6 +353,17 @@
             <path>
               <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
               <item name="RemoveRecursionRefactoring" type="462c0819:PsiDirectoryNode" />
+              <item name="resources" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="RemoveRecursionRefactoring" type="462c0819:PsiDirectoryNode" />
+              <item name="resources" type="462c0819:PsiDirectoryNode" />
+              <item name="inspectionDescriptions" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="RemoveRecursionRefactoring" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -288,13 +371,6 @@
               <item name="RemoveRecursionRefactoring" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="diploma" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
-              <item name="RemoveRecursionRefactoring" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="diploma" type="462c0819:PsiDirectoryNode" />
-              <item name="ir" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
@@ -331,27 +407,332 @@
               <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
               <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
               <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
-              <item name="kotlin-runtime.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="idea.jar" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
               <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
               <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
-              <item name="kotlin-runtime.jar" type="462c0819:PsiDirectoryNode" />
-              <item name="kotlin" type="462c0819:PsiDirectoryNode" />
+              <item name="idea.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="idea.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="intellij" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="idea.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="intellij" type="462c0819:PsiDirectoryNode" />
+              <item name="codeInsight" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="idea.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="intellij" type="462c0819:PsiDirectoryNode" />
+              <item name="codeInsight" type="462c0819:PsiDirectoryNode" />
+              <item name="daemon" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="idea.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="intellij" type="462c0819:PsiDirectoryNode" />
+              <item name="codeInsight" type="462c0819:PsiDirectoryNode" />
+              <item name="daemon" type="462c0819:PsiDirectoryNode" />
+              <item name="impl" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="idea.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="intellij" type="462c0819:PsiDirectoryNode" />
+              <item name="psi" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="idea.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="intellij" type="462c0819:PsiDirectoryNode" />
+              <item name="psi" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="idea.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="intellij" type="462c0819:PsiDirectoryNode" />
+              <item name="psi" type="462c0819:PsiDirectoryNode" />
+              <item name="impl" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="idea.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="intellij" type="462c0819:PsiDirectoryNode" />
+              <item name="psi" type="462c0819:PsiDirectoryNode" />
+              <item name="impl" type="462c0819:PsiDirectoryNode" />
+              <item name="source" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="idea.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="intellij" type="462c0819:PsiDirectoryNode" />
+              <item name="psi" type="462c0819:PsiDirectoryNode" />
+              <item name="impl" type="462c0819:PsiDirectoryNode" />
+              <item name="source" type="462c0819:PsiDirectoryNode" />
+              <item name="codeStyle" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="idea.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="intellij" type="462c0819:PsiDirectoryNode" />
+              <item name="refactoring" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="idea.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="intellij" type="462c0819:PsiDirectoryNode" />
+              <item name="refactoring" type="462c0819:PsiDirectoryNode" />
+              <item name="util" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="idea.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="siyeh" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="idea.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="siyeh" type="462c0819:PsiDirectoryNode" />
+              <item name="ig" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="idea.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="siyeh" type="462c0819:PsiDirectoryNode" />
+              <item name="ig" type="462c0819:PsiDirectoryNode" />
+              <item name="bugs" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="idea.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="siyeh" type="462c0819:PsiDirectoryNode" />
+              <item name="ig" type="462c0819:PsiDirectoryNode" />
+              <item name="performance" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="idea.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="siyeh" type="462c0819:PsiDirectoryNode" />
+              <item name="ig" type="462c0819:PsiDirectoryNode" />
+              <item name="psiutils" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="idea.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="org" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="idea.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="org" type="462c0819:PsiDirectoryNode" />
+              <item name="jetbrains" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="idea.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="org" type="462c0819:PsiDirectoryNode" />
+              <item name="jetbrains" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="idea.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="org" type="462c0819:PsiDirectoryNode" />
+              <item name="jetbrains" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="openapi.jar" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="openapi.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="openapi.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="intellij" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="openapi.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="intellij" type="462c0819:PsiDirectoryNode" />
+              <item name="codeInspection" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="openapi.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="intellij" type="462c0819:PsiDirectoryNode" />
+              <item name="navigation" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="openapi.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="intellij" type="462c0819:PsiDirectoryNode" />
+              <item name="psi" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="openapi.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="intellij" type="462c0819:PsiDirectoryNode" />
+              <item name="psi" type="462c0819:PsiDirectoryNode" />
+              <item name="codeStyle" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="openapi.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="intellij" type="462c0819:PsiDirectoryNode" />
+              <item name="psi" type="462c0819:PsiDirectoryNode" />
+              <item name="util" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="openapi.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="intellij" type="462c0819:PsiDirectoryNode" />
+              <item name="testFramework" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="openapi.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="intellij" type="462c0819:PsiDirectoryNode" />
+              <item name="testFramework" type="462c0819:PsiDirectoryNode" />
+              <item name="fixtures" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="openapi.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="ig" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="rt.jar" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="rt.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="RemoveRecursionRefactoring" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; IntelliJ IDEA IU-172.3317.6 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="rt.jar" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="lang" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="AndroidView" />
       <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="settings.editor.selected.configurable" value="reference.idesettings.debugger.kotlin.data.view" />
+    <property name="settings.editor.selected.configurable" value="preferences.intentionPowerPack" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="SearchEverywhereHistoryKey" value="psimethod&#9;PSI&#9;JAVA://com.intellij.psi.PsiMethodCallExpression&#10;psi&#9;FILE&#9;file:///home/andrei/Desktop/community/java/java-psi-api/src/com/intellij/psi/PsiPostfixExpression.java&#10;psipost&#9;PSI&#9;JAVA://com.intellij.psi.PsiPostfixExpression&#10;psiprefi&#9;FILE&#9;file:///home/andrei/Desktop/community/java/java-psi-api/src/com/intellij/psi/PsiPrefixExpression.java&#10;integer&#9;PSI&#9;JAVA://java.lang.Integer&#10;linkedhash&#9;FILE&#9;jar:///usr/lib/jvm/java-8-openjdk-amd64/src.zip!/java/util/LinkedHashMap.java&#10;psitype&#9;PSI&#9;JAVA://com.intellij.psi.PsiType&#10;implicitva&#9;PSI&#9;JAVA://com.intellij.psi.ImplicitVariable&#10;psiresourceva&#9;PSI&#9;JAVA://com.intellij.psi.PsiResourceVariable&#10;psivar&#9;FILE&#9;file:///home/andrei/Desktop/community/java/java-psi-api/src/com/intellij/psi/PsiVariable.java&#10;refactoringF&#9;PSI&#9;JAVA://com.intellij.refactoring.RefactoringFactory&#10;psireferenceex&#9;PSI&#9;JAVA://com.intellij.psi.PsiReferenceExpression&#10;psiiden&#9;PSI&#9;JAVA://com.intellij.psi.PsiIdentifier&#10;psireferencepa&#9;PSI&#9;JAVA://com.intellij.psi.PsiReferenceParameterList&#10;psideclarat&#9;PSI&#9;JAVA://com.intellij.psi.PsiDeclarationStatement&#10;psiexpressionlist&#9;PSI&#9;JAVA://com.intellij.psi.PsiExpressionListStatement&#10;psifield&#9;PSI&#9;JAVA://com.intellij.psi.PsiField&#10;switchlabel&#9;PSI&#9;JAVA://ro.pub.cs.diploma.BasicBlocksGenerator#switchLabelName&#10;psiloop&#9;PSI&#9;JAVA://com.intellij.psi.PsiLoopStatement&#10;arraydeq&#9;PSI&#9;JAVA://java.util.ArrayDeque&#10;isboolean&#9;FILE&#9;file:///home/andrei/Desktop/community/out/production/java-analysis-impl/com/siyeh/ig/controlflow/SimplifiableBooleanExpressionInspection$SimplifiableBooleanExpressionFix.class&#10;isConstantexpression&#9;PSI&#9;JAVA://com.intellij.psi.impl.IsConstantExpressionVisitor&#10;PsiDoW&#9;PSI&#9;JAVA://com.intellij.psi.PsiDoWhileStatement&#10;arrays&#9;PSI&#9;JAVA://java.util.Arrays&#10;comparetoignorecase&#9;PSI&#9;JAVA://java.lang.String#compareToIgnoreCase&#10;getreferences&#9;PSI&#9;JAVA://com.intellij.psi.PsiElement#getReferences&#10;getUsages&#9;PSI&#9;JAVA://com.intellij.internal.statistic.UsagesCollector#getUsages&#10;findusages&#9;PSI&#9;JAVA://com.intellij.find.FindManager#findUsages&#10;psidecla&#9;PSI&#9;JAVA://com.intellij.psi.PsiDeclarationStatement&#10;javaKeyword&#9;PSI&#9;JAVA://com.intellij.codeInsight.daemon.impl.JavaHighlightInfoTypes#JAVA_KEYWORD&#10;psipara&#9;FILE&#9;file:///home/andrei/Desktop/community/java/java-psi-api/src/com/intellij/psi/PsiParameter.java&#10;fac&#9;FILE&#9;file:///home/andrei/Desktop/licenta/RemoveRecursionRefactoring/testdata/fixes/Factorial2.java&#10;rem&#9;FILE&#9;file:///home/andrei/Desktop/licenta/RemoveRecursionRefactoring/tests/ro/pub/cs/diploma/RemoveRecursionFixTest.java&#10;fa&#9;FILE&#9;file:///home/andrei/Desktop/licenta/RemoveRecursionRefactoring/testdata/fixes/Factorial1.java&#10;fib2&#9;FILE&#9;file:///home/andrei/Desktop/licenta/RemoveRecursionRefactoring/testdata/fixes/Fib2.java&#10;removere&#9;FILE&#9;file:///home/andrei/Desktop/licenta/RemoveRecursionRefactoring/tests/ro/pub/cs/diploma/RemoveRecursionFixTest.java&#10;arraylist&#9;PSI&#9;JAVA://java.util.ArrayList&#10;igquick&#9;FILE&#9;file:///home/andrei/Desktop/community/plugins/InspectionGadgets/testsrc/com/siyeh/ig/IGQuickFixesTestCase.java&#10;igquickfi&#9;FILE&#9;file:///home/andrei/Desktop/community/plugins/InspectionGadgets/testsrc/com/siyeh/ig/IGQuickFixesTestCase.java&#10;lightplatform&#9;PSI&#9;JAVA://com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase&#10;Methodut&#9;FILE&#9;file:///home/andrei/Desktop/community/plugins/InspectionGadgets/InspectionGadgetsAnalysis/src/com/siyeh/ig/psiutils/MethodUtils.java&#10;visitreturnstatement&#9;PSI&#9;JAVA://null#visitReturnStatement&#10;tailre&#9;PSI&#9;JAVA://com.siyeh.ig.performance.TailRecursionInspection&#10;psibreak&#9;PSI&#9;JAVA://com.intellij.psi.PsiBreakStatement&#10;psilabe&#9;PSI&#9;JAVA://com.intellij.psi.PsiLabeledStatement&#10;PsiLocal&#9;PSI&#9;JAVA://com.intellij.psi.PsiLocalVariable&#10;isLocalVariable&#9;PSI&#9;JAVA://com.intellij.psi.controlFlow.ControlFlowPolicy#isLocalVariableAccepted&#10;PsiReferenceEx&#9;FILE&#9;file:///home/andrei/Desktop/community/java/java-psi-api/src/com/intellij/psi/PsiReferenceExpression.java&#10;psiexpressions&#9;FILE&#9;file:///home/andrei/Desktop/community/java/java-psi-api/src/com/intellij/psi/PsiExpressionStatement.java&#10;psiass&#9;FILE&#9;file:///home/andrei/Desktop/community/java/java-psi-api/src/com/intellij/psi/PsiAssignmentExpression.java" />
+    <property name="SearchEverywhereHistoryKey" value="infinitere&#9;PSI&#9;JAVA://com.siyeh.ig.bugs.InfiniteRecursionInspection&#10;lightinspection&#9;PSI&#9;JAVA://com.siyeh.ig.LightInspectionTestCase&#10;psimethod&#9;PSI&#9;JAVA://com.intellij.psi.PsiMethodCallExpression&#10;psi&#9;FILE&#9;file:///home/andrei/Desktop/community/java/java-psi-api/src/com/intellij/psi/PsiPostfixExpression.java&#10;psipost&#9;PSI&#9;JAVA://com.intellij.psi.PsiPostfixExpression&#10;psiprefi&#9;FILE&#9;file:///home/andrei/Desktop/community/java/java-psi-api/src/com/intellij/psi/PsiPrefixExpression.java&#10;integer&#9;PSI&#9;JAVA://java.lang.Integer&#10;linkedhash&#9;FILE&#9;jar:///usr/lib/jvm/java-8-openjdk-amd64/src.zip!/java/util/LinkedHashMap.java&#10;psitype&#9;PSI&#9;JAVA://com.intellij.psi.PsiType&#10;implicitva&#9;PSI&#9;JAVA://com.intellij.psi.ImplicitVariable&#10;psiresourceva&#9;PSI&#9;JAVA://com.intellij.psi.PsiResourceVariable&#10;psivar&#9;FILE&#9;file:///home/andrei/Desktop/community/java/java-psi-api/src/com/intellij/psi/PsiVariable.java&#10;refactoringF&#9;PSI&#9;JAVA://com.intellij.refactoring.RefactoringFactory&#10;psireferenceex&#9;PSI&#9;JAVA://com.intellij.psi.PsiReferenceExpression&#10;psiiden&#9;PSI&#9;JAVA://com.intellij.psi.PsiIdentifier&#10;psireferencepa&#9;PSI&#9;JAVA://com.intellij.psi.PsiReferenceParameterList&#10;psideclarat&#9;PSI&#9;JAVA://com.intellij.psi.PsiDeclarationStatement&#10;psiexpressionlist&#9;PSI&#9;JAVA://com.intellij.psi.PsiExpressionListStatement&#10;psifield&#9;PSI&#9;JAVA://com.intellij.psi.PsiField&#10;switchlabel&#9;PSI&#9;JAVA://ro.pub.cs.diploma.BasicBlocksGenerator#switchLabelName&#10;psiloop&#9;PSI&#9;JAVA://com.intellij.psi.PsiLoopStatement&#10;arraydeq&#9;PSI&#9;JAVA://java.util.ArrayDeque&#10;isboolean&#9;FILE&#9;file:///home/andrei/Desktop/community/out/production/java-analysis-impl/com/siyeh/ig/controlflow/SimplifiableBooleanExpressionInspection$SimplifiableBooleanExpressionFix.class&#10;isConstantexpression&#9;PSI&#9;JAVA://com.intellij.psi.impl.IsConstantExpressionVisitor&#10;PsiDoW&#9;PSI&#9;JAVA://com.intellij.psi.PsiDoWhileStatement&#10;arrays&#9;PSI&#9;JAVA://java.util.Arrays&#10;comparetoignorecase&#9;PSI&#9;JAVA://java.lang.String#compareToIgnoreCase&#10;getreferences&#9;PSI&#9;JAVA://com.intellij.psi.PsiElement#getReferences&#10;getUsages&#9;PSI&#9;JAVA://com.intellij.internal.statistic.UsagesCollector#getUsages&#10;findusages&#9;PSI&#9;JAVA://com.intellij.find.FindManager#findUsages&#10;psidecla&#9;PSI&#9;JAVA://com.intellij.psi.PsiDeclarationStatement&#10;javaKeyword&#9;PSI&#9;JAVA://com.intellij.codeInsight.daemon.impl.JavaHighlightInfoTypes#JAVA_KEYWORD&#10;psipara&#9;FILE&#9;file:///home/andrei/Desktop/community/java/java-psi-api/src/com/intellij/psi/PsiParameter.java&#10;fac&#9;FILE&#9;file:///home/andrei/Desktop/licenta/RemoveRecursionRefactoring/testdata/fixes/Factorial2.java&#10;rem&#9;FILE&#9;file:///home/andrei/Desktop/licenta/RemoveRecursionRefactoring/tests/ro/pub/cs/diploma/RemoveRecursionFixTest.java&#10;fa&#9;FILE&#9;file:///home/andrei/Desktop/licenta/RemoveRecursionRefactoring/testdata/fixes/Factorial1.java&#10;fib2&#9;FILE&#9;file:///home/andrei/Desktop/licenta/RemoveRecursionRefactoring/testdata/fixes/Fib2.java&#10;removere&#9;FILE&#9;file:///home/andrei/Desktop/licenta/RemoveRecursionRefactoring/tests/ro/pub/cs/diploma/RemoveRecursionFixTest.java&#10;arraylist&#9;PSI&#9;JAVA://java.util.ArrayList&#10;igquick&#9;FILE&#9;file:///home/andrei/Desktop/community/plugins/InspectionGadgets/testsrc/com/siyeh/ig/IGQuickFixesTestCase.java&#10;igquickfi&#9;FILE&#9;file:///home/andrei/Desktop/community/plugins/InspectionGadgets/testsrc/com/siyeh/ig/IGQuickFixesTestCase.java&#10;lightplatform&#9;PSI&#9;JAVA://com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase&#10;Methodut&#9;FILE&#9;file:///home/andrei/Desktop/community/plugins/InspectionGadgets/InspectionGadgetsAnalysis/src/com/siyeh/ig/psiutils/MethodUtils.java&#10;visitreturnstatement&#9;PSI&#9;JAVA://null#visitReturnStatement&#10;tailre&#9;PSI&#9;JAVA://com.siyeh.ig.performance.TailRecursionInspection&#10;psibreak&#9;PSI&#9;JAVA://com.intellij.psi.PsiBreakStatement&#10;psilabe&#9;PSI&#9;JAVA://com.intellij.psi.PsiLabeledStatement&#10;PsiLocal&#9;PSI&#9;JAVA://com.intellij.psi.PsiLocalVariable&#10;isLocalVariable&#9;PSI&#9;JAVA://com.intellij.psi.controlFlow.ControlFlowPolicy#isLocalVariableAccepted&#10;PsiReferenceEx&#9;FILE&#9;file:///home/andrei/Desktop/community/java/java-psi-api/src/com/intellij/psi/PsiReferenceExpression.java" />
     <property name="extract.method.default.visibility" value="private" />
     <property name="INTRODUCE_CONSTANT_NONNLS" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../../community/plugins/InspectionGadgets/testsrc" />
@@ -381,6 +762,8 @@
       <recent name="$PROJECT_DIR$/src/ro/pub/cs/diploma" />
     </key>
     <key name="MoveMembersDialog.RECENTS_KEY">
+      <recent name="ro.pub.cs.diploma.Util" />
+      <recent name="ro.pub.cs.diploma.Passes" />
       <recent name="ro.pub.cs.diploma.Constants" />
       <recent name="ro.pub.cs.diploma.c" />
       <recent name="ro.pub.cs.diploma.Visitors" />
@@ -603,20 +986,9 @@
       <workItem from="1500725042608" duration="51541000" />
       <workItem from="1501016794731" duration="193000" />
       <workItem from="1501060685594" duration="79000" />
-    </task>
-    <task id="LOCAL-00014" summary="Added test source folder and test resource folder.">
-      <created>1499695665386</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1499695665386</updated>
-    </task>
-    <task id="LOCAL-00015" summary="Refactored inspection warning.">
-      <created>1499695700929</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1499695700929</updated>
+      <workItem from="1501152190042" duration="5703000" />
+      <workItem from="1501162242138" duration="75000" />
+      <workItem from="1501162357846" duration="25274000" />
     </task>
     <task id="LOCAL-00016" summary="Added inspection tests.">
       <created>1499695724833</created>
@@ -947,19 +1319,24 @@
       <option name="project" value="LOCAL" />
       <updated>1500989520297</updated>
     </task>
-    <option name="localTasksCounter" value="63" />
+    <task id="LOCAL-00063" summary="Updated inspection description.">
+      <created>1501264069614</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1501264069615</updated>
+    </task>
+    <task id="LOCAL-00064" summary="Refactorings.">
+      <created>1501264206454</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1501264206454</updated>
+    </task>
+    <option name="localTasksCounter" value="65" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="RemoveRecursionFixTest - 2017.07.25 at 13h 22m 27s.xml">
-      <configuration name="RemoveRecursionFixTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="RemoveRecursionFixTest - 2017.07.25 at 14h 00m 43s.xml">
-      <configuration name="RemoveRecursionFixTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="RemoveRecursionFixTest - 2017.07.25 at 15h 13m 43s.xml">
-      <configuration name="RemoveRecursionFixTest" configurationId="JUnit" />
-    </history-entry>
     <history-entry file="RemoveRecursionFixTest - 2017.07.25 at 15h 29m 35s.xml">
       <configuration name="RemoveRecursionFixTest" configurationId="JUnit" />
     </history-entry>
@@ -978,37 +1355,48 @@
     <history-entry file="RemoveRecursionFixTest - 2017.07.25 at 16h 31m 37s.xml">
       <configuration name="RemoveRecursionFixTest" configurationId="JUnit" />
     </history-entry>
+    <history-entry file="RemoveRecursionFixTest - 2017.07.27 at 22h 39m 41s.xml">
+      <configuration name="RemoveRecursionFixTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="RemoveRecursionFixTest - 2017.07.27 at 23h 28m 11s.xml">
+      <configuration name="RemoveRecursionFixTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="RemoveRecursionFixTest - 2017.07.28 at 20h 42m 20s.xml">
+      <configuration name="RemoveRecursionFixTest" configurationId="JUnit" />
+    </history-entry>
     <history-entry file="RemoveRecursionInspectionTest - 2017.07.25 at 02h 17m 51s.xml">
       <configuration name="RemoveRecursionInspectionTest" configurationId="JUnit" />
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="456090000" />
+    <option name="totallyTimeSpent" value="487142000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1431" y="-4" width="1857" height="1092" extended-state="6" />
+    <frame x="65" y="-4" width="1301" height="772" extended-state="6" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32879582" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4879581" sideWeight="0.5041459" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="PsiViewer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32780543" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4867807" sideWeight="0.5041459" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="PsiViewer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32749003" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32984293" sideWeight="0.49585405" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.45340315" sideWeight="0.49585405" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4525661" sideWeight="0.49585405" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32970452" sideWeight="0.49585405" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18518518" sideWeight="0.494705" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26693228" sideWeight="0.494705" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.16694306" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3281493" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.212749" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.43856922" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.20066334" sideWeight="0.505295" order="6" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.43874344" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -1017,10 +1405,8 @@
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Duplicates" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32984293" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection Results" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3291536" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32879582" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Java Enterprise" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32879582" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1056,8 +1442,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added continue statement support and tests." />
-    <MESSAGE value="Added do while statement support." />
     <MESSAGE value="Removed unreachable blocks." />
     <MESSAGE value="Short-circuited blocks." />
     <MESSAGE value="Removed some modifiers." />
@@ -1081,7 +1465,9 @@
     <MESSAGE value="Renamed concrete visitor to inline and deleted stupid NewBlocksGenerator." />
     <MESSAGE value="Ported the codebase to Kotlin." />
     <MESSAGE value="Refactoring." />
-    <option name="LAST_COMMIT_MESSAGE" value="Refactoring." />
+    <MESSAGE value="Updated inspection description." />
+    <MESSAGE value="Refactorings." />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactorings." />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -1154,7 +1540,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="117" />
+      <option name="time" value="119" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -1163,379 +1549,147 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/../../community/java/java-psi-api/src/com/intellij/psi/PsiMethodCallExpression.java">
+    <entry file="file://$PROJECT_DIR$/../../community/platform/core-api/src/com/intellij/navigation/NavigationItem.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
-          <caret line="22" column="57" lean-forward="false" selection-start-line="22" selection-start-column="57" selection-end-line="22" selection-end-column="57" />
+        <state relative-caret-position="90">
+          <caret line="20" column="17" lean-forward="false" selection-start-line="20" selection-start-column="17" selection-end-line="20" selection-end-column="17" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../community/platform/core-api/src/com/intellij/lang/ASTNode.java">
+    <entry file="file://$PROJECT_DIR$/../../community/platform/core-api/src/com/intellij/psi/NavigatablePsiElement.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="309">
-          <caret line="44" column="15" lean-forward="false" selection-start-line="44" selection-start-column="15" selection-end-line="44" selection-end-column="15" />
+        <state relative-caret-position="162">
+          <caret line="23" column="64" lean-forward="false" selection-start-line="23" selection-start-column="64" selection-end-line="23" selection-end-column="64" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../community/platform/core-api/src/com/intellij/psi/tree/TokenSet.java">
+    <entry file="jar://$APPLICATION_HOME_DIR$/lib/idea.jar!/org/jetbrains/uast/java/JavaUMethod.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="309">
-          <caret line="60" column="17" lean-forward="false" selection-start-line="60" selection-start-column="17" selection-end-line="60" selection-end-column="17" />
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../community/platform/core-impl/src/com/intellij/psi/impl/source/tree/CompositeElement.java">
+    <entry file="file://$PROJECT_DIR$/../../community/platform/core-api/src/com/intellij/psi/SyntheticElement.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="309">
-          <caret line="220" column="17" lean-forward="false" selection-start-line="220" selection-start-column="17" selection-end-line="220" selection-end-column="17" />
+        <state relative-caret-position="180">
+          <caret line="24" column="17" lean-forward="false" selection-start-line="24" selection-start-column="17" selection-end-line="24" selection-end-column="17" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../community/java/java-psi-impl/src/com/intellij/psi/impl/source/tree/java/PsiExpressionStatementImpl.java">
+    <entry file="file://$PROJECT_DIR$/../../community/java/java-psi-api/src/com/intellij/psi/PsiSyntheticClass.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="234">
-          <caret line="37" column="89" lean-forward="false" selection-start-line="37" selection-start-column="89" selection-end-line="37" selection-end-column="89" />
+        <state relative-caret-position="108">
+          <caret line="20" column="58" lean-forward="false" selection-start-line="20" selection-start-column="58" selection-end-line="20" selection-end-column="58" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../community/java/java-psi-api/src/com/intellij/psi/PsiExpressionStatement.java">
+    <entry file="file://$PROJECT_DIR$/../../community/platform/core-api/src/com/intellij/psi/util/PsiTreeUtil.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="29" column="16" lean-forward="false" selection-start-line="29" selection-start-column="16" selection-end-line="29" selection-end-column="16" />
+        <state relative-caret-position="215">
+          <caret line="525" column="21" lean-forward="false" selection-start-line="525" selection-start-column="21" selection-end-line="525" selection-end-column="21" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../community/java/java-psi-api/src/com/intellij/psi/PsiExpressionList.java">
+    <entry file="file://$PROJECT_DIR$/../../community/platform/core-impl/src/com/intellij/extapi/psi/StubBasedPsiElementBase.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="31" column="27" lean-forward="false" selection-start-line="31" selection-start-column="27" selection-end-line="31" selection-end-column="27" />
+        <state relative-caret-position="205">
+          <caret line="356" column="20" lean-forward="false" selection-start-line="356" selection-start-column="20" selection-end-line="356" selection-end-column="20" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../community/java/java-psi-api/src/com/intellij/psi/PsiElementFactory.java">
+    <entry file="file://$PROJECT_DIR$/../../community/java/java-psi-impl/src/com/intellij/psi/impl/source/PsiMethodImpl.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
-          <caret line="36" column="17" lean-forward="false" selection-start-line="36" selection-start-column="17" selection-end-line="36" selection-end-column="17" />
+        <state relative-caret-position="215">
+          <caret line="84" column="28" lean-forward="false" selection-start-line="84" selection-start-column="28" selection-end-line="84" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../community/java/java-psi-api/src/com/intellij/psi/PsiMember.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="34" column="11" lean-forward="false" selection-start-line="34" selection-start-column="11" selection-end-line="34" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../community/java/java-impl/src/com/intellij/refactoring/util/RefactoringUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="331" column="21" lean-forward="false" selection-start-line="331" selection-start-column="21" selection-end-line="331" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../community/java/java-psi-api/src/com/intellij/psi/PsiVariable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="25" column="3" lean-forward="true" selection-start-line="25" selection-start-column="3" selection-end-line="25" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/Refactorings.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="197">
+          <caret line="87" column="14" lean-forward="false" selection-start-line="87" selection-start-column="14" selection-end-line="87" selection-end-column="14" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../../community/platform/core-api/src/com/intellij/psi/PsiElement.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="309">
-          <caret line="269" column="7" lean-forward="false" selection-start-line="269" selection-start-column="7" selection-end-line="269" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../community/java/java-psi-api/src/com/intellij/psi/PsiStatement.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
-          <caret line="22" column="17" lean-forward="false" selection-start-line="22" selection-start-column="17" selection-end-line="22" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../community/java/java-psi-api/src/com/intellij/psi/PsiJavaParserFacade.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="309">
-          <caret line="185" column="15" lean-forward="false" selection-start-line="185" selection-start-column="15" selection-end-line="185" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar:///usr/lib/jvm/java-8-openjdk-amd64/src.zip!/java/util/List.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="309">
-          <caret line="237" column="12" lean-forward="false" selection-start-line="237" selection-start-column="12" selection-end-line="237" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../community/platform/util/src/com/intellij/openapi/util/Ref.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="576">
-          <caret line="57" column="27" lean-forward="false" selection-start-line="57" selection-start-column="27" selection-end-line="57" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/testdata/fixes/P1.after.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="867">
-          <caret line="482" column="0" lean-forward="false" selection-start-line="482" selection-start-column="0" selection-end-line="482" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../eliminare-recursivitate/src/P1Ideal.java" />
-    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/NewBlocksGenerator.java" />
-    <entry file="file://$PROJECT_DIR$/../../community/java/java-psi-api/src/com/intellij/psi/PsiMethod.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="730">
-          <caret line="194" column="13" lean-forward="false" selection-start-line="194" selection-start-column="13" selection-end-line="194" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar:///usr/lib/jvm/java-8-openjdk-amd64/src.zip!/java/util/ArrayList.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="301">
-          <caret line="163" column="11" lean-forward="false" selection-start-line="163" selection-start-column="11" selection-end-line="163" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../community/java/java-psi-api/src/com/intellij/psi/PsiIfStatement.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="31" column="16" lean-forward="false" selection-start-line="31" selection-start-column="16" selection-end-line="31" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar:///usr/lib/jvm/java-8-openjdk-amd64/src.zip!/java/util/LinkedHashMap.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3711">
-          <caret line="366" column="11" lean-forward="false" selection-start-line="366" selection-start-column="11" selection-end-line="366" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$APPLICATION_HOME_DIR$/lib/kotlin-runtime.jar!/kotlin/collections/collections.kotlin_builtins">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="309">
-          <caret line="164" column="24" lean-forward="false" selection-start-line="164" selection-start-column="24" selection-end-line="164" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../community/platform/core-api/src/com/intellij/psi/PsiNamedElement.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
-          <caret line="35" column="19" lean-forward="false" selection-start-line="35" selection-start-column="19" selection-end-line="35" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../community/platform/core-api/src/com/intellij/pom/PomNamedTarget.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="162">
-          <caret line="23" column="9" lean-forward="false" selection-start-line="23" selection-start-column="9" selection-end-line="23" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../community/platform/annotations/common/src/org/jetbrains/annotations/NonNls.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="702">
-          <caret line="53" column="18" lean-forward="false" selection-start-line="53" selection-start-column="18" selection-end-line="53" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar:///usr/lib/jvm/java-8-openjdk-amd64/src.zip!/java/lang/ref/Reference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
-          <caret line="41" column="22" lean-forward="false" selection-start-line="41" selection-start-column="22" selection-end-line="41" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/ro/pub/cs/diploma/DefaultLightProjectDescriptor.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="234">
-          <caret line="22" column="57" lean-forward="false" selection-start-line="22" selection-start-column="57" selection-end-line="22" selection-end-column="57" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/ro/pub/cs/diploma/RemoveRecursionFixTest.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="36">
-          <caret line="2" column="0" lean-forward="true" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
-          <folding>
-            <element signature="n#!!block;n#setUp#0;n#!!block;n#RemoveRecursionFixTest#0" expanded="false" />
-            <element signature="n#!!block;n#getTestDataPath#0;n#!!block;n#RemoveRecursionFixTest#0" expanded="false" />
-            <element signature="n#!!block;n#testCallOnOtherInstance1#0;n#!!block;n#RemoveRecursionFixTest#0" expanded="false" />
-            <element signature="n#!!block;n#testCallOnOtherInstance2#0;n#!!block;n#RemoveRecursionFixTest#0" expanded="false" />
-            <element signature="n#!!block;n#testDependency1#0;n#!!block;n#RemoveRecursionFixTest#0" expanded="false" />
-            <element signature="n#!!block;n#testDependency2#0;n#!!block;n#RemoveRecursionFixTest#0" expanded="false" />
-            <element signature="n#!!block;n#testDependency3#0;n#!!block;n#RemoveRecursionFixTest#0" expanded="false" />
-            <element signature="n#!!block;n#testDependency4#0;n#!!block;n#RemoveRecursionFixTest#0" expanded="false" />
-            <element signature="n#!!block;n#testThisVariable#0;n#!!block;n#RemoveRecursionFixTest#0" expanded="false" />
-            <element signature="n#!!block;n#testUnmodifiedParameter#0;n#!!block;n#RemoveRecursionFixTest#0" expanded="false" />
-            <element signature="n#!!block;n#testArrayPrinter1#0;n#!!block;n#RemoveRecursionFixTest#0" expanded="false" />
-            <element signature="n#!!block;n#testArrayPrinter2#0;n#!!block;n#RemoveRecursionFixTest#0" expanded="false" />
-            <element signature="n#!!block;n#testArrayPrinter3#0;n#!!block;n#RemoveRecursionFixTest#0" expanded="false" />
-            <element signature="n#!!block;n#testFib1#0;n#!!block;n#RemoveRecursionFixTest#0" expanded="false" />
-            <element signature="n#!!block;n#testFib2#0;n#!!block;n#RemoveRecursionFixTest#0" expanded="false" />
-            <element signature="n#!!block;n#testFactorial1#0;n#!!block;n#RemoveRecursionFixTest#0" expanded="false" />
-            <element signature="n#!!block;n#testFactorial2#0;n#!!block;n#RemoveRecursionFixTest#0" expanded="false" />
-            <element signature="n#!!block;n#testBreakStatement#0;n#!!block;n#RemoveRecursionFixTest#0" expanded="false" />
-            <element signature="n#!!block;n#testLabeledBreakStatement#0;n#!!block;n#RemoveRecursionFixTest#0" expanded="false" />
-            <element signature="n#!!block;n#testNameClash#0;n#!!block;n#RemoveRecursionFixTest#0" expanded="false" />
-            <element signature="n#!!block;n#testContinueStatement#0;n#!!block;n#RemoveRecursionFixTest#0" expanded="false" />
-            <element signature="n#!!block;n#testDoWhileStatement#0;n#!!block;n#RemoveRecursionFixTest#0" expanded="false" />
-            <element signature="n#!!block;n#testP1#0;n#!!block;n#RemoveRecursionFixTest#0" expanded="false" />
-            <element signature="n#!!block;n#testLocalVariableSameName#0;n#!!block;n#RemoveRecursionFixTest#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/ro/pub/cs/diploma/RemoveRecursionInspectionTest.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
-          <caret line="18" column="42" lean-forward="true" selection-start-line="18" selection-start-column="42" selection-end-line="18" selection-end-column="42" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/ro/pub/cs/diploma/IGQuickFixesTestCase.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="846">
-          <caret line="57" column="30" lean-forward="false" selection-start-line="57" selection-start-column="30" selection-end-line="57" selection-end-column="30" />
+        <state relative-caret-position="421">
+          <caret line="458" column="17" lean-forward="false" selection-start-line="458" selection-start-column="17" selection-end-line="458" selection-end-column="17" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/ir/ConditionalJumpStatement.kt">
+    <entry file="file://$PROJECT_DIR$/../../community/platform/core-api/src/com/intellij/psi/PsiReference.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="197">
+          <caret line="36" column="17" lean-forward="false" selection-start-line="36" selection-start-column="17" selection-end-line="36" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/inspectionDescriptions/RemoveRecursion.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="72">
+          <caret line="4" column="93" lean-forward="false" selection-start-line="4" selection-start-column="93" selection-end-line="4" selection-end-column="93" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../community/platform/util/src/com/intellij/openapi/diagnostic/Logger.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="29" column="22" lean-forward="false" selection-start-line="29" selection-start-column="22" selection-end-line="29" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../community/plugins/InspectionGadgets/InspectionGadgetsAnalysis/src/com/siyeh/ig/InspectionGadgetsFix.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="25" column="22" lean-forward="false" selection-start-line="25" selection-start-column="22" selection-end-line="25" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/RemoveRecursionBundle.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="126">
-          <caret line="7" column="69" lean-forward="false" selection-start-line="7" selection-start-column="69" selection-end-line="7" selection-end-column="69" />
-          <folding>
-            <element signature="e#30#104#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/ir/InlineVisitor.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="108">
-          <caret line="8" column="24" lean-forward="false" selection-start-line="8" selection-start-column="24" selection-end-line="8" selection-end-column="24" />
-          <folding>
-            <element signature="n#!!block;n#newBlock#0;n#!!block;n#InlineVisitor#0" expanded="false" />
-            <element signature="n#!!block;n#addStatement#0;n#!!block;n#InlineVisitor#0" expanded="false" />
-            <element signature="n#!!block;n#addStatement#1;n#!!block;n#InlineVisitor#0" expanded="false" />
-            <element signature="n#!!block;n#addBlockSet#0;n#!!block;n#InlineVisitor#0" expanded="false" />
-            <element signature="n#!!block;n#visit#0;n#!!block;n#InlineVisitor#0" expanded="false" />
-            <element signature="e#954#990#1" expanded="false" />
-            <element signature="n#!!block;n#inline#0;n#!!block;n#InlineVisitor#0" expanded="false" />
-            <element signature="e#1079#1266#1" expanded="false" />
-            <element signature="e#1272#1290#1" expanded="false" />
-            <element signature="n#!!block;n#getConcreteBlock#0;n#!!block;n#InlineVisitor#0" expanded="false" />
-            <element signature="e#1415#1640#1" expanded="false" />
-            <element signature="e#1646#1668#1" expanded="false" />
-            <element signature="n#!!block;n#visit#1;n#!!block;n#InlineVisitor#0" expanded="false" />
-            <element signature="e#2062#2154#1" expanded="false" />
-            <element signature="n#!!block;n#visit#2;n#!!block;n#InlineVisitor#0" expanded="false" />
-            <element signature="n#!!block;n#visit#3;n#!!block;n#InlineVisitor#0" expanded="false" />
-            <element signature="n#!!block;n#visit#4;n#!!block;n#InlineVisitor#0" expanded="false" />
-            <element signature="e#2811#2918#1" expanded="false" />
-            <element signature="e#2858#2899#1" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/ir/NormalStatement.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="72">
-          <caret line="4" column="64" lean-forward="false" selection-start-line="4" selection-start-column="64" selection-end-line="4" selection-end-column="64" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/ir/ReturnStatement.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="72">
-          <caret line="4" column="80" lean-forward="false" selection-start-line="4" selection-start-column="80" selection-end-line="4" selection-end-column="80" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/ir/Statement.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="36">
-          <caret line="2" column="18" lean-forward="false" selection-start-line="2" selection-start-column="18" selection-end-line="2" selection-end-column="18" />
+          <caret line="14" column="25" lean-forward="true" selection-start-line="14" selection-start-column="25" selection-end-line="14" selection-end-column="25" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/ir/TerminatorStatement.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="36">
-          <caret line="2" column="41" lean-forward="false" selection-start-line="2" selection-start-column="41" selection-end-line="2" selection-end-column="41" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/ir/UnconditionalJumpStatement.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="72">
-          <caret line="4" column="90" lean-forward="false" selection-start-line="4" selection-start-column="90" selection-end-line="4" selection-end-column="90" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/ir/Visitor.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="36">
-          <caret line="2" column="19" lean-forward="false" selection-start-line="2" selection-start-column="19" selection-end-line="2" selection-end-column="19" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/BasicBlocksGenerator.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
-          <caret line="17" column="103" lean-forward="true" selection-start-line="17" selection-start-column="103" selection-end-line="17" selection-end-column="103" />
-          <folding>
-            <element signature="e#1120#1162#0" expanded="false" />
-            <element signature="n#!!block;n#newPair#0;n#!!block;n#BasicBlocksGenerator#0" expanded="false" />
-            <element signature="n#!!block;n#Pair#0;n#!!block;n#BasicBlocksGenerator#0" expanded="false" />
-            <element signature="n#!!block;n#addReference#0;n#!!block;n#Pair#0;n#!!block;n#BasicBlocksGenerator#0" expanded="false" />
-            <element signature="n#!!block;n#terminate#0;n#!!block;n#Pair#0;n#!!block;n#BasicBlocksGenerator#0" expanded="false" />
-            <element signature="n#!!block;n#JumpBase#0;n#!!block;n#BasicBlocksGenerator#0" expanded="false" />
-            <element signature="n#!!block;n#Jump#0;n#!!block;n#BasicBlocksGenerator#0" expanded="false" />
-            <element signature="n#!!block;n#terminatePair#0;n#!!block;n#Jump#0;n#!!block;n#BasicBlocksGenerator#0" expanded="false" />
-            <element signature="n#!!block;n#ConditionalJump#0;n#!!block;n#BasicBlocksGenerator#0" expanded="false" />
-            <element signature="n#!!block;n#terminatePair#0;n#!!block;n#ConditionalJump#0;n#!!block;n#BasicBlocksGenerator#0" expanded="false" />
-            <element signature="n#!!block;n#createStatement#0;n#!!block;n#BasicBlocksGenerator#0" expanded="false" />
-            <element signature="n#!!block;n#createJump#0;n#!!block;n#BasicBlocksGenerator#0" expanded="false" />
-            <element signature="e#2647#2667#1" expanded="false" />
-            <element signature="e#2749#2881#1" expanded="false" />
-            <element signature="n#!!block;n#createConditionalJump#0;n#!!block;n#BasicBlocksGenerator#0" expanded="false" />
-            <element signature="e#3015#3035#1" expanded="false" />
-            <element signature="e#3117#3401#1" expanded="false" />
-            <element signature="n#!!block;n#processStatement#0;n#!!block;n#BasicBlocksGenerator#0" expanded="false" />
-            <element signature="e#3517#3553#1" expanded="false" />
-            <element signature="e#3563#3609#1" expanded="false" />
-            <element signature="e#3651#3694#1" expanded="false" />
-            <element signature="n#!!block;n#visitBlockStatement#0;n#!!block;n#BasicBlocksGenerator#0" expanded="false" />
-            <element signature="n#!!block;n#visitCodeBlock#0;n#!!block;n#BasicBlocksGenerator#0" expanded="false" />
-            <element signature="e#4219#4282#1" expanded="false" />
-            <element signature="n#!!block;n#visitIfStatement#0;n#!!block;n#BasicBlocksGenerator#0" expanded="false" />
-            <element signature="e#4539#4599#1" expanded="false" />
-            <element signature="e#4821#4915#1" expanded="false" />
-            <element signature="n#!!block;n#visitWhileStatement#0;n#!!block;n#BasicBlocksGenerator#0" expanded="false" />
-            <element signature="n#!!block;n#visitDoWhileStatement#0;n#!!block;n#BasicBlocksGenerator#0" expanded="false" />
-            <element signature="n#!!block;n#visitMethodCallExpression#0;n#!!block;n#BasicBlocksGenerator#0" expanded="false" />
-            <element signature="e#6392#6496#1" expanded="false" />
-            <element signature="n#!!block;n#visitBreakStatement#0;n#!!block;n#BasicBlocksGenerator#0" expanded="false" />
-            <element signature="n#!!block;n#visitContinueStatement#0;n#!!block;n#BasicBlocksGenerator#0" expanded="false" />
-            <element signature="e#7098#7601#0" expanded="false" />
-            <element signature="e#7176#7486#1" expanded="false" />
-            <element signature="e#7272#7450#1" expanded="false" />
-            <element signature="e#7366#7421#1" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/Constants.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
-          <caret line="14" column="1" lean-forward="false" selection-start-line="14" selection-start-column="1" selection-end-line="14" selection-end-column="1" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/FrameClassGenerator.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="64">
-          <caret line="6" column="9" lean-forward="false" selection-start-line="6" selection-start-column="9" selection-end-line="6" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/Refactorings.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1242">
-          <caret line="76" column="24" lean-forward="false" selection-start-line="76" selection-start-column="24" selection-end-line="76" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/RemoveRecursionBundle.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="108">
-          <caret line="11" column="3" lean-forward="false" selection-start-line="11" selection-start-column="3" selection-end-line="11" selection-end-column="3" />
         </state>
       </provider>
     </entry>
@@ -1543,99 +1697,286 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/RemoveRecursionInspection.kt">
+    <entry file="file://$PROJECT_DIR$/../../community/java/testFramework/src/com/intellij/testFramework/fixtures/JavaCodeInsightFixtureTestCase.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="234">
-          <caret line="21" column="39" lean-forward="false" selection-start-line="21" selection-start-column="39" selection-end-line="21" selection-end-column="39" />
+        <state relative-caret-position="144">
+          <caret line="34" column="22" lean-forward="false" selection-start-line="34" selection-start-column="22" selection-end-line="34" selection-end-column="22" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/RemoveRecursionRefactoringAction.kt">
+    <entry file="file://$PROJECT_DIR$/tests/ro/pub/cs/diploma/RemoveRecursionInspectionTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="162">
-          <caret line="14" column="8" lean-forward="false" selection-start-line="14" selection-start-column="8" selection-end-line="14" selection-end-column="8" />
+        <state relative-caret-position="126">
+          <caret line="11" column="13" lean-forward="false" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="13" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/Visitors.kt">
+    <entry file="file://$PROJECT_DIR$/../../community/java/testFramework/src/com/siyeh/ig/LightInspectionTestCase.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="576">
-          <caret line="35" column="6" lean-forward="false" selection-start-line="35" selection-start-column="6" selection-end-line="35" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/Utilities.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="54">
-          <caret line="3" column="11" lean-forward="false" selection-start-line="3" selection-start-column="11" selection-end-line="3" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$APPLICATION_HOME_DIR$/lib/kotlin-runtime.jar!/kotlin/kotlin.kotlin_builtins">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="334">
-          <caret line="1016" column="19" lean-forward="false" selection-start-line="1016" selection-start-column="19" selection-end-line="1016" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/IterativeMethodGenerator.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="601">
-          <caret line="239" column="0" lean-forward="false" selection-start-line="239" selection-start-column="0" selection-end-line="239" selection-end-column="0" />
+        <state relative-caret-position="90">
+          <caret line="39" column="22" lean-forward="false" selection-start-line="39" selection-start-column="22" selection-end-line="39" selection-end-column="22" />
           <folding>
-            <element signature="e#27#526#0" expanded="true" />
+            <marker date="1496942432376" expanded="true" signature="3610:3633" ph="{...}" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/BasicBlocksGenerator2.kt">
+    <entry file="file://$PROJECT_DIR$/tests/ro/pub/cs/diploma/IGQuickFixesTestCase.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="216">
-          <caret line="15" column="53" lean-forward="false" selection-start-line="15" selection-start-column="53" selection-end-line="15" selection-end-column="53" />
+        <state relative-caret-position="324">
+          <caret line="18" column="29" lean-forward="true" selection-start-line="18" selection-start-column="29" selection-end-line="18" selection-end-column="29" />
           <folding>
-            <element signature="n#!!block;n#addStatement#0;n#!!block;n#BasicBlocksGenerator2#0" expanded="false" />
-            <element signature="n#!!block;n#addUnconditionalJumpStatement#0;n#!!block;n#BasicBlocksGenerator2#0" expanded="false" />
-            <element signature="n#!!block;n#addConditionalJumpStatement#0;n#!!block;n#BasicBlocksGenerator2#0" expanded="false" />
-            <element signature="n#!!block;n#addReturnStatement#0;n#!!block;n#BasicBlocksGenerator2#0" expanded="false" />
-            <element signature="n#!!block;n#processStatement#0;n#!!block;n#BasicBlocksGenerator2#0" expanded="false" />
-            <element signature="e#2027#2063#1" expanded="false" />
-            <element signature="e#2073#2114#1" expanded="false" />
-            <element signature="n#!!block;n#visitReturnStatement#0;n#!!block;n#BasicBlocksGenerator2#0" expanded="false" />
-            <element signature="n#!!block;n#visitCodeBlock#0;n#!!block;n#BasicBlocksGenerator2#0" expanded="false" />
-            <element signature="e#2634#2738#1" expanded="false" />
-            <element signature="n#!!block;n#visitMethodCallExpression#0;n#!!block;n#BasicBlocksGenerator2#0" expanded="false" />
-            <element signature="e#3348#3426#1" expanded="false" />
-            <element signature="n#!!block;n#visitIfStatement#0;n#!!block;n#BasicBlocksGenerator2#0" expanded="false" />
-            <element signature="e#3679#3743#1" expanded="false" />
-            <element signature="e#3753#3812#1" expanded="false" />
-            <element signature="e#4064#4180#1" expanded="false" />
-            <element signature="n#!!block;n#visitWhileStatement#0;n#!!block;n#BasicBlocksGenerator2#0" expanded="false" />
-            <element signature="n#!!block;n#visitDoWhileStatement#0;n#!!block;n#BasicBlocksGenerator2#0" expanded="false" />
-            <element signature="n#!!block;n#getBlocks#0;n#!!block;n#BasicBlocksGenerator2#0" expanded="false" />
-            <element signature="e#5568#5599#1" expanded="false" />
-            <element signature="e#5680#5896#1" expanded="false" />
+            <element signature="imports" expanded="true" />
+            <element signature="e#1172#1173#0" expanded="true" />
+            <element signature="e#1193#1194#0" expanded="true" />
+            <marker date="1501149676242" expanded="true" signature="3705:3740" ph="{...}" />
+            <marker date="1501149676242" expanded="true" signature="3756:3790" ph="{...}" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/ir/Block.kt">
+    <entry file="file://$PROJECT_DIR$/tests/ro/pub/cs/diploma/RemoveRecursionFixTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="5" column="50" lean-forward="true" selection-start-line="5" selection-start-column="50" selection-end-line="5" selection-end-column="50" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../community/java/java-psi-api/src/com/intellij/psi/PsiMethodCallExpression.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="144">
+          <caret line="22" column="17" lean-forward="false" selection-start-line="22" selection-start-column="17" selection-end-line="22" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../community/platform/analysis-api/src/com/intellij/codeHighlighting/HighlightDisplayLevel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="37" column="13" lean-forward="false" selection-start-line="37" selection-start-column="13" selection-end-line="37" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../community/platform/analysis-api/src/com/intellij/codeInspection/ProblemHighlightType.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="19" column="119" lean-forward="false" selection-start-line="19" selection-start-column="119" selection-end-line="19" selection-end-column="119" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../community/plugins/InspectionGadgets/InspectionGadgetsAnalysis/src/com/siyeh/ig/psiutils/MethodUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="277">
+          <caret line="247" column="63" lean-forward="false" selection-start-line="247" selection-start-column="63" selection-end-line="247" selection-end-column="63" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../community/platform/core-api/src/com/intellij/util/UniqueResultsQuery.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="223">
+          <caret line="35" column="7" lean-forward="false" selection-start-line="35" selection-start-column="7" selection-end-line="35" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../community/platform/core-api/src/com/intellij/util/QueryFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="223">
+          <caret line="61" column="30" lean-forward="false" selection-start-line="61" selection-start-column="30" selection-end-line="61" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../community/java/java-indexing-api/src/com/intellij/psi/search/searches/OverridingMethodsSearch.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="125">
+          <caret line="61" column="0" lean-forward="true" selection-start-line="61" selection-start-column="0" selection-end-line="61" selection-end-column="0" />
+          <folding>
+            <element signature="e#3227#3228#0" expanded="false" />
+            <element signature="e#3264#3265#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../community/plugins/InspectionGadgets/InspectionGadgetsAnalysis/src/com/siyeh/ig/bugs/InfiniteRecursionInspection.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="291">
+          <caret line="60" column="33" lean-forward="false" selection-start-line="60" selection-start-column="33" selection-end-line="60" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../community/plugins/InspectionGadgets/InspectionGadgetsAnalysis/src/com/siyeh/ig/psiutils/RecursionUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="21" column="13" lean-forward="false" selection-start-line="21" selection-start-column="13" selection-end-line="21" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../community/plugins/InspectionGadgets/InspectionGadgetsAnalysis/src/com/siyeh/ig/performance/TailRecursionInspection.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="38" column="13" lean-forward="false" selection-start-line="38" selection-start-column="13" selection-end-line="38" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../community/java/java-impl/src/com/intellij/codeInsight/daemon/impl/RecursiveCallLineMarkerProvider.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="205">
+          <caret line="65" column="24" lean-forward="false" selection-start-line="65" selection-start-column="24" selection-end-line="65" selection-end-column="24" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/Utilities.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="72">
-          <caret line="6" column="11" lean-forward="false" selection-start-line="6" selection-start-column="11" selection-end-line="6" selection-end-column="11" />
+          <caret line="4" column="12" lean-forward="false" selection-start-line="4" selection-start-column="12" selection-end-line="4" selection-end-column="12" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../community/plugins/InspectionGadgets/InspectionGadgetsAnalysis/src/com/siyeh/ig/psiutils/RecursionVisitor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="18">
+          <caret line="20" column="6" lean-forward="false" selection-start-line="20" selection-start-column="6" selection-end-line="20" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///usr/lib/jvm/java-8-openjdk-amd64/src.zip!/java/lang/String.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="18">
+          <caret line="110" column="19" lean-forward="false" selection-start-line="110" selection-start-column="19" selection-end-line="110" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../community/platform/core-api/src/com/intellij/psi/PsiQualifiedReference.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="450">
+          <caret line="40" column="6" lean-forward="false" selection-start-line="40" selection-start-column="6" selection-end-line="40" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../community/java/java-impl/src/com/intellij/psi/impl/source/codeStyle/JavaCodeStyleManagerImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="223">
+          <caret line="932" column="23" lean-forward="false" selection-start-line="932" selection-start-column="23" selection-end-line="932" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../community/java/java-psi-api/src/com/intellij/psi/codeStyle/JavaCodeStyleManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="205">
+          <caret line="189" column="25" lean-forward="false" selection-start-line="189" selection-start-column="25" selection-end-line="189" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../community/plugins/InspectionGadgets/InspectionGadgetsAnalysis/src/com/siyeh/ig/BaseInspection.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="88" column="35" lean-forward="false" selection-start-line="88" selection-start-column="35" selection-end-line="88" selection-end-column="35" />
           <folding>
-            <element signature="n#!!block;n#setInline#0;n#!!block;n#Block#0" expanded="false" />
-            <element signature="e#660#689#1" expanded="false" />
-            <element signature="n#!!block;n#inlineIfTrivial#0;n#!!block;n#Block#0" expanded="false" />
-            <element signature="e#818#997#1" expanded="false" />
-            <element signature="e#930#972#1" expanded="false" />
-            <element signature="n#!!block;n#add#0;n#!!block;n#Block#0" expanded="false" />
-            <element signature="n#!!block;n#add#1;n#!!block;n#Block#0" expanded="false" />
-            <element signature="n#!!block;n#addReference#0;n#!!block;n#Block#0" expanded="false" />
-            <element signature="n#!!block;n#accept#0;n#!!block;n#Block#0" expanded="false" />
+            <element signature="e#2850#2851#0" expanded="true" />
+            <element signature="e#2871#2872#0" expanded="true" />
+            <element signature="e#2948#2949#0" expanded="true" />
+            <element signature="e#2997#2998#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../community/plugins/InspectionGadgets/InspectionGadgetsAnalysis/src/com/siyeh/ig/BaseInspectionVisitor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="241">
+          <caret line="59" column="25" lean-forward="false" selection-start-line="59" selection-start-column="25" selection-end-line="59" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../community/platform/analysis-api/src/com/intellij/codeInspection/ProblemDescriptor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="197">
+          <caret line="30" column="13" lean-forward="false" selection-start-line="30" selection-start-column="13" selection-end-line="30" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/BasicBlocksGenerator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="197">
+          <caret line="161" column="53" lean-forward="false" selection-start-line="161" selection-start-column="53" selection-end-line="161" selection-end-column="53" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/BasicBlocksGenerator2.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="555">
+          <caret line="73" column="38" lean-forward="false" selection-start-line="73" selection-start-column="38" selection-end-line="73" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/IterativeMethodGenerator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="160">
+          <caret line="9" column="17" lean-forward="false" selection-start-line="9" selection-start-column="17" selection-end-line="9" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/Passes.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="108">
+          <caret line="45" column="7" lean-forward="true" selection-start-line="45" selection-start-column="7" selection-end-line="45" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/RemoveRecursionInspection.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="67" column="37" lean-forward="true" selection-start-line="67" selection-start-column="37" selection-end-line="67" selection-end-column="37" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#592#654#0" expanded="true" />
+            <element signature="e#2160#2161#0" expanded="true" />
+            <element signature="e#2205#2206#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/Util.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="252">
+          <caret line="14" column="46" lean-forward="false" selection-start-line="14" selection-start-column="46" selection-end-line="14" selection-end-column="46" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ro/pub/cs/diploma/Visitors.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="36">
+          <caret line="7" column="22" lean-forward="true" selection-start-line="7" selection-start-column="22" selection-end-line="7" selection-end-column="22" />
+          <folding />
         </state>
       </provider>
     </entry>
