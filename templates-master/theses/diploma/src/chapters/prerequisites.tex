@@ -1,17 +1,45 @@
-%%
-%% Author: andrei
-%% 28.07.2017
-%%
+\chapter{Prerequisites}
 
-% Preamble
-\documentclass[11pt]{article}
+\section{Defining a recursive method in Java}
 
-% Packages
-\usepackage{a4wide}
+The JLS (Java Language Specification)\abbrev{JLS}{Java Language Specification}\footnote{\url{https://docs.oracle.com/javase/specs/jls/se8/html/jls-15.html#jls-15.12}}
+states the following:
+\begin{quote}
+    Resolving a method name at compile time is more complicated than resolving a field name because of the possibility
+    of method overloading. Invoking a method at run time is also more complicated than accessing a field because of the
+    possibility of instance method overriding.
+\end{quote}
+Given the complexity of the method overloading and overriding mechanisms, the definition of a recursive method in this
+paper will be restricted in such a way in order to avoid these mechanisms.
 
-% Document
-\begin{document}
+A \textit{recursive method} is defined as a method whose body contains one or more method call expressions for which the
+static method in \labelindexref{Figure}{img:is-recursive} returns \code{true}.
 
+\fig[width=5in]{src/img/isRecursive.png}{img:is-recursive}{Test for a recursive method call expression}
 
+For performance reasons, Intellij IDEA code base contains many fail-fast methods. This method is also a fail-fast one.
+The first check verifies if the name of the method in the method call expression matches the name of the expected
+method. Only after passing this simple check does the test verify that the method to which the call expression resolves
+is indeed the expected method. Resolving the method is an expensive operation compared with a string equality test.
 
-\end{document}
+The \code{PsiMethod} instance returned by the call to \code{resolveMethod()} represents the
+\textit{compile-time declaration}\footnote{\url{https://docs.oracle.com/javase/specs/jls/se8/html/jls-15.html#jls-15.12.3}}
+for the method invocation \code{expression}. In order to guarantee that the method which gets called at runtime is the
+same as the method corresponding to the compile-time declaration, further checks are needed.
+JLS specifies that\footnote{\url{https://docs.oracle.com/javase/specs/jls/se8/html/jls-15.html#jls-15.12.3}}:
+\begin{quote}
+    If the compile-time declaration has the static modifier, then the invocation mode is static.
+    Otherwise, if the compile-time declaration has the private modifier, then the invocation mode is nonvirtual.
+\end{quote}
+It also specifies that\footnote{\url{https://docs.oracle.com/javase/specs/jls/se8/html/jls-15.html#jls-15.12.4.4}}:
+\begin{quote}
+    The strategy for method lookup depends on the invocation mode.
+    If the invocation mode is static, no target reference is needed and overriding is not allowed. Method m of class T is the one to be invoked.
+    If the invocation mode is nonvirtual, overriding is not allowed. Method m of class T is the one to be invoked.
+\end{quote}
+
+What this means is that in case of \code{static} and \code{private} methods, the method invoked at runtime is the method
+corresponding to the compile-time declaration. The last check of the test method corresponds to the case when the method
+is an non-\code{private} instance method (not \code{static}). In order to avoid the overriding mechanism, the only
+methods which this refactoring will consider are those which contain unqualified (or qualified with \code{this}) method
+call expressions. This means that the \textit{target reference} of the method remains unmodified.

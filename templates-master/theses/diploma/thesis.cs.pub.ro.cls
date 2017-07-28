@@ -250,3 +250,5 @@
 
 % mathematical formulas
 \usepackage{amsmath}
+
+\def\code#1{\texttt{#1}}

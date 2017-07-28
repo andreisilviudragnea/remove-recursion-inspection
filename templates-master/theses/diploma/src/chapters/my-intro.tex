@@ -1,17 +1,40 @@
-%%
-%% Author: andrei
-%% 27.07.2017
-%%
+\chapter{My Introduction}
 
-% Preamble
-\documentclass[11pt]{article}
+The Java programming language compiler \code{javac} does not perform any kind of recursion removal. Recursive methods
+are known to potentially exhaust the call stack space. The purpose of this thesis is to create a refactoring which
+automatically transforms a recursive method into an iterative one, by simulating the call stack with a stack in the user
+program. The refactoring alters the initial recursive method as little as possible while still preserving the semantics
+of the code.
 
-% Packages
-\usepackage{a4wide}
+\section{Project Description}
 
-% Document
-\begin{document}
+The refactoring will be implemented as a plugin for the Intellij IDEA IDE (Integrated Development Environment).
+\abbrev{IDE}{Integrated Development Environment} There is an open source community edition of the IDE
+available\footnote{\url{https://github.com/JetBrains/intellij-community}}. Intellij IDEA features a framework for
+static analysis of Java code with many existing code
+inspections\footnote{\url{https://www.jetbrains.com/help/idea/code-inspection.html}} which detect compiler and potential
+runtime errors, but also potential code inefficiencies. The plugin introduces a new code inspection in the
+\textit{Performance Issues} group of inspections for the Java programming language. The default severity of the inspection is
+\textit{Warning}. The \textit{Remove Recursion} inspection can be seen in \labelindexref{Figure}{img:inspection-settings}.
 
+The Intellij Platform SDK (Software Development Kit)\abbrev{SDK}{Software Development Kit}\footnote{\url{http://www.jetbrains.org/intellij/sdk/docs/}}
+presents the API (Application Programming Interface)\abbrev{API}{Application Programming Interface} for manipulating
+the source code in a file. A PSI (Program Structure Interface)\abbrev{PSI}{Program Structure Interface}
+File\footnote{\url{http://www.jetbrains.org/intellij/sdk/docs/basics/architectural_overview/psi_files.html}} is the root
+of a structure representing the contents of a file as a hierarchy of PSI elements. A PSI
+element\footnote{\url{http://www.jetbrains.org/intellij/sdk/docs/basics/architectural_overview/psi_elements.html}} can
+have child PSI elements. The PsiElement class is the common base class for all PSI elements. There is a PsiElement
+subclass for each element in the Java programming language.
 
+In Intellij IDEA, new Java code inspections are created by extending the abstract class\\
+\code{com.siyeh.ig.BaseInspection}\footnote{\url{https://github.com/JetBrains/intellij-community/blob/master/plugins/InspectionGadgets/InspectionGadgetsAnalysis/src/com/siyeh/ig/BaseInspection.java}}.
+Each code inspection needs to override the abstract method \code{buildVisitor()} in \code{com.siyeh.ig.BaseInspection}
+to provide a custom instance of \code{com.siyeh.ig.BaseInspectionVisitor}\footnote{\url{https://github.com/JetBrains/intellij-community/blob/master/plugins/InspectionGadgets/InspectionGadgetsAnalysis/src/com/siyeh/ig/BaseInspectionVisitor.java}},
+which visits each element of a PSI File and detects problems specific to that inspection. Depending on the inspection
+severity, the problem is highlighted in the editor accordingly. In the case of the recursion removal inspection,
+the visitor verifies each method call expression to see if it resolves to the containing method and if the qualifier
+is either absent or this. If this is the case, then the visitor registers an error on the method call expression and it
+appears highlighted in the editor as in \labelindexref{Figure}{img:recursion-highlight-warning}.
 
-\end{document}
+\fig[width=4in]{src/img/inspection-settings.png}{img:inspection-settings}{Remove Recursion inspection}
+\fig[width=4in]{src/img/recursion-highlight-warning.png}{img:recursion-highlight-warning}{Recursion Highlighted as a Warning}

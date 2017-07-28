@@ -1,17 +1,88 @@
-%%
-%% Author: andrei
-%% 27.07.2017
-%%
+\chapter{Algorithm}
 
-% Preamble
-\documentclass[11pt]{article}
+This chapter presents all the passes which are applied to the code of the method until the final result is achieved.
+Each pass is represented by a visitor which usually first collects information about the change that has to be made and
+then alters the code.
 
-% Packages
-\usepackage{a4wide}
+\section{Renaming local variables to unique names}
 
-% Document
-\begin{document}
+This code transformation is needed in order to avoid name clashes later on, when the static nested class which
+holds the variables of the method (both formal parameters and all the local variables) is generated. The members of this
+class will simulate the stack frame of the method.
 
+The JVMS (Java Virtual Machine Specification)\abbrev{JVMS}{Java Virtual Machine Specification} states the
+following\footnote{\url{http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-2.html#jvms-2.6.1}}:
 
+\begin{quote}
+    The Java Virtual Machine uses local variables to pass parameters on method invocation. On class method invocation,
+    any parameters are passed in consecutive local variables starting from local variable 0. On instance method invocation,
+    local variable 0 is always used to pass a reference to the object on which the instance method is being invoked
+    (\code{this} in the Java programming language). Any parameters are subsequently passed in consecutive local
+    variables starting from local variable 1.
+\end{quote}
 
-\end{document}
+In the context of this refactoring, the recursive call is defined only as a method call expression whose qualifier is
+either absent or \code{this}, so the implicit \code{this} parameter of the instance method invocation never changes.
+This is why it is not a field of the frame class. In the case of class method invocations, there is no implicit
+\code{this} parameter.
+
+The scope of a formal parameter is specified in JLS\footnote{\url{https://docs.oracle.com/javase/specs/jls/se8/html/jls-6.html#jls-6.3}} as:
+\begin{quote}
+    The scope of a formal parameter of a method, constructor, or lambda expression is the entire body of the method,
+    constructor, or lambda expression.
+\end{quote}
+
+The scope of a local variable declaration is specified in JLS\footnote{\url{https://docs.oracle.com/javase/specs/jls/se8/html/jls-6.html#jls-6.3}} as:
+\begin{quote}
+    The scope of a local variable declaration in a block is the rest of the block in which the declaration
+    appears, starting with its own initializer and including any further declarators to the right in the local variable
+    declaration statement.
+
+    The scope of a local variable declared in the \textit{ForInit} part of a basic \code{for} statement includes all of
+    the following:
+\begin{itemize}
+    \item Its own initializer
+    \item Any further declarators to the right in the \textit{ForInit} part of the \code{for} statement
+    \item The \textit{Expression} and \textit{ForUpdate} parts of the \code{for} statement
+    \item The contained \textit{Statement}
+\end{itemize}
+
+    The scope of a local variable declared in the \textit{FormalParameter} part of an enhanced \code{for} statement
+    is the contained \textit{Statement}.
+\end{quote}
+
+JLS also specifies that\footnote{\url{https://docs.oracle.com/javase/specs/jls/se8/html/jls-6.html#jls-6.4}}:
+\begin{quote}
+    It is a compile-time error if the name of a formal parameter is used to declare a new variable within the body of
+    the method, constructor, or lambda expression, unless the new variable is declared within a class declaration
+    contained by the method, constructor, or lambda expression.
+
+    It is a compile-time error if the name of a local variable v is used to declare a new variable within the scope of
+    v, unless the new variable is declared within a class whose declaration is within the scope of v.
+\end{quote}
+
+This means that all the names of formal parameters and local variables whose scopes overlap are unique in the method
+body. In other words, a compile-time error occurs for the program in
+\labelindexref{Figure}{img:attempted-shadowing-of-a-local-variable}, but not for the program in
+\labelindexref{Figure}{img:no-shadow}.
+
+\fig[width=4in]{src/img/attempted-shadowing-of-a-local-variable.png}{img:attempted-shadowing-of-a-local-variable}{Attempted shadowing of a local variable}
+\fig[width=4in]{src/img/no-shadow.png}{img:no-shadow}{Two non-overlapping scopes}
+
+In the second example, it also means that the storage for the first \code{i} variable can be reused as the storage for
+the second \code{i} variable, thus reducing the number of fields in the generated frame class, as at any moment during
+the execution of the method, only one variable (formal parameter or local variable) of a certain name is in scope,
+meaning that its value can be used in the code.
+
+There are still problems if there is another variable in the method which shares the same name with other variable, but
+whose type is different. If this other variable is not renamed, when generating the frame class, a compile-time error
+will later occur because JLS specifies that\footnote{\url{https://docs.oracle.com/javase/specs/jls/se8/html/jls-8.html#jls-FieldDeclaration}}:
+\begin{quote}
+    It is a compile-time error for the body of a class declaration to declare two fields with the same name.
+\end{quote}
+
+So all the variables in the method (formal parameters and local variables) will be collected as fields of a static
+nested frame class, which will be used by the recursive method to save the state of the method call when recursing, thus
+simulating the call stack. The rule is that for all the variables with the same name and type, there will be only one
+corresponding field in the frame class, but if there are variables with the same name, but different type, each variable
+in a type group will have a different name and a different corresponding frame class field.
