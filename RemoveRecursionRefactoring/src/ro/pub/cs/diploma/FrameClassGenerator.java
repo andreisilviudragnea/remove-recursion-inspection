@@ -2,18 +2,17 @@ package ro.pub.cs.diploma;
 
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 class FrameClassGenerator {
   static void addFrameClass(@NotNull final PsiMethod method, @NotNull final String frameClassName, @NotNull final String blockFieldName) {
-    @NotNull final PsiElementFactory factory = Util.getFactory(method);
-    @NotNull final PsiClass frameClass = factory.createClass(frameClassName);
+    final PsiElementFactory factory = Util.getFactory(method);
+    final PsiClass frameClass = factory.createClass(frameClassName);
 
     // Set modifiers
-    @Nullable final PsiModifierList modifierList = frameClass.getModifierList();
+    final PsiModifierList modifierList = frameClass.getModifierList();
     if (modifierList == null) {
       return;
     }
@@ -21,39 +20,34 @@ class FrameClassGenerator {
     modifierList.setModifierProperty(PsiModifier.STATIC, true);
 
     // Add fields
-    final Map<String, PsiType> variables = new LinkedHashMap<>();
+    final Map<String, PsiVariable> variables = new LinkedHashMap<>();
     method.accept(new JavaRecursiveElementVisitor() {
       @Override
       public void visitVariable(PsiVariable variable) {
         super.visitVariable(variable);
         final String name = variable.getName();
-        if (name == null) {
-          return;
+        if (!variables.containsKey(name)) {
+          variables.put(name, variable);
         }
-        final PsiType type = variable.getType();
-        if (variables.containsKey(name) && variables.get(name).equals(type)) {
-          return;
-        }
-        variables.put(name, type);
       }
     });
 
     variables.entrySet().stream()
-      .map(variable -> factory
-        .createFieldFromText("private " + variable.getValue().getPresentableText() + " " + variable.getKey() + ";", null))
+      .map(pair -> factory
+        .createFieldFromText("private " + pair.getValue().getType().getPresentableText() + " " + pair.getKey() + ";", null))
       .forEach(frameClass::add);
     frameClass.add(factory.createField(blockFieldName, PsiPrimitiveType.INT));
 
     // Create constructor
-    @NotNull final PsiMethod constructor = factory.createConstructor(frameClassName);
+    final PsiMethod constructor = factory.createConstructor(frameClassName);
     constructor.getModifierList().setModifierProperty(PsiModifier.PRIVATE, true);
-    @Nullable final PsiCodeBlock body = constructor.getBody();
+    final PsiCodeBlock body = constructor.getBody();
     if (body == null) {
       return;
     }
-    @NotNull final PsiParameterList parameterList = constructor.getParameterList();
-    for (@NotNull final PsiParameter parameter : method.getParameterList().getParameters()) {
-      @Nullable final String name = parameter.getName();
+    final PsiParameterList parameterList = constructor.getParameterList();
+    for (final PsiParameter parameter : method.getParameterList().getParameters()) {
+      final String name = parameter.getName();
       if (name == null) {
         return;
       }
