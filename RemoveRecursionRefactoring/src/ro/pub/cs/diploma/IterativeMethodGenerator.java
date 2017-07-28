@@ -7,19 +7,17 @@ import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.psi.search.LocalSearchScope;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.refactoring.util.RefactoringUtil;
-import com.siyeh.ig.psiutils.MethodUtils;
-import com.siyeh.ig.psiutils.ParenthesesUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 class IterativeMethodGenerator {
   static void createIterativeBody(PsiMethod oldMethod, Project project, boolean replaceOriginalMethod) {
-    final PsiClass psiClass = PsiTreeUtil.getParentOfType(oldMethod, PsiClass.class, true);
+    final PsiClass psiClass = oldMethod.getContainingClass();
     if (psiClass == null) {
       return;
     }
@@ -31,10 +29,10 @@ class IterativeMethodGenerator {
     }
     else {
       method = (PsiMethod)psiClass.addAfter(oldMethod, oldMethod);
-      method.setName(styleManager.suggestUniqueVariableName(oldMethod.getName() + Constants.ITERATIVE, psiClass, true));
+      method.setName(oldMethod.getName() + Constants.ITERATIVE);
     }
 
-    renameVariablesToUniqueNames(styleManager, method);
+    Passes.renameVariablesToUniqueNames(styleManager, method);
 
     Visitors.replaceForEachStatementsWithForStatements(method);
     Visitors.replaceForStatementsWithWhileStatements(method);
@@ -48,10 +46,9 @@ class IterativeMethodGenerator {
     if (returnType == null) {
       return;
     }
-    extractRecursiveCallsToStatements(factory, styleManager, body, returnType);
+    extractRecursiveCallsToStatements(factory, styleManager, method, returnType);
 
-    final String frameClassName =
-      styleManager.suggestUniqueVariableName(Utilities.capitalize(oldMethod.getName()) + Constants.FRAME, psiClass, true);
+    final String frameClassName = Utilities.capitalize(oldMethod.getName()) + Constants.FRAME;
     final String blockFieldName = styleManager.suggestUniqueVariableName(Constants.BLOCK_FIELD_NAME, method, true);
 
     final PsiClass frameClass = FrameClassGenerator.createFrameClass(factory, method, frameClassName, blockFieldName);
@@ -103,7 +100,7 @@ class IterativeMethodGenerator {
     final String switchLabelName = styleManager.suggestUniqueVariableName(Constants.SWITCH_LABEL, method, true);
 
     final BasicBlocksGenerator2 basicBlocksGenerator =
-      new BasicBlocksGenerator2(factory, frameClassName, frameVarName, blockFieldName, stackVarName, returnType, retVarName);
+      new BasicBlocksGenerator2(factory, method, frameClassName, frameVarName, blockFieldName, stackVarName, returnType, retVarName);
     body.accept(basicBlocksGenerator);
     final List<BasicBlocksGenerator2.Pair> blocks = basicBlocksGenerator.getBlocks();
 
@@ -118,53 +115,6 @@ class IterativeMethodGenerator {
     body.replace(factory.createStatementFromText(
       (atLeastOneLabeledBreak.get() ? switchLabelName + ": " : "") +
       "switch (" + frameVarName + "." + blockFieldName + ") {" + casesString + "}", null));
-  }
-
-  /**
-   * Rename all the variables (parameters and local variables) to unique names at method level (if necessary),
-   * in order to avoid name clashes when generating the Frame class.
-   */
-  private static void renameVariablesToUniqueNames(JavaCodeStyleManager styleManager, PsiMethod method) {
-    final Map<String, Map<String, List<PsiVariable>>> names = new LinkedHashMap<>();
-    method.accept(new JavaRecursiveElementVisitor() {
-      @Override
-      public void visitVariable(PsiVariable variable) {
-        super.visitVariable(variable);
-        final String name = variable.getName();
-        if (name == null) {
-          return;
-        }
-        if (!names.containsKey(name)) {
-          names.put(name, new LinkedHashMap<>());
-        }
-        final Map<String, List<PsiVariable>> typesMap = names.get(name);
-        final String typeText = variable.getType().getCanonicalText();
-        if (!typesMap.containsKey(typeText)) {
-          typesMap.put(typeText, new ArrayList<>());
-        }
-        final List<PsiVariable> variables = typesMap.get(typeText);
-        variables.add(variable);
-      }
-    });
-    for (Map.Entry<String, Map<String, List<PsiVariable>>> entry : names.entrySet()) {
-      final Map<String, List<PsiVariable>> typesMap = entry.getValue();
-      if (typesMap.size() <= 1) {
-        continue;
-      }
-      boolean first = true;
-      for (List<PsiVariable> variables : typesMap.values()) {
-        if (first) {
-          first = false;
-          continue;
-        }
-        final String oldName = entry.getKey();
-        final String newName = styleManager.suggestUniqueVariableName(oldName, method, true);
-        for (PsiVariable variable : variables) {
-          RefactoringUtil.renameVariableReferences(variable, newName, new LocalSearchScope(method));
-          variable.setName(newName);
-        }
-      }
-    }
   }
 
   private static boolean isNotVoid(PsiType returnType) {
@@ -294,29 +244,11 @@ class IterativeMethodGenerator {
     return "null";
   }
 
-  @Nullable
-  static PsiMethod isRecursiveMethodCall(@NotNull final PsiMethodCallExpression expression) {
-    final PsiMethod containingMethod =
-      PsiTreeUtil.getParentOfType(expression, PsiMethod.class, true, PsiClass.class, PsiLambdaExpression.class);
-    if (containingMethod == null) {
-      return null;
-    }
-    final PsiMethod resolvedMethod = expression.resolveMethod();
-    if (!containingMethod.equals(resolvedMethod)) {
-      return null;
-    }
-    final PsiExpression qualifier = ParenthesesUtils.stripParentheses(expression.getMethodExpression().getQualifierExpression());
-    if (qualifier != null && !(qualifier instanceof PsiThisExpression) && MethodUtils.isOverridden(containingMethod)) {
-      return null;
-    }
-    return containingMethod;
-  }
-
   private static void extractRecursiveCallsToStatements(@NotNull final PsiElementFactory factory,
                                                         @NotNull final JavaCodeStyleManager styleManager,
-                                                        @NotNull final PsiCodeBlock block,
+                                                        @NotNull final PsiMethod method,
                                                         @NotNull final PsiType returnType) {
-    for (final PsiMethodCallExpression call : Visitors.extractRecursiveCalls(block)) {
+    for (final PsiMethodCallExpression call : Visitors.extractRecursiveCalls(method)) {
       final PsiStatement parentStatement = PsiTreeUtil.getParentOfType(call, PsiStatement.class, true);
       if (parentStatement == call.getParent() && parentStatement instanceof PsiExpressionStatement) {
         continue;
@@ -325,7 +257,7 @@ class IterativeMethodGenerator {
       if (parentBlock == null) {
         continue;
       }
-      final String temp = styleManager.suggestUniqueVariableName(Constants.TEMP, block, true);
+      final String temp = styleManager.suggestUniqueVariableName(Constants.TEMP, method, true);
       parentBlock.addBefore(factory.createVariableDeclarationStatement(temp, returnType, call), parentStatement);
       call.replace(factory.createExpressionFromText(temp, null));
     }

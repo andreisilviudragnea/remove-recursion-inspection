@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
   private final PsiElementFactory factory;
+  private final PsiMethod method;
   private final String frameClassName;
   private final String frameVarName;
   private final String blockFieldName;
@@ -23,6 +24,7 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
   private int counter;
 
   BasicBlocksGenerator2(final PsiElementFactory factory,
+                        final PsiMethod method,
                         final String frameClassName,
                         final String frameVarName,
                         final String blockFieldName,
@@ -30,6 +32,7 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
                         final PsiType returnType,
                         final String retVarName) {
     this.factory = factory;
+    this.method = method;
     currentBlock = newBlock();
     this.frameClassName = frameClassName;
     this.frameVarName = frameVarName;
@@ -72,7 +75,7 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
   }
 
   private void processStatement(PsiStatement statement) {
-    if (Visitors.containsRecursiveCalls(statement) || statement instanceof PsiReturnStatement) {
+    if (Visitors.containsRecursiveCalls(statement, method) || statement instanceof PsiReturnStatement) {
       statement.accept(this);
     }
     else {

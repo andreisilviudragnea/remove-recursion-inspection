@@ -87,6 +87,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
 
   private Pair currentPair;
   private final PsiElementFactory factory;
+  private final PsiMethod method;
   private int blockCounter;
   private final String frameClassName;
   private final String frameVarName;
@@ -137,6 +138,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   }
 
   BasicBlocksGenerator(final PsiElementFactory factory,
+                       final PsiMethod method,
                        final String frameClassName,
                        final String frameVarName,
                        final String blockFieldName,
@@ -144,6 +146,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
                        final PsiType returnType,
                        final String retVarName) {
     this.factory = factory;
+    this.method = method;
     currentPair = newPair();
     reachableBlocks.add(currentPair);
     this.frameClassName = frameClassName;
@@ -156,7 +159,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
 
 
   private void processStatement(PsiStatement statement) {
-    if (Visitors.containsRecursiveCalls(statement)) {
+    if (Visitors.containsRecursiveCalls(statement, method)) {
       statement.accept(this);
     }
     else {

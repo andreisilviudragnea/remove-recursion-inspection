@@ -2,22 +2,21 @@ package ro.pub.cs.diploma;
 
 import com.intellij.openapi.util.Ref;
 import com.intellij.psi.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
 class Visitors {
-  static List<PsiMethodCallExpression> extractRecursiveCalls(PsiCodeBlock block) {
+  static List<PsiMethodCallExpression> extractRecursiveCalls(@NotNull final PsiMethod method) {
     final List<PsiMethodCallExpression> calls = new ArrayList<>();
-    block.accept(new JavaRecursiveElementWalkingVisitor() {
+    method.accept(new JavaRecursiveElementWalkingVisitor() {
       @Override
       public void visitMethodCallExpression(PsiMethodCallExpression expression) {
         super.visitMethodCallExpression(expression);
-        final PsiMethod containingMethod = IterativeMethodGenerator.isRecursiveMethodCall(expression);
-        if (containingMethod == null) {
-          return;
+        if (Util.isRecursive(expression, method)) {
+          calls.add(expression);
         }
-        calls.add(expression);
       }
 
       @Override
@@ -71,14 +70,13 @@ class Visitors {
     return returnStatements;
   }
 
-  static boolean containsRecursiveCalls(PsiStatement statement) {
+  static boolean containsRecursiveCalls(@NotNull final PsiStatement statement, @NotNull final PsiMethod method) {
     final Ref<Boolean> contains = new Ref<>(false);
     statement.accept(new JavaRecursiveElementWalkingVisitor() {
       @Override
       public void visitMethodCallExpression(PsiMethodCallExpression expression) {
         super.visitMethodCallExpression(expression);
-        final PsiMethod containingMethod = IterativeMethodGenerator.isRecursiveMethodCall(expression);
-        if (containingMethod == null) {
+        if (!Util.isRecursive(expression, method)) {
           return;
         }
         contains.set(true);

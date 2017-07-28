@@ -1,10 +1,8 @@
 package ro.pub.cs.diploma;
 
-import com.intellij.codeInsight.daemon.impl.RecursiveCallLineMarkerProvider;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.siyeh.ig.BaseInspection;
 import com.siyeh.ig.BaseInspectionVisitor;
 import com.siyeh.ig.InspectionGadgetsFix;
@@ -63,8 +61,7 @@ public class RemoveRecursionInspection extends BaseInspection {
     @Override
     public void doFix(Project project, ProblemDescriptor descriptor) {
       final PsiElement callToken = descriptor.getPsiElement();
-      final PsiMethod method =
-        PsiTreeUtil.getParentOfType(callToken, PsiMethod.class, true, PsiClass.class, PsiLambdaExpression.class);
+      final PsiMethod method = Util.getContainingMethod(callToken);
       if (method == null) {
         return;
       }
@@ -78,18 +75,16 @@ public class RemoveRecursionInspection extends BaseInspection {
   }
 
   private static class RemoveRecursionVisitor extends BaseInspectionVisitor {
-    /**
-     * @see RecursiveCallLineMarkerProvider#isRecursiveMethodCall(PsiMethodCallExpression)
-     * @see TailRecursionInspection.TailRecursionVisitor#visitReturnStatement(PsiReturnStatement)
-     */
     @Override
     public void visitMethodCallExpression(PsiMethodCallExpression expression) {
       super.visitMethodCallExpression(expression);
-      final PsiMethod containingMethod = IterativeMethodGenerator.isRecursiveMethodCall(expression);
-      if (containingMethod == null) {
+      final PsiMethod method = Util.getContainingMethod(expression);
+      if (method == null) {
         return;
       }
-      registerMethodCallError(expression, containingMethod);
+      if (Util.isRecursive(expression, method)) {
+        registerMethodCallError(expression, method);
+      }
     }
   }
 }
