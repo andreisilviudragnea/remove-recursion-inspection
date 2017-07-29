@@ -152,16 +152,4 @@ class Visitors {
       Refactorings.replaceForEachStatementWithIteratorForLoopStatement(foreachStatement, method);
     }
   }
-
-  static void replaceForStatementsWithWhileStatements(PsiMethod method) {
-    final List<PsiForStatement> forStatements = new ArrayList<>();
-    method.accept(new JavaRecursiveElementVisitor() {
-      @Override
-      public void visitForStatement(PsiForStatement statement) {
-        super.visitForStatement(statement);
-        forStatements.add(statement);
-      }
-    });
-    forStatements.forEach(Refactorings::replaceForStatementWithWhileStatement);
-  }
 }
