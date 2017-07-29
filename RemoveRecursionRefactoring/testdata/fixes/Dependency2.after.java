@@ -20,8 +20,7 @@ class Dependency2 {
                         frame.block = 3;
                         break;
                     } else {
-                        frame.iterator = frame.ids1.iterator();
-                        while (frame.iterator.hasNext()) {
+                        for (frame.iterator = frame.ids1.iterator(); frame.iterator.hasNext(); ) {
                             frame.id = frame.iterator.next();
                             if (frame.ids2.contains(frame.id)) {
                                 ret = true;

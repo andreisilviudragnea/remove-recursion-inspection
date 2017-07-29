@@ -1,18 +1,13 @@
 package ro.pub.cs.diploma;
 
-import com.intellij.psi.JavaRecursiveElementVisitor;
-import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiType;
-import com.intellij.psi.PsiVariable;
+import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.psi.search.LocalSearchScope;
 import com.intellij.refactoring.util.RefactoringUtil;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 class Passes {
   /**
@@ -60,6 +55,36 @@ class Passes {
           variable.setName(newName);
         }
       }
+    }
+  }
+
+  static void replaceDeclarationsWithInitializersWithAssignments(@NotNull final String frameVarName,
+                                                                 @NotNull final PsiCodeBlock block) {
+    final PsiElementFactory factory = Util.getFactory(block);
+    for (final PsiDeclarationStatement statement : Visitors.extractDeclarationStatements(block)) {
+      final PsiElement parent = statement.getParent();
+      if (parent instanceof PsiForStatement) {
+        final String text = Arrays
+                              .stream(statement.getDeclaredElements())
+                              .map(element -> (PsiLocalVariable) element)
+                              .filter(PsiVariable::hasInitializer)
+                              .map(variable -> frameVarName + "." + variable.getName() + " = " + variable.getInitializer().getText())
+                              .collect(Collectors.joining(",")) + ";";
+        statement.replace(Util.statement(factory, text));
+        continue;
+      }
+      final PsiCodeBlock parentBlock = (PsiCodeBlock)parent;
+      PsiElement anchor = statement;
+      for (final PsiElement element : statement.getDeclaredElements()) {
+        final PsiLocalVariable variable = (PsiLocalVariable)element;
+        final PsiExpression initializer = variable.getInitializer();
+        if (initializer == null) {
+          continue;
+        }
+        anchor = parentBlock.addAfter(
+          Util.statement(factory, frameVarName + "." + variable.getName() + " = " + initializer.getText() + ";"), anchor);
+      }
+      statement.delete();
     }
   }
 }

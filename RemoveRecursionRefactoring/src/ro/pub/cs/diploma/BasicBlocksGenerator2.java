@@ -2,6 +2,7 @@ package ro.pub.cs.diploma;
 
 import com.intellij.openapi.util.Ref;
 import com.intellij.psi.*;
+import org.jetbrains.annotations.NotNull;
 import ro.pub.cs.diploma.ir.*;
 
 import java.util.ArrayList;
@@ -46,6 +47,10 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
     return block;
   }
 
+  private void addStatement(PsiStatement statement) {
+    currentBlock.add(statement);
+  }
+
   private void addStatement(String text) {
     currentBlock.add(factory.createStatementFromText(text, null));
   }
@@ -77,7 +82,7 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
       statement.accept(this);
     }
     else {
-      currentBlock.add(statement);
+      addStatement(statement);
     }
   }
 
@@ -105,8 +110,8 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
 
   @Override
   public void visitMethodCallExpression(PsiMethodCallExpression expression) {
-    currentBlock.add(IterativeMethodGenerator.createPushStatement(
-      factory, frameClassName, stackVarName, expression.getArgumentList().getExpressions(), PsiElement::getText));
+    addStatement(IterativeMethodGenerator.createPushStatement(factory, frameClassName, stackVarName,
+                                                              expression.getArgumentList().getExpressions(), PsiElement::getText));
 
     final Block block = newBlock();
     block.setAfterRecursiveCall(true);
@@ -181,6 +186,54 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
 
     currentBlock = conditionBlock;
     addConditionalJumpStatement(statement.getCondition(), bodyBlock, mergeBlock);
+
+    currentBlock = mergeBlock;
+  }
+
+  private void addStatements(@NotNull final PsiStatement statement) {
+    if (statement instanceof PsiExpressionStatement) {
+      addStatement(statement);
+    } else if (statement instanceof PsiExpressionListStatement) {
+      for (PsiExpression expression : ((PsiExpressionListStatement)statement).getExpressionList().getExpressions()) {
+        addStatement(expression.getText() + ";");
+      }
+    }
+  }
+
+  @Override
+  public void visitForStatement(PsiForStatement statement) {
+    final PsiStatement initialization = statement.getInitialization();
+    if (initialization != null && !(initialization instanceof PsiEmptyStatement)) {
+      addStatements(initialization);
+    }
+
+    final PsiExpression condition = statement.getCondition();
+    final PsiStatement update = statement.getUpdate();
+
+    final Block conditionBlock = condition != null ? newBlock() : null;
+    final Block bodyBlock = newBlock();
+    final Block updateBlock = update != null ? newBlock() : null;
+    final Block mergeBlock = newBlock();
+
+    final Block actualConditionBlock = conditionBlock != null ? conditionBlock : bodyBlock;
+    final Block actualUpdateBlock = updateBlock != null ? updateBlock : actualConditionBlock;
+
+    addUnconditionalJumpStatement(actualConditionBlock);
+
+    if (conditionBlock != null) {
+      currentBlock = conditionBlock;
+      addConditionalJumpStatement(condition, bodyBlock, mergeBlock);
+    }
+
+    if (updateBlock != null) {
+      currentBlock = updateBlock;
+      addStatements(update);
+      addUnconditionalJumpStatement(actualConditionBlock);
+    }
+
+    currentBlock = bodyBlock;
+    statement.getBody().accept(this);
+    addUnconditionalJumpStatement(actualUpdateBlock);
 
     currentBlock = mergeBlock;
   }

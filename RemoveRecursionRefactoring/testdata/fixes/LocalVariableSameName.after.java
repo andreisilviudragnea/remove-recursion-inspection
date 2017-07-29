@@ -12,35 +12,26 @@ public class LocalVariableSameName {
                         stack.pop();
                         break;
                     }
-                    frame.i = 0;
-                    while (frame.i < 2) {
+                    for (frame.i = 0; frame.i < 2; frame.i++) {
                         frame.val = frame.i;
                         frame.result.add(frame.val);
-                        frame.i++;
                     }
-                    frame.i = 0;
-                    while (frame.i < 3) {
+                    for (frame.i = 0; frame.i < 3; frame.i++) {
                         frame.val2 = (double) frame.i;
                         frame.result.add(frame.val2);
-                        frame.j = 0;
-                        while (frame.j < 1) {
+                        for (frame.j = 0; frame.j < 1; frame.j++) {
                             frame.val1 = frame.j;
                             frame.result.add(frame.val1);
-                            frame.j++;
                         }
-                        frame.i++;
                     }
-                    frame.iterator = Arrays.asList(0, 1).iterator();
-                    while (frame.iterator.hasNext()) {
+                    for (frame.iterator = Arrays.asList(0, 1).iterator(); frame.iterator.hasNext(); ) {
                         frame.i1 = frame.iterator.next();
                         frame.result.add(frame.i1);
                     }
-                    frame.iterator2 = Arrays.asList(0, 1).iterator();
-                    while (frame.iterator2.hasNext()) {
+                    for (frame.iterator2 = Arrays.asList(0, 1).iterator(); frame.iterator2.hasNext(); ) {
                         frame.i1 = frame.iterator2.next();
                         frame.result.add(frame.i1);
-                        frame.iterator1 = Arrays.asList(1, 2).iterator();
-                        while (frame.iterator1.hasNext()) {
+                        for (frame.iterator1 = Arrays.asList(1, 2).iterator(); frame.iterator1.hasNext(); ) {
                             frame.j1 = frame.iterator1.next();
                             frame.result.add(frame.j1);
                         }

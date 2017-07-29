@@ -33,7 +33,6 @@ class IterativeMethodGenerator {
     Passes.renameVariablesToUniqueNames(method);
 
     Visitors.replaceForEachStatementsWithForStatements(method);
-    Visitors.replaceForStatementsWithWhileStatements(method);
     Visitors.replaceSingleStatementsWithBlockStatements(method);
 
     extractRecursiveCallsToStatements(method);
@@ -91,7 +90,7 @@ class IterativeMethodGenerator {
     body = lastBodyStatement.getCodeBlock();
 
     replaceIdentifierWithFrameAccess(frameVarName, stackVarName, method, body);
-    replaceDeclarationsWithInitializersWithAssignments(frameVarName, body);
+    Passes.replaceDeclarationsWithInitializersWithAssignments(frameVarName, body);
 
     final String switchLabelName = styleManager.suggestUniqueVariableName(Constants.SWITCH_LABEL, method, true);
 
@@ -182,32 +181,6 @@ class IterativeMethodGenerator {
       atLeastOneLabeledBreak.set(atLeastOneLabeledBreak.get() || inLoop);
       parentBlock.addAfter(factory.createStatementFromText("break " + (inLoop ? switchLabelName : "") + ";", null), anchor);
 
-      statement.delete();
-    }
-  }
-
-  private static void replaceDeclarationsWithInitializersWithAssignments(@NotNull final String frameVarName,
-                                                                         @NotNull final PsiCodeBlock block) {
-    final PsiElementFactory factory = Util.getFactory(block);
-    for (final PsiDeclarationStatement statement : Visitors.extractDeclarationStatements(block)) {
-      final PsiCodeBlock parentBlock = PsiTreeUtil.getParentOfType(statement, PsiCodeBlock.class, true);
-      if (parentBlock == null) {
-        continue;
-      }
-      PsiElement anchor = statement;
-      for (final PsiElement element : statement.getDeclaredElements()) {
-        if (!(element instanceof PsiLocalVariable)) {
-          continue;
-        }
-        final PsiLocalVariable variable = (PsiLocalVariable)element;
-        final PsiExpression initializer = variable.getInitializer();
-        if (initializer == null) {
-          continue;
-        }
-        anchor = parentBlock
-          .addAfter(factory.createStatementFromText(frameVarName + "." + variable.getName() + " = " + initializer.getText() + ";", null),
-                    anchor);
-      }
       statement.delete();
     }
   }

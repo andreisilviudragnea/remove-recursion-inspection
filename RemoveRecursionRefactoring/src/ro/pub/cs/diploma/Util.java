@@ -11,6 +11,11 @@ import org.jetbrains.annotations.Nullable;
 
 class Util {
   @NotNull
+  static PsiStatement statement(@NotNull final PsiElementFactory factory, @NotNull final String text) {
+    return factory.createStatementFromText(text, null);
+  }
+
+  @NotNull
   static PsiElementFactory getFactory(@NotNull final PsiElement element) {
     return JavaPsiFacade.getElementFactory(element.getProject());
   }
