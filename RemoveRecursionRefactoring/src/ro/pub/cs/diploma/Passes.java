@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 class Passes {
   /**
@@ -58,31 +59,27 @@ class Passes {
     }
   }
 
-  static void replaceDeclarationsWithInitializersWithAssignments(@NotNull final String frameVarName,
-                                                                 @NotNull final PsiCodeBlock block) {
+  private static Stream<String> getVariablesStream(PsiDeclarationStatement statement, String frameVarName) {
+    return Arrays
+      .stream(statement.getDeclaredElements())
+      .map(element -> (PsiLocalVariable)element)
+      .filter(PsiVariable::hasInitializer)
+      .map(variable -> frameVarName + "." + variable.getName() + " = " + variable.getInitializer().getText());
+  }
+
+  static void replaceDeclarationsWithInitializersWithAssignments(@NotNull final String frameVarName, @NotNull final PsiCodeBlock block) {
     final PsiElementFactory factory = Util.getFactory(block);
     for (final PsiDeclarationStatement statement : Visitors.extractDeclarationStatements(block)) {
       final PsiElement parent = statement.getParent();
+      final Stream<String> stream = getVariablesStream(statement, frameVarName);
       if (parent instanceof PsiForStatement) {
-        final String text = Arrays
-                              .stream(statement.getDeclaredElements())
-                              .map(element -> (PsiLocalVariable) element)
-                              .filter(PsiVariable::hasInitializer)
-                              .map(variable -> frameVarName + "." + variable.getName() + " = " + variable.getInitializer().getText())
-                              .collect(Collectors.joining(",")) + ";";
-        statement.replace(Util.statement(factory, text));
+        statement.replace(Util.statement(factory, stream.collect(Collectors.joining(",")) + ";"));
         continue;
       }
       final PsiCodeBlock parentBlock = (PsiCodeBlock)parent;
       PsiElement anchor = statement;
-      for (final PsiElement element : statement.getDeclaredElements()) {
-        final PsiLocalVariable variable = (PsiLocalVariable)element;
-        final PsiExpression initializer = variable.getInitializer();
-        if (initializer == null) {
-          continue;
-        }
-        anchor = parentBlock.addAfter(
-          Util.statement(factory, frameVarName + "." + variable.getName() + " = " + initializer.getText() + ";"), anchor);
+      for (final String string : stream.collect(Collectors.toList())) {
+        anchor = parentBlock.addAfter(Util.statement(factory, string + ";"), anchor);
       }
       statement.delete();
     }
