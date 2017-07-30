@@ -108,4 +108,8 @@ public class RemoveRecursionFixTest extends IGQuickFixesTestCase {
   public void testMergesort() {
     doTest();
   }
+
+  public void testForeachArray() {
+    doTest();
+  }
 }

@@ -31,7 +31,8 @@ class IterativeMethodGenerator {
 
     Passes.renameVariablesToUniqueNames(method);
 
-    Visitors.replaceForEachStatementsWithForStatements(method);
+    Visitors.replaceForEachLoopsWithIteratorForLoops(method);
+    Visitors.replaceForEachLoopsWithIndexedForLoops(method);
     Visitors.replaceSingleStatementsWithBlockStatements(method);
 
     extractRecursiveCallsToStatements(method);

@@ -119,7 +119,7 @@ class Visitors {
     });
   }
 
-  static void replaceForEachStatementsWithForStatements(PsiMethod method) {
+  static void replaceForEachLoopsWithIteratorForLoops(PsiMethod method) {
     final List<PsiForeachStatement> foreachStatements = new ArrayList<>();
     method.accept(new JavaRecursiveElementVisitor() {
       @Override
@@ -130,7 +130,23 @@ class Visitors {
     });
     for (PsiForeachStatement foreachStatement : foreachStatements) {
       if (containsRecursiveCalls(foreachStatement, method)) {
-        Refactorings.replaceForEachStatementWithIteratorForLoopStatement(foreachStatement, method);
+        Refactorings.replaceForEachLoopWithIteratorForLoop(foreachStatement, method);
+      }
+    }
+  }
+
+  static void replaceForEachLoopsWithIndexedForLoops(PsiMethod method) {
+    final List<PsiForeachStatement> foreachStatements = new ArrayList<>();
+    method.accept(new JavaRecursiveElementVisitor() {
+      @Override
+      public void visitForeachStatement(PsiForeachStatement statement) {
+        super.visitForeachStatement(statement);
+        foreachStatements.add(statement);
+      }
+    });
+    for (PsiForeachStatement foreachStatement : foreachStatements) {
+      if (containsRecursiveCalls(foreachStatement, method)) {
+        Refactorings.replaceForEachLoopWithIndexedForLoop(foreachStatement, method);
       }
     }
   }
