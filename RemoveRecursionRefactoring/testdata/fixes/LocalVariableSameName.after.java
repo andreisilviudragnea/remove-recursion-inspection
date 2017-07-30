@@ -1,4 +1,7 @@
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.List;
 
 public class LocalVariableSameName {
     static void recursive(int n, List<Number> result) {
@@ -12,28 +15,25 @@ public class LocalVariableSameName {
                         stack.pop();
                         break;
                     }
-                    for (frame.i = 0; frame.i < 2; frame.i++) {
-                        frame.val = frame.i;
-                        frame.result.add(frame.val);
+                    for (int i = 0; i < 2; i++) {
+                        final Integer val = i;
+                        frame.result.add(val);
                     }
-                    for (frame.i = 0; frame.i < 3; frame.i++) {
-                        frame.val2 = (double) frame.i;
-                        frame.result.add(frame.val2);
-                        for (frame.j = 0; frame.j < 1; frame.j++) {
-                            frame.val1 = frame.j;
-                            frame.result.add(frame.val1);
+                    for (int i = 0; i < 3; i++) {
+                        Double val = (double) i;
+                        frame.result.add(val);
+                        for (int j = 0; j < 1; j++) {
+                            final Integer val1 = j;
+                            frame.result.add(val1);
                         }
                     }
-                    for (frame.iterator = Arrays.asList(0, 1).iterator(); frame.iterator.hasNext(); ) {
-                        frame.i1 = frame.iterator.next();
-                        frame.result.add(frame.i1);
+                    for (Integer i : Arrays.asList(0, 1)) {
+                        frame.result.add(i);
                     }
-                    for (frame.iterator2 = Arrays.asList(0, 1).iterator(); frame.iterator2.hasNext(); ) {
-                        frame.i1 = frame.iterator2.next();
-                        frame.result.add(frame.i1);
-                        for (frame.iterator1 = Arrays.asList(1, 2).iterator(); frame.iterator1.hasNext(); ) {
-                            frame.j1 = frame.iterator1.next();
-                            frame.result.add(frame.j1);
+                    for (Integer i : Arrays.asList(0, 1)) {
+                        frame.result.add(i);
+                        for (Integer j : Arrays.asList(1, 2)) {
+                            frame.result.add(j);
                         }
                     }
                     stack.push(new RecursiveFrame(frame.n - 1, frame.result));
@@ -51,16 +51,6 @@ public class LocalVariableSameName {
     private static class RecursiveFrame {
         private int n;
         private List<Number> result;
-        private int i;
-        private Integer val;
-        private Double val2;
-        private int j;
-        private Integer val1;
-        private Iterator<Integer> iterator;
-        private Integer i1;
-        private Iterator<Integer> iterator2;
-        private Iterator<Integer> iterator1;
-        private Integer j1;
         private int block;
 
         private RecursiveFrame(int n, List<Number> result) {

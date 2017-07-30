@@ -1,7 +1,6 @@
 import com.sun.istack.internal.NotNull;
 
 import java.util.Deque;
-import java.util.Iterator;
 import java.util.Set;
 
 class Dependency2 {
@@ -20,9 +19,8 @@ class Dependency2 {
                         frame.block = 3;
                         break;
                     } else {
-                        for (frame.iterator = frame.ids1.iterator(); frame.iterator.hasNext(); ) {
-                            frame.id = frame.iterator.next();
-                            if (frame.ids2.contains(frame.id)) {
+                        for (String id : frame.ids1) {
+                            if (frame.ids2.contains(id)) {
                                 ret = true;
                                 stack.pop();
                                 break switchLabel;
@@ -48,8 +46,6 @@ class Dependency2 {
         private Set<String> ids1;
         private Set<String> ids2;
         private boolean temp;
-        private Iterator<String> iterator;
-        private String id;
         private int block;
 
         private IntersectFrame(Set<String> ids1, Set<String> ids2) {

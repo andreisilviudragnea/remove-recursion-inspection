@@ -18,9 +18,7 @@ class Passes {
   static void renameVariablesToUniqueNames(@NotNull final PsiMethod method) {
     final Map<String, Map<PsiType, List<PsiVariable>>> names = new LinkedHashMap<>();
     method.accept(new JavaRecursiveElementVisitor() {
-      @Override
-      public void visitVariable(PsiVariable variable) {
-        super.visitVariable(variable);
+      private void processVariable(PsiVariable variable) {
         final String name = variable.getName();
         if (name == null) {
           return;
@@ -35,6 +33,24 @@ class Passes {
         }
         final List<PsiVariable> variables = typesMap.get(type);
         variables.add(variable);
+      }
+
+      @Override
+      public void visitParameter(PsiParameter parameter) {
+        if (Util.hasToBeSavedOnStack(parameter, method)) {
+          processVariable(parameter);
+        }
+      }
+
+      @Override
+      public void visitDeclarationStatement(PsiDeclarationStatement statement) {
+        if (Util.hasToBeSavedOnStack(statement, method)) {
+          Arrays
+            .stream(statement.getDeclaredElements())
+            .filter(element -> element instanceof PsiLocalVariable)
+            .map(element -> (PsiLocalVariable)element)
+            .forEach(this::processVariable);
+        }
       }
     });
     final JavaCodeStyleManager styleManager = JavaCodeStyleManager.getInstance(method.getProject());
@@ -62,14 +78,34 @@ class Passes {
   private static Stream<String> getVariablesStream(PsiDeclarationStatement statement, String frameVarName) {
     return Arrays
       .stream(statement.getDeclaredElements())
+      .filter(element -> element instanceof PsiLocalVariable)
       .map(element -> (PsiLocalVariable)element)
       .filter(PsiVariable::hasInitializer)
       .map(variable -> frameVarName + "." + variable.getName() + " = " + variable.getInitializer().getText());
   }
 
-  static void replaceDeclarationsWithInitializersWithAssignments(@NotNull final String frameVarName, @NotNull final PsiCodeBlock block) {
+  static void replaceDeclarationsWithInitializersWithAssignments(@NotNull final String frameVarName,
+                                                                 @NotNull final PsiMethod method,
+                                                                 @NotNull final PsiCodeBlock block) {
+    final List<PsiDeclarationStatement> declarations = new ArrayList<>();
+    block.accept(new JavaRecursiveElementWalkingVisitor() {
+      @Override
+      public void visitDeclarationStatement(PsiDeclarationStatement statement) {
+        if (Util.hasToBeSavedOnStack(statement, method)) {
+          declarations.add(statement);
+        }
+      }
+
+      @Override
+      public void visitClass(PsiClass aClass) {
+      }
+
+      @Override
+      public void visitLambdaExpression(PsiLambdaExpression expression) {
+      }
+    });
     final PsiElementFactory factory = Util.getFactory(block);
-    for (final PsiDeclarationStatement statement : Visitors.extractDeclarationStatements(block)) {
+    for (final PsiDeclarationStatement statement : declarations) {
       final PsiElement parent = statement.getParent();
       final Stream<String> stream = getVariablesStream(statement, frameVarName);
       if (parent instanceof PsiForStatement) {

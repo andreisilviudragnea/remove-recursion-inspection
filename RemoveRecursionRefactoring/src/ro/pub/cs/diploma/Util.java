@@ -10,6 +10,16 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 class Util {
+  static boolean hasToBeSavedOnStack(@NotNull final PsiParameter parameter, @NotNull final PsiMethod method) {
+    final PsiElement parent = parameter.getParent();
+    return !(parent instanceof PsiForeachStatement) || Visitors.containsRecursiveCalls(parent, method);
+  }
+
+  static boolean hasToBeSavedOnStack(@NotNull final PsiDeclarationStatement statement, @NotNull final PsiMethod method) {
+    final PsiElement parent = statement.getParent();
+    return (!(parent instanceof PsiForStatement) && !(parent instanceof PsiCodeBlock)) || Visitors.containsRecursiveCalls(parent, method);
+  }
+
   @NotNull
   static PsiStatement statement(@NotNull final PsiElementFactory factory, @NotNull final String text) {
     return factory.createStatementFromText(text, null);

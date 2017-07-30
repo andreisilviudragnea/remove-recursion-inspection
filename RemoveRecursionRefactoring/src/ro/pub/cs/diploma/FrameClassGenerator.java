@@ -3,6 +3,7 @@ package ro.pub.cs.diploma;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -22,17 +23,34 @@ class FrameClassGenerator {
     // Add fields
     final Map<String, PsiVariable> variables = new LinkedHashMap<>();
     method.accept(new JavaRecursiveElementVisitor() {
-      @Override
-      public void visitVariable(PsiVariable variable) {
-        super.visitVariable(variable);
+      private void processVariable(PsiVariable variable) {
         final String name = variable.getName();
         if (!variables.containsKey(name)) {
           variables.put(name, variable);
         }
       }
+
+      @Override
+      public void visitParameter(PsiParameter parameter) {
+        if (Util.hasToBeSavedOnStack(parameter, method)) {
+          processVariable(parameter);
+        }
+      }
+
+      @Override
+      public void visitDeclarationStatement(PsiDeclarationStatement statement) {
+        if (Util.hasToBeSavedOnStack(statement, method)) {
+          Arrays
+            .stream(statement.getDeclaredElements())
+            .filter(element -> element instanceof PsiLocalVariable)
+            .map(element -> (PsiLocalVariable)element)
+            .forEach(this::processVariable);
+        }
+      }
     });
 
-    variables.entrySet().stream()
+    variables.entrySet()
+      .stream()
       .map(pair -> factory
         .createFieldFromText("private " + pair.getValue().getType().getPresentableText() + " " + pair.getKey() + ";", null))
       .forEach(frameClass::add);

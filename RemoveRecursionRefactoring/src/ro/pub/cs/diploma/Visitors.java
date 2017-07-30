@@ -30,26 +30,6 @@ class Visitors {
     return calls;
   }
 
-  static List<PsiDeclarationStatement> extractDeclarationStatements(PsiCodeBlock block) {
-    final List<PsiDeclarationStatement> declarations = new ArrayList<>();
-    block.accept(new JavaRecursiveElementWalkingVisitor() {
-      @Override
-      public void visitDeclarationStatement(PsiDeclarationStatement statement) {
-        super.visitDeclarationStatement(statement);
-        declarations.add(statement);
-      }
-
-      @Override
-      public void visitClass(PsiClass aClass) {
-      }
-
-      @Override
-      public void visitLambdaExpression(PsiLambdaExpression expression) {
-      }
-    });
-    return declarations;
-  }
-
   static List<PsiReturnStatement> extractReturnStatements(PsiCodeBlock block) {
     final List<PsiReturnStatement> returnStatements = new ArrayList<>();
     block.accept(new JavaRecursiveElementWalkingVisitor() {
@@ -70,9 +50,9 @@ class Visitors {
     return returnStatements;
   }
 
-  static boolean containsRecursiveCalls(@NotNull final PsiStatement statement, @NotNull final PsiMethod method) {
+  static boolean containsRecursiveCalls(@NotNull final PsiElement element, @NotNull final PsiMethod method) {
     final Ref<Boolean> contains = new Ref<>(false);
-    statement.accept(new JavaRecursiveElementWalkingVisitor() {
+    element.accept(new JavaRecursiveElementWalkingVisitor() {
       @Override
       public void visitMethodCallExpression(PsiMethodCallExpression expression) {
         super.visitMethodCallExpression(expression);
@@ -149,7 +129,9 @@ class Visitors {
       }
     });
     for (PsiForeachStatement foreachStatement : foreachStatements) {
-      Refactorings.replaceForEachStatementWithIteratorForLoopStatement(foreachStatement, method);
+      if (containsRecursiveCalls(foreachStatement, method)) {
+        Refactorings.replaceForEachStatementWithIteratorForLoopStatement(foreachStatement, method);
+      }
     }
   }
 }

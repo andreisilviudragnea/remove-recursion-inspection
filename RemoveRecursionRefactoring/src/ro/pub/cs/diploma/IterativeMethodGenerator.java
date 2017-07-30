@@ -90,7 +90,7 @@ class IterativeMethodGenerator {
     body = lastBodyStatement.getCodeBlock();
 
     replaceIdentifierWithFrameAccess(frameVarName, stackVarName, method, body);
-    Passes.replaceDeclarationsWithInitializersWithAssignments(frameVarName, body);
+    Passes.replaceDeclarationsWithInitializersWithAssignments(frameVarName, method, body);
 
     final String switchLabelName = styleManager.suggestUniqueVariableName(Constants.SWITCH_LABEL, method, true);
 
@@ -124,18 +124,24 @@ class IterativeMethodGenerator {
     method.accept(new JavaRecursiveElementVisitor() {
       @Override
       public void visitParameter(PsiParameter parameter) {
-        super.visitParameter(parameter);
-        variables.add(parameter);
+        if (Util.hasToBeSavedOnStack(parameter, method)) {
+          variables.add(parameter);
+        }
       }
 
       @Override
-      public void visitLocalVariable(PsiLocalVariable variable) {
-        super.visitLocalVariable(variable);
-        final String name = variable.getName();
-        if (frameVarName.equals(name) || stackVarName.equals(name)) {
-          return;
+      public void visitDeclarationStatement(PsiDeclarationStatement statement) {
+        if (Util.hasToBeSavedOnStack(statement, method)) {
+          Arrays
+            .stream(statement.getDeclaredElements())
+            .filter(element -> element instanceof PsiLocalVariable)
+            .map(element -> (PsiLocalVariable)element)
+            .filter(variable -> {
+              final String name = variable.getName();
+              return !frameVarName.equals(name) && !stackVarName.equals(name);
+            })
+            .forEach(variables::add);
         }
-        variables.add(variable);
       }
 
       @Override
