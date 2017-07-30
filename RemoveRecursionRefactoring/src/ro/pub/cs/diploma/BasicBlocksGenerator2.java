@@ -56,16 +56,18 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
   }
 
   private void addUnconditionalJumpStatement(Block block) {
-    if (currentBlock.isFinished())
+    if (currentBlock.isFinished()) {
       return;
+    }
     final Ref<Block> blockRef = Ref.create(block);
     currentBlock.add(new UnconditionalJumpStatement(blockRef));
     block.addReference(blockRef);
   }
 
   private void addConditionalJumpStatement(PsiExpression condition, Block thenBlock, Block jumpBlock) {
-    if (currentBlock.isFinished())
+    if (currentBlock.isFinished()) {
       return;
+    }
     final Ref<Block> thenBlockRef = Ref.create(thenBlock);
     final Ref<Block> jumpBlockRef = Ref.create(jumpBlock);
     currentBlock.add(new ConditionalJumpStatement(condition, thenBlockRef, jumpBlockRef));
@@ -196,8 +198,10 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
 
   private void addStatements(@NotNull final PsiStatement statement) {
     if (statement instanceof PsiExpressionStatement) {
-      addStatement(statement);
-    } else if (statement instanceof PsiExpressionListStatement) {
+      addStatement(((PsiExpressionStatement)statement).getExpression().getText() + ";");
+      return;
+    }
+    if (statement instanceof PsiExpressionListStatement) {
       for (PsiExpression expression : ((PsiExpressionListStatement)statement).getExpressionList().getExpressions()) {
         addStatement(expression.getText() + ";");
       }
@@ -269,8 +273,11 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
   }
 
   List<Pair> getBlocks() {
-    final List<Block> nonTrivialReachableBlocks = blocks.stream().
-      filter(Block::isReachable).filter(Block::inlineIfTrivial).collect(Collectors.toList());
+    final List<Block> nonTrivialReachableBlocks = blocks
+      .stream()
+      .filter(Block::isReachable)
+      .filter(Block::inlineIfTrivial)
+      .collect(Collectors.toList());
 
     for (Block block : nonTrivialReachableBlocks) {
       block.setInline();
@@ -278,8 +285,9 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
 
     List<Pair> pairs = new ArrayList<>();
     for (Block block : nonTrivialReachableBlocks) {
-      if (block.isInline())
+      if (block.isInline()) {
         continue;
+      }
       InlineVisitor inlineVisitor = new InlineVisitor(factory, frameVarName, blockFieldName);
       block.accept(inlineVisitor);
       pairs.add(new Pair(block.getId(), inlineVisitor.getBlock()));
