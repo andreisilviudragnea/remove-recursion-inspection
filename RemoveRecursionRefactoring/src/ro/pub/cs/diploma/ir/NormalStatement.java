@@ -3,7 +3,7 @@ package ro.pub.cs.diploma.ir;
 import com.intellij.psi.PsiStatement;
 import org.jetbrains.annotations.NotNull;
 
-public class NormalStatement implements Statement {
+public class NormalStatement implements Statement, WrapperStatement {
   @NotNull private final PsiStatement statement;
 
   NormalStatement(@NotNull final PsiStatement statement) {

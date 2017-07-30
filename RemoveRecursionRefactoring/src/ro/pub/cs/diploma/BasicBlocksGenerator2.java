@@ -280,8 +280,6 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
       .filter(Block::inlineIfTrivial)
       .collect(Collectors.toList());
 
-    nonTrivialReachableBlocks.forEach(Block::setInline);
-
     return nonTrivialReachableBlocks.stream().filter(block -> !block.isInline()).map(block -> {
       InlineVisitor inlineVisitor = new InlineVisitor(factory, frameVarName, blockFieldName);
       block.accept(inlineVisitor);

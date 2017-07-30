@@ -1,9 +1,10 @@
 package ro.pub.cs.diploma.ir;
 
 import com.intellij.psi.PsiReturnStatement;
+import com.intellij.psi.PsiStatement;
 import org.jetbrains.annotations.NotNull;
 
-public class ReturnStatement implements TerminatorStatement {
+public class ReturnStatement implements TerminatorStatement, WrapperStatement {
   @NotNull private final PsiReturnStatement statement;
 
   public ReturnStatement(@NotNull final PsiReturnStatement statement) {
@@ -11,7 +12,7 @@ public class ReturnStatement implements TerminatorStatement {
   }
 
   @NotNull
-  public PsiReturnStatement getStatement() {
+  public PsiStatement getStatement() {
     return statement;
   }
 

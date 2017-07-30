@@ -12,7 +12,6 @@ public class Block implements Statement {
   @NotNull private final List<Statement> statements = new ArrayList<>();
   @NotNull private final List<Ref<Block>> references = new ArrayList<>();
 
-  private boolean inline;
   private boolean afterRecursiveCall;
 
   public Block(final int id) {
@@ -35,6 +34,14 @@ public class Block implements Statement {
     return statements.size() != 0 && statements.get(statements.size() - 1) instanceof TerminatorStatement;
   }
 
+  public boolean isInline() {
+    return references.size() == 1 && !afterRecursiveCall;
+  }
+
+  public boolean isReachable() {
+    return id == 0 || references.size() > 0;
+  }
+
   public int getId() {
     return id;
   }
@@ -44,10 +51,8 @@ public class Block implements Statement {
     return statements;
   }
 
-  public void setInline() {
-    if (references.size() == 1 && !afterRecursiveCall) {
-      inline = true;
-    }
+  public void setAfterRecursiveCall(final boolean afterRecursiveCall) {
+    this.afterRecursiveCall = afterRecursiveCall;
   }
 
   public boolean inlineIfTrivial() {
@@ -62,18 +67,6 @@ public class Block implements Statement {
       return false;
     }
     return true;
-  }
-
-  public boolean isInline() {
-    return inline;
-  }
-
-  public boolean isReachable() {
-    return id == 0 || references.size() > 0;
-  }
-
-  public void setAfterRecursiveCall(final boolean afterRecursiveCall) {
-    this.afterRecursiveCall = afterRecursiveCall;
   }
 
   @Override
