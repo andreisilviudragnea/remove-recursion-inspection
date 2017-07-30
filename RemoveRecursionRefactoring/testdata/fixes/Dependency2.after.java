@@ -32,8 +32,8 @@ class Dependency2 {
                     }
                 }
                 case 3: {
-                    frame.temp = ret;
-                    ret = frame.temp;
+                    boolean temp = ret;
+                    ret = temp;
                     stack.pop();
                     break;
                 }
@@ -45,7 +45,6 @@ class Dependency2 {
     private static class IntersectFrame {
         private Set<String> ids1;
         private Set<String> ids2;
-        private boolean temp;
         private int block;
 
         private IntersectFrame(Set<String> ids1, Set<String> ids2) {

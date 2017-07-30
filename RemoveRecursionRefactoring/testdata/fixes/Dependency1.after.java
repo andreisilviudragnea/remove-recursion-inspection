@@ -24,8 +24,8 @@ class Dependency1 {
                     }
                 }
                 case 4: {
-                    frame.temp = ret;
-                    ret = (frame.temp);
+                    int temp = ret;
+                    ret = (temp);
                     stack.pop();
                     break;
                 }
@@ -37,7 +37,6 @@ class Dependency1 {
     private static class FactorialFrame {
         private int val;
         private int runningVal;
-        private int temp;
         private int block;
 
         private FactorialFrame(int val, int runningVal) {

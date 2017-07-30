@@ -124,6 +124,10 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
       PsiAssignmentExpression assignment = (PsiAssignmentExpression)parent;
       addStatement(assignment.getLExpression().getText() + " = " + retVarName + ";");
     }
+    if (parent instanceof PsiLocalVariable) {
+      PsiLocalVariable variable = (PsiLocalVariable)parent;
+      addStatement(variable.getType().getPresentableText() + " " + variable.getName() + " = " + retVarName + ";");
+    }
   }
 
   @Override

@@ -20,8 +20,8 @@ public class Factorial1 {
                     }
                 }
                 case 4: {
-                    frame.temp = ret;
-                    ret = frame.n * frame.temp;
+                    int temp = ret;
+                    ret = frame.n * temp;
                     stack.pop();
                     break;
                 }
@@ -32,7 +32,6 @@ public class Factorial1 {
 
     private static class Factorial1Frame {
         private int n;
-        private int temp;
         private int block;
 
         private Factorial1Frame(int n) {

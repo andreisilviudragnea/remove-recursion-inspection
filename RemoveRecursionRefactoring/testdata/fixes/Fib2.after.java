@@ -32,8 +32,8 @@ public class Fib2 {
                     break;
                 }
                 case 8: {
-                    frame.temp1 = ret;
-                    ret = frame.temp + frame.temp1;
+                    int temp1 = ret;
+                    ret = frame.temp + temp1;
                     stack.pop();
                     break;
                 }
@@ -45,7 +45,6 @@ public class Fib2 {
     private static class Fib2Frame {
         private int n;
         private int temp;
-        private int temp1;
         private int block;
 
         private Fib2Frame(int n) {

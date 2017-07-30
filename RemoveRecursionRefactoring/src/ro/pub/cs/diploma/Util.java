@@ -9,7 +9,13 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 class Util {
+  private Util() {
+  }
+
   static boolean hasToBeSavedOnStack(@NotNull final PsiParameter parameter, @NotNull final PsiMethod method) {
     final PsiElement parent = parameter.getParent();
     return !(parent instanceof PsiForeachStatement) || Visitors.containsRecursiveCalls(parent, method);
@@ -17,7 +23,29 @@ class Util {
 
   static boolean hasToBeSavedOnStack(@NotNull final PsiDeclarationStatement statement, @NotNull final PsiMethod method) {
     final PsiElement parent = statement.getParent();
-    return (!(parent instanceof PsiForStatement) && !(parent instanceof PsiCodeBlock)) || Visitors.containsRecursiveCalls(parent, method);
+    if (parent instanceof PsiForStatement && !Visitors.containsRecursiveCalls(parent, method)) {
+      return false;
+    }
+    if (parent instanceof PsiCodeBlock) {
+      PsiCodeBlock block = (PsiCodeBlock)parent;
+      List<PsiStatement> statements = new ArrayList<>();
+      boolean met = false;
+      for (PsiStatement psiStatement : block.getStatements()) {
+        if (met) {
+          statements.add(psiStatement);
+        }
+        if (psiStatement == statement) {
+          met = true;
+        }
+      }
+      for (PsiStatement psiStatement : statements) {
+        if (Visitors.containsRecursiveCalls(psiStatement, method)) {
+          return true;
+        }
+      }
+      return false;
+    }
+    return true;
   }
 
   @NotNull

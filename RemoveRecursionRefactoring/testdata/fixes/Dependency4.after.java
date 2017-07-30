@@ -14,8 +14,8 @@ class Dependency4 {
                     break;
                 }
                 case 1: {
-                    frame.temp = ret;
-                    ret = frame.temp;
+                    int temp = ret;
+                    ret = temp;
                     stack.pop();
                     break;
                 }
@@ -28,7 +28,6 @@ class Dependency4 {
         private int one;
         private int two;
         private int three;
-        private int temp;
         private int block;
 
         private CalculateFrame(int one, int two, int three) {
