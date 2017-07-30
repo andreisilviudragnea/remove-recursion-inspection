@@ -53,7 +53,7 @@ class Passes {
         }
       }
     });
-    final JavaCodeStyleManager styleManager = JavaCodeStyleManager.getInstance(method.getProject());
+    final JavaCodeStyleManager styleManager = Util.getStyleManager(method);
     for (final Map.Entry<String, Map<PsiType, List<PsiVariable>>> entry : names.entrySet()) {
       final Map<PsiType, List<PsiVariable>> typesMap = entry.getValue();
       if (typesMap.size() <= 1) {

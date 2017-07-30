@@ -47,7 +47,7 @@ public class RenameVariablesToUniqueNamesAndGenerateFrameClassInspection extends
           return;
         }
         Passes.renameVariablesToUniqueNames(method);
-        final JavaCodeStyleManager styleManager = JavaCodeStyleManager.getInstance(method.getProject());
+        final JavaCodeStyleManager styleManager = Util.getStyleManager(method);
         final String blockFieldName = styleManager.suggestUniqueVariableName(Constants.BLOCK_FIELD_NAME, method, true);
         FrameClassGenerator.addFrameClass(method, Util.getFrameClassName(method.getName()), blockFieldName);
       }

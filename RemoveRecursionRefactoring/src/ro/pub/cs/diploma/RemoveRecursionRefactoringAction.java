@@ -31,6 +31,6 @@ public class RemoveRecursionRefactoringAction extends AnAction {
     if (project == null) {
       return;
     }
-    WriteCommandAction.runWriteCommandAction(project, () -> IterativeMethodGenerator.createIterativeBody(method, project, false));
+    WriteCommandAction.runWriteCommandAction(project, () -> IterativeMethodGenerator.createIterativeBody(method, false));
   }
 }

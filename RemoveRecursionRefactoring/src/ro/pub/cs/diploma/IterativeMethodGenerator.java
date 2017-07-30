@@ -1,6 +1,5 @@
 package ro.pub.cs.diploma;
 
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Ref;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
@@ -16,7 +15,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 class IterativeMethodGenerator {
-  static void createIterativeBody(PsiMethod oldMethod, Project project, boolean replaceOriginalMethod) {
+  static void createIterativeBody(PsiMethod oldMethod, boolean replaceOriginalMethod) {
     final PsiMethod method;
     if (replaceOriginalMethod) {
       method = oldMethod;
@@ -38,7 +37,7 @@ class IterativeMethodGenerator {
     extractRecursiveCallsToStatements(method);
 
     final String frameClassName = Util.getFrameClassName(oldMethod.getName());
-    final JavaCodeStyleManager styleManager = JavaCodeStyleManager.getInstance(project);
+    final JavaCodeStyleManager styleManager = Util.getStyleManager(method);
     final String blockFieldName = styleManager.suggestUniqueVariableName(Constants.BLOCK_FIELD_NAME, method, true);
 
     FrameClassGenerator.addFrameClass(method, frameClassName, blockFieldName);
@@ -221,8 +220,7 @@ class IterativeMethodGenerator {
   }
 
   private static void extractRecursiveCallsToStatements(@NotNull final PsiMethod method) {
-    final Project project = method.getProject();
-    final JavaCodeStyleManager styleManager = JavaCodeStyleManager.getInstance(project);
+    final JavaCodeStyleManager styleManager = Util.getStyleManager(method);
     final PsiElementFactory factory = Util.getFactory(method);
     final PsiType returnType = method.getReturnType();
     if (returnType == null) {

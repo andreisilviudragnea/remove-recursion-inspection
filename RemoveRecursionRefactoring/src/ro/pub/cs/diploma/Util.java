@@ -2,6 +2,7 @@ package ro.pub.cs.diploma;
 
 import com.intellij.codeInsight.daemon.impl.RecursiveCallLineMarkerProvider;
 import com.intellij.psi.*;
+import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.siyeh.ig.performance.TailRecursionInspection;
 import com.siyeh.ig.psiutils.ParenthesesUtils;
@@ -56,6 +57,11 @@ class Util {
   @NotNull
   static PsiElementFactory getFactory(@NotNull final PsiElement element) {
     return JavaPsiFacade.getElementFactory(element.getProject());
+  }
+
+  @NotNull
+  static JavaCodeStyleManager getStyleManager(@NotNull final PsiElement element) {
+    return JavaCodeStyleManager.getInstance(element.getProject());
   }
 
   @Nullable
