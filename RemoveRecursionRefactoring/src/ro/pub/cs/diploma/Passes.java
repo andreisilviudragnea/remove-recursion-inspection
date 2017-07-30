@@ -81,7 +81,8 @@ class Passes {
       .filter(element -> element instanceof PsiLocalVariable)
       .map(element -> (PsiLocalVariable)element)
       .filter(PsiVariable::hasInitializer)
-      .map(variable -> frameVarName + "." + variable.getName() + " = " + variable.getInitializer().getText());
+      .map(variable -> frameVarName + "." + variable.getName() + " = " +
+                       RefactoringUtil.convertInitializerToNormalExpression(variable.getInitializer(), variable.getType()).getText());
   }
 
   static void replaceDeclarationsWithInitializersWithAssignments(@NotNull final String frameVarName,
