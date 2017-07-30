@@ -104,4 +104,8 @@ public class RemoveRecursionFixTest extends IGQuickFixesTestCase {
   public void testLocalVariableSameName() {
     doTest();
   }
+
+  public void testMergesort() {
+    doTest();
+  }
 }
