@@ -53,6 +53,9 @@ public class Block implements Statement {
       for (Ref<Block> reference : references) {
         reference.set(jumpBlock);
       }
+      if (afterRecursiveCall) {
+        jumpBlock.afterRecursiveCall = true;
+      }
       return false;
     }
     return true;
