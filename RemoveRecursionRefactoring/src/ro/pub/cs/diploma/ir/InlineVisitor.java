@@ -7,26 +7,27 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class InlineVisitor implements Visitor {
-  private final PsiElementFactory factory;
-  private final String blockSet;
-  private final PsiCodeBlock block;
+  @NotNull private final PsiElementFactory factory;
+  @NotNull private final String blockSet;
+  @NotNull private final PsiCodeBlock block;
 
-  private PsiCodeBlock currentBlock;
+  @NotNull private PsiCodeBlock currentBlock;
 
+  @NotNull
   private PsiCodeBlock newBlock() {
     return factory.createCodeBlock();
   }
 
-  private void newStatement(String text) {
+  private void newStatement(@NotNull final String text) {
     currentBlock.add(factory.createStatementFromText(text, null));
   }
 
-  private void newBlockSet(String val) {
+  private void newBlockSet(@NotNull final String val) {
     newStatement(blockSet + val + ";");
     newStatement("break;");
   }
 
-  public InlineVisitor(PsiElementFactory factory, String frameVarName, String blockFieldName) {
+  public InlineVisitor(@NotNull final PsiElementFactory factory, @NotNull final String frameVarName, @NotNull final String blockFieldName) {
     this.factory = factory;
     blockSet = frameVarName + "." + blockFieldName + " = ";
     block = newBlock();
@@ -34,21 +35,22 @@ public class InlineVisitor implements Visitor {
     currentBlock = block;
   }
 
+  @NotNull
   public PsiCodeBlock getBlock() {
     return block;
   }
 
   @Override
-  public void visit(Block block) {
-    for (Statement statement : block.getStatements()) {
+  public void visit(@NotNull final Block block) {
+    for (final Statement statement : block.getStatements()) {
       statement.accept(this);
     }
   }
 
   @Nullable
-  private PsiCodeBlock inline(Block block) {
-    final PsiCodeBlock oldCurrentBlock = currentBlock;
-    PsiCodeBlock psiBlock = null;
+  private PsiCodeBlock inline(@NotNull final Block block) {
+    @NotNull final PsiCodeBlock oldCurrentBlock = currentBlock;
+    @Nullable PsiCodeBlock psiBlock = null;
     if (block.isInline()) {
       psiBlock = newBlock();
       currentBlock = psiBlock;
@@ -59,7 +61,7 @@ public class InlineVisitor implements Visitor {
   }
 
   @NotNull
-  private PsiCodeBlock getConcreteBlock(Block block, PsiCodeBlock psiBlock) {
+  private PsiCodeBlock getConcreteBlock(@NotNull final Block block, @Nullable final PsiCodeBlock psiBlock) {
     PsiCodeBlock concretePsiBlock;
     if (psiBlock != null) {
       concretePsiBlock = psiBlock;
@@ -75,7 +77,7 @@ public class InlineVisitor implements Visitor {
   }
 
   @Override
-  public void visit(ConditionalJumpStatement conditionalJumpStatement) {
+  public void visit(@NotNull ConditionalJumpStatement conditionalJumpStatement) {
     final Block thenBlock = conditionalJumpStatement.getThenBlock();
     final PsiCodeBlock thenPsiBlock = inline(thenBlock);
 
@@ -96,23 +98,23 @@ public class InlineVisitor implements Visitor {
   }
 
   @Override
-  public void visit(NormalStatement normalStatement) {
+  public void visit(@NotNull final NormalStatement normalStatement) {
     currentBlock.add(normalStatement.getStatement());
   }
 
   @Override
-  public void visit(ReturnStatement returnStatement) {
+  public void visit(@NotNull final ReturnStatement returnStatement) {
     currentBlock.add(returnStatement.getStatement());
   }
 
   @Override
-  public void visit(UnconditionalJumpStatement unconditionalJumpStatement) {
+  public void visit(@NotNull final UnconditionalJumpStatement unconditionalJumpStatement) {
     final Block block = unconditionalJumpStatement.getBlock();
 
     final PsiCodeBlock psiBlock = inline(block);
 
     if (psiBlock != null) {
-      for (PsiStatement statement : psiBlock.getStatements()) {
+      for (final PsiStatement statement : psiBlock.getStatements()) {
         currentBlock.add(statement);
       }
       return;

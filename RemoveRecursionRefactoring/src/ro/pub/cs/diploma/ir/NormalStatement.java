@@ -1,20 +1,22 @@
 package ro.pub.cs.diploma.ir;
 
 import com.intellij.psi.PsiStatement;
+import org.jetbrains.annotations.NotNull;
 
 public class NormalStatement implements Statement {
-  private final PsiStatement statement;
+  @NotNull private final PsiStatement statement;
 
-  public NormalStatement(PsiStatement statement) {
+  NormalStatement(@NotNull final PsiStatement statement) {
     this.statement = statement;
   }
 
+  @NotNull
   public PsiStatement getStatement() {
     return statement;
   }
 
   @Override
-  public void accept(Visitor visitor) {
+  public void accept(@NotNull final Visitor visitor) {
     visitor.visit(this);
   }
 }

@@ -11,25 +11,25 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
-  private final PsiElementFactory factory;
-  private final PsiMethod method;
-  private final String frameClassName;
-  private final String frameVarName;
-  private final String blockFieldName;
-  private final String stackVarName;
-  private final PsiType returnType;
-  private final String retVarName;
-  private final List<Block> blocks = new ArrayList<>();
+  @NotNull private final PsiElementFactory factory;
+  @NotNull private final PsiMethod method;
+  @NotNull private final String frameClassName;
+  @NotNull private final String frameVarName;
+  @NotNull private final String blockFieldName;
+  @NotNull private final String stackVarName;
+  @NotNull private final PsiType returnType;
+  @NotNull private final String retVarName;
+  @NotNull private final List<Block> blocks = new ArrayList<>();
 
-  private Block currentBlock;
+  @NotNull private Block currentBlock;
   private int counter;
 
-  BasicBlocksGenerator2(final PsiMethod method,
-                        final String frameClassName,
-                        final String frameVarName,
-                        final String blockFieldName,
-                        final String stackVarName,
-                        final String retVarName) {
+  BasicBlocksGenerator2(@NotNull final PsiMethod method,
+                        @NotNull final String frameClassName,
+                        @NotNull final String frameVarName,
+                        @NotNull final String blockFieldName,
+                        @NotNull final String stackVarName,
+                        @NotNull final String retVarName) {
     this.factory = Util.getFactory(method);
     this.method = method;
     currentBlock = newBlock();
@@ -256,17 +256,18 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
 
   class Pair {
     private int id;
-    private PsiCodeBlock block;
+    @NotNull private PsiCodeBlock block;
 
-    public Pair(int id, PsiCodeBlock block) {
+    public Pair(final int id, @NotNull final PsiCodeBlock block) {
       this.id = id;
       this.block = block;
     }
 
-    public int getId() {
+    int getId() {
       return id;
     }
 
+    @NotNull
     public PsiCodeBlock getBlock() {
       return block;
     }
@@ -279,20 +280,12 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
       .filter(Block::inlineIfTrivial)
       .collect(Collectors.toList());
 
-    for (Block block : nonTrivialReachableBlocks) {
-      block.setInline();
-    }
+    nonTrivialReachableBlocks.forEach(Block::setInline);
 
-    List<Pair> pairs = new ArrayList<>();
-    for (Block block : nonTrivialReachableBlocks) {
-      if (block.isInline()) {
-        continue;
-      }
+    return nonTrivialReachableBlocks.stream().filter(block -> !block.isInline()).map(block -> {
       InlineVisitor inlineVisitor = new InlineVisitor(factory, frameVarName, blockFieldName);
       block.accept(inlineVisitor);
-      pairs.add(new Pair(block.getId(), inlineVisitor.getBlock()));
-    }
-
-    return pairs;
+      return new Pair(block.getId(), inlineVisitor.getBlock());
+    }).collect(Collectors.toList());
   }
 }

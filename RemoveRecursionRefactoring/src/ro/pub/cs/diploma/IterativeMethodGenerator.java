@@ -15,7 +15,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 class IterativeMethodGenerator {
-  static void createIterativeBody(PsiMethod oldMethod, boolean replaceOriginalMethod) {
+  static void createIterativeBody(@NotNull final PsiMethod oldMethod, final boolean replaceOriginalMethod) {
     final PsiMethod method;
     if (replaceOriginalMethod) {
       method = oldMethod;
@@ -112,7 +112,7 @@ class IterativeMethodGenerator {
       "switch (" + frameVarName + "." + blockFieldName + ") {" + casesString + "}", null));
   }
 
-  private static boolean isNotVoid(PsiType returnType) {
+  private static boolean isNotVoid(@NotNull final PsiType returnType) {
     return !(returnType instanceof PsiPrimitiveType) || !(PsiPrimitiveType.VOID.equals(returnType));
   }
 
@@ -192,7 +192,7 @@ class IterativeMethodGenerator {
   }
 
   @NotNull
-  private static String getInitialValue(PsiType type) {
+  private static String getInitialValue(@NotNull final PsiType type) {
     if (PsiPrimitiveType.BYTE.equals(type)) {
       return "(byte) 0";
     }
@@ -247,7 +247,7 @@ class IterativeMethodGenerator {
                                                                  @NotNull final String frameClassName,
                                                                  @NotNull final String stackVarName,
                                                                  @NotNull final T[] arguments,
-                                                                 @NotNull Function<T, String> function) {
+                                                                 @NotNull final Function<T, String> function) {
     final String argumentsString = Arrays.stream(arguments).map(function).collect(Collectors.joining(","));
     return factory.createStatementFromText(stackVarName + ".push(new " + frameClassName + "(" + argumentsString + "));", null);
   }

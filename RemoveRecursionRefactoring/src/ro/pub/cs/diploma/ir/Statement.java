@@ -1,5 +1,7 @@
 package ro.pub.cs.diploma.ir;
 
+import org.jetbrains.annotations.NotNull;
+
 public interface Statement {
-  void accept(Visitor visitor);
+  void accept(@NotNull final Visitor visitor);
 }

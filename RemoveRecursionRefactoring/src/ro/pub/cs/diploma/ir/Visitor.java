@@ -1,13 +1,15 @@
 package ro.pub.cs.diploma.ir;
 
+import org.jetbrains.annotations.NotNull;
+
 public interface Visitor {
-  void visit(Block block);
+  void visit(@NotNull final Block block);
 
-  void visit(ConditionalJumpStatement conditionalJumpStatement);
+  void visit(@NotNull final ConditionalJumpStatement conditionalJumpStatement);
 
-  void visit(NormalStatement normalStatement);
+  void visit(@NotNull final NormalStatement normalStatement);
 
-  void visit(ReturnStatement returnStatement);
+  void visit(@NotNull final ReturnStatement returnStatement);
 
-  void visit(UnconditionalJumpStatement unconditionalJumpStatement);
+  void visit(@NotNull final UnconditionalJumpStatement unconditionalJumpStatement);
 }

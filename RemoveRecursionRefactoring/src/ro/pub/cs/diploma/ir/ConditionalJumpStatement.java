@@ -2,32 +2,38 @@ package ro.pub.cs.diploma.ir;
 
 import com.intellij.openapi.util.Ref;
 import com.intellij.psi.PsiExpression;
+import org.jetbrains.annotations.NotNull;
 
 public class ConditionalJumpStatement implements TerminatorStatement {
-  private final PsiExpression condition;
-  private final Ref<Block> thenBlockRef;
-  private final Ref<Block> elseBlockRef;
+  @NotNull private final PsiExpression condition;
+  @NotNull private final Ref<Block> thenBlockRef;
+  @NotNull private final Ref<Block> elseBlockRef;
 
-  public ConditionalJumpStatement(PsiExpression condition, Ref<Block> thenBlockRef, Ref<Block> elseBlockRef) {
+  public ConditionalJumpStatement(@NotNull final PsiExpression condition,
+                                  @NotNull final Ref<Block> thenBlockRef,
+                                  @NotNull final Ref<Block> elseBlockRef) {
     this.condition = condition;
     this.thenBlockRef = thenBlockRef;
     this.elseBlockRef = elseBlockRef;
   }
 
   @Override
-  public void accept(Visitor visitor) {
+  public void accept(@NotNull final Visitor visitor) {
     visitor.visit(this);
   }
 
-  public PsiExpression getCondition() {
+  @NotNull
+  PsiExpression getCondition() {
     return condition;
   }
 
-  public Block getThenBlock() {
+  @NotNull
+  Block getThenBlock() {
     return thenBlockRef.get();
   }
 
-  public Block getElseBlock() {
+  @NotNull
+  Block getElseBlock() {
     return elseBlockRef.get();
   }
 }
