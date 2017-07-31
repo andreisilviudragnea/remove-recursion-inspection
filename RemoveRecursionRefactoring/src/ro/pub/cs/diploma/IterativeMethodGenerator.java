@@ -50,24 +50,19 @@ class IterativeMethodGenerator {
     replaceIdentifierWithFrameAccess(method, incorporatedBody, nameManager);
     Passes.replaceDeclarationsWithInitializersWithAssignments(method, incorporatedBody, nameManager);
 
-    //final String switchLabelName = styleManager.suggestUniqueVariableName(Constants.SWITCH_LABEL, method, true);
-
     final BasicBlocksGenerator2 basicBlocksGenerator = new BasicBlocksGenerator2(method, nameManager);
     incorporatedBody.accept(basicBlocksGenerator);
-    final List<BasicBlocksGenerator2.Pair> blocks = basicBlocksGenerator.getBlocks();
+    final List<BasicBlocksGenerator2.Pair> pairs = basicBlocksGenerator.getBlocks();
 
     final Ref<Boolean> atLeastOneLabeledBreak = new Ref<>(false);
-    blocks.forEach(
-      codeBlock -> replaceReturnStatements(codeBlock.getBlock(), nameManager, atLeastOneLabeledBreak));
+    pairs.forEach(pair -> replaceReturnStatements(pair.getBlock(), nameManager, atLeastOneLabeledBreak));
 
-    final String casesString = blocks.stream()
-      .map(section -> "case " + section.getId() + ": " + section.getBlock().getText())
+    final String casesString = pairs.stream().map(pair -> "case " + pair.getId() + ":" + pair.getBlock().getText())
       .collect(Collectors.joining(""));
 
-    final PsiElementFactory factory = Util.getFactory(method);
-    incorporatedBody.replace(factory.createStatementFromText(
-      (atLeastOneLabeledBreak.get() ? nameManager.getSwitchLabelName() + ": " : "") +
-      "switch (" + nameManager.getFrameVarName() + "." + nameManager.getBlockFieldName() + ") {" + casesString + "}", null));
+    incorporatedBody.replace(Util.getFactory(method).createStatementFromText(
+      (atLeastOneLabeledBreak.get() ? nameManager.getSwitchLabelName() + ":" : "") +
+      "switch(" + nameManager.getFrameVarName() + "." + nameManager.getBlockFieldName() + "){" + casesString + "}", null));
   }
 
   @Nullable
@@ -81,10 +76,8 @@ class IterativeMethodGenerator {
     final String stackVarName = nameManager.getStackVarName();
     final String frameClassName = nameManager.getFrameClassName();
     final PsiWhileStatement whileStatement = (PsiWhileStatement)factory.createStatementFromText(
-      "while (!" + stackVarName + ".isEmpty()) {" +
-      frameClassName + " " + nameManager.getFrameVarName() + " = " + stackVarName + ".peek();" +
-      body.getText() +
-      "}", null);
+      "while(!" + stackVarName + ".isEmpty()){" +
+      frameClassName + " " + nameManager.getFrameVarName() + "=" + stackVarName + ".peek();" + body.getText() + "}", null);
 
     final PsiCodeBlock newBody = (PsiCodeBlock)body.replace(factory.createCodeBlock());
 
@@ -100,7 +93,7 @@ class IterativeMethodGenerator {
     final String retVarName = nameManager.getRetVarName();
     if (isNotVoid(returnType)) {
       newBody.add(factory.createStatementFromText(
-        returnType.getPresentableText() + " " + retVarName + " = " + getInitialValue(returnType) + ";", null));
+        returnType.getPresentableText() + " " + retVarName + "=" + getInitialValue(returnType) + ";", null));
     }
 
     final PsiWhileStatement incorporatedWhileStatement = (PsiWhileStatement)newBody.add(whileStatement);
@@ -187,8 +180,8 @@ class IterativeMethodGenerator {
       anchor = parentBlock.addAfter(factory.createStatementFromText(nameManager.getStackVarName() + ".pop();", null), anchor);
       final boolean inLoop = PsiTreeUtil.getParentOfType(statement, PsiLoopStatement.class, true, PsiClass.class) != null;
       atLeastOneLabeledBreak.set(atLeastOneLabeledBreak.get() || inLoop);
-      parentBlock
-        .addAfter(factory.createStatementFromText("break " + (inLoop ? nameManager.getSwitchLabelName() : "") + ";", null), anchor);
+      parentBlock.addAfter(
+        factory.createStatementFromText("break " + (inLoop ? nameManager.getSwitchLabelName() : "") + ";", null), anchor);
 
       statement.delete();
     }
