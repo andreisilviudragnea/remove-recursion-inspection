@@ -7,6 +7,7 @@ import com.intellij.psi.search.LocalSearchScope;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,58 +46,21 @@ class IterativeMethodGenerator {
 
     final String frameVarName = styleManager.suggestUniqueVariableName(Constants.FRAME_VAR_NAME, method, true);
     final String stackVarName = styleManager.suggestUniqueVariableName(Constants.STACK_VAR_NAME, method, true);
-
-    PsiCodeBlock body = method.getBody();
-    if (body == null) {
-      return;
-    }
-    final PsiElementFactory factory = Util.getFactory(method);
-    PsiWhileStatement whileStatement = (PsiWhileStatement)factory.createStatementFromText(
-      "while (!" + stackVarName + ".isEmpty()) {" +
-      frameClassName + " " + frameVarName + " = " + stackVarName + ".peek();" +
-      body.getText() +
-      "}", null);
-
-    body = (PsiCodeBlock)body.replace(factory.createCodeBlock());
-
-    body.add(styleManager.shortenClassReferences(factory.createStatementFromText(
-      "java.util.Deque<" + frameClassName + "> " + stackVarName + " = new java.util.ArrayDeque<>();", null)));
-    body
-      .add(createPushStatement(factory, frameClassName, stackVarName, method.getParameterList().getParameters(), PsiNamedElement::getName));
     final String retVarName = styleManager.suggestUniqueVariableName(Constants.RET_VAR_NAME, method, true);
-    final PsiType returnType = method.getReturnType();
-    if (returnType == null) {
+
+    final PsiCodeBlock incorporatedBody = incorporateBody(method, stackVarName, frameClassName, frameVarName, retVarName);
+    if (incorporatedBody == null) {
       return;
     }
-    if (isNotVoid(returnType)) {
-      body.add(factory.createStatementFromText(
-        returnType.getPresentableText() + " " + retVarName + " = " + getInitialValue(returnType) + ";", null));
-    }
 
-    whileStatement = (PsiWhileStatement)body.add(whileStatement);
-
-    if (isNotVoid(returnType)) {
-      body.addAfter(factory.createStatementFromText("return " + retVarName + ";", null), whileStatement);
-    }
-
-    final PsiBlockStatement whileStatementBody = (PsiBlockStatement)whileStatement.getBody();
-    if (whileStatementBody == null) {
-      return;
-    }
-    final PsiBlockStatement lastBodyStatement = (PsiBlockStatement)whileStatementBody.getCodeBlock().getLastBodyElement();
-    if (lastBodyStatement == null) {
-      return;
-    }
-    body = lastBodyStatement.getCodeBlock();
-
-    replaceIdentifierWithFrameAccess(frameVarName, stackVarName, method, body);
-    Passes.replaceDeclarationsWithInitializersWithAssignments(frameVarName, method, body);
+    replaceIdentifierWithFrameAccess(frameVarName, stackVarName, method, incorporatedBody);
+    Passes.replaceDeclarationsWithInitializersWithAssignments(frameVarName, method, incorporatedBody);
 
     final String switchLabelName = styleManager.suggestUniqueVariableName(Constants.SWITCH_LABEL, method, true);
 
     final BasicBlocksGenerator2 basicBlocksGenerator =
       new BasicBlocksGenerator2(method, frameClassName, frameVarName, blockFieldName, stackVarName, retVarName);
-    body.accept(basicBlocksGenerator);
+    incorporatedBody.accept(basicBlocksGenerator);
     final List<BasicBlocksGenerator2.Pair> blocks = basicBlocksGenerator.getBlocks();
 
     final Ref<Boolean> atLeastOneLabeledBreak = new Ref<>(false);
@@ -107,9 +71,60 @@ class IterativeMethodGenerator {
       .map(section -> "case " + section.getId() + ": " + section.getBlock().getText())
       .collect(Collectors.joining(""));
 
-    body.replace(factory.createStatementFromText(
+    final PsiElementFactory factory = Util.getFactory(method);
+    incorporatedBody.replace(factory.createStatementFromText(
       (atLeastOneLabeledBreak.get() ? switchLabelName + ": " : "") +
       "switch (" + frameVarName + "." + blockFieldName + ") {" + casesString + "}", null));
+  }
+
+  @Nullable
+  private static PsiCodeBlock incorporateBody(@NotNull final PsiMethod method,
+                                              @NotNull final String stackVarName,
+                                              @NotNull final String frameClassName,
+                                              @NotNull final String frameVarName,
+                                              @NotNull final String retVarName) {
+    final PsiCodeBlock body = method.getBody();
+    if (body == null) {
+      return null;
+    }
+    final PsiElementFactory factory = Util.getFactory(method);
+    final PsiWhileStatement whileStatement = (PsiWhileStatement)factory.createStatementFromText(
+      "while (!" + stackVarName + ".isEmpty()) {" +
+      frameClassName + " " + frameVarName + " = " + stackVarName + ".peek();" +
+      body.getText() +
+      "}", null);
+
+    final PsiCodeBlock newBody = (PsiCodeBlock)body.replace(factory.createCodeBlock());
+
+    final JavaCodeStyleManager styleManager = Util.getStyleManager(method);
+    newBody.add(styleManager.shortenClassReferences(factory.createStatementFromText(
+      "java.util.Deque<" + frameClassName + "> " + stackVarName + " = new java.util.ArrayDeque<>();", null)));
+    newBody
+      .add(createPushStatement(factory, frameClassName, stackVarName, method.getParameterList().getParameters(), PsiNamedElement::getName));
+    final PsiType returnType = method.getReturnType();
+    if (returnType == null) {
+      return null;
+    }
+    if (isNotVoid(returnType)) {
+      newBody.add(factory.createStatementFromText(
+        returnType.getPresentableText() + " " + retVarName + " = " + getInitialValue(returnType) + ";", null));
+    }
+
+    final PsiWhileStatement incorporatedWhileStatement = (PsiWhileStatement)newBody.add(whileStatement);
+
+    if (isNotVoid(returnType)) {
+      newBody.addAfter(factory.createStatementFromText("return " + retVarName + ";", null), incorporatedWhileStatement);
+    }
+
+    final PsiBlockStatement whileStatementBody = (PsiBlockStatement)incorporatedWhileStatement.getBody();
+    if (whileStatementBody == null) {
+      return null;
+    }
+    final PsiBlockStatement lastBodyStatement = (PsiBlockStatement)whileStatementBody.getCodeBlock().getLastBodyElement();
+    if (lastBodyStatement == null) {
+      return null;
+    }
+    return lastBodyStatement.getCodeBlock();
   }
 
   private static boolean isNotVoid(@NotNull final PsiType returnType) {
