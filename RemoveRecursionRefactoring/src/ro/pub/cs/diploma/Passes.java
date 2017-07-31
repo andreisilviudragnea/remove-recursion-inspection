@@ -43,14 +43,18 @@ class Passes {
       }
 
       @Override
-      public void visitDeclarationStatement(PsiDeclarationStatement statement) {
-        if (RecursionUtil.hasToBeSavedOnStack(statement, method)) {
-          Arrays
-            .stream(statement.getDeclaredElements())
-            .filter(element -> element instanceof PsiLocalVariable)
-            .map(element -> (PsiLocalVariable)element)
-            .forEach(this::processVariable);
+      public void visitLocalVariable(PsiLocalVariable variable) {
+        if (RecursionUtil.hasToBeSavedOnStack(variable, method)) {
+          processVariable(variable);
         }
+      }
+
+      @Override
+      public void visitClass(PsiClass aClass) {
+      }
+
+      @Override
+      public void visitLambdaExpression(PsiLambdaExpression expression) {
       }
     });
     final JavaCodeStyleManager styleManager = Util.getStyleManager(method);

@@ -130,17 +130,13 @@ class IterativeMethodGenerator {
       }
 
       @Override
-      public void visitDeclarationStatement(PsiDeclarationStatement statement) {
-        if (RecursionUtil.hasToBeSavedOnStack(statement, method)) {
-          Arrays
-            .stream(statement.getDeclaredElements())
-            .filter(element -> element instanceof PsiLocalVariable)
-            .map(element -> (PsiLocalVariable)element)
-            .filter(variable -> {
-              final String name = variable.getName();
-              return !frameVarName.equals(name) && !stackVarName.equals(name);
-            })
-            .forEach(variables::add);
+      public void visitLocalVariable(PsiLocalVariable variable) {
+        final String name = variable.getName();
+        if (frameVarName.equals(name) || stackVarName.equals(name)) {
+          return;
+        }
+        if (RecursionUtil.hasToBeSavedOnStack(variable, method)) {
+          variables.add(variable);
         }
       }
 

@@ -75,30 +75,75 @@ class RecursionUtil {
     return body != null && containsRecursiveCalls(body, method);
   }
 
-  static boolean hasToBeSavedOnStack(@NotNull final PsiDeclarationStatement statement, @NotNull final PsiMethod method) {
-    final PsiElement parent = statement.getParent();
-    if (parent instanceof PsiForStatement && !containsRecursiveCalls(parent, method)) {
-      return false;
-    }
-    if (parent instanceof PsiCodeBlock) {
-      PsiCodeBlock block = (PsiCodeBlock)parent;
-      List<PsiStatement> statements = new ArrayList<>();
-      boolean met = false;
-      for (PsiStatement psiStatement : block.getStatements()) {
+  static boolean hasToBeSavedOnStack(@NotNull final PsiLocalVariable variable, @NotNull final PsiMethod method) {
+    final PsiDeclarationStatement declarationStatement = (PsiDeclarationStatement)variable.getParent();
+    final PsiElement parent = declarationStatement.getParent();
+
+    final List<PsiElement> elements = new ArrayList<>();
+
+    // This is because the variable is actually used only after it has been initialized.
+    //final PsiExpression initializer = variable.getInitializer();
+    //if (initializer != null) {
+    //  elements.add(initializer);
+    //}
+
+    boolean met = false;
+    for (final PsiElement element : declarationStatement.getDeclaredElements()) {
+      if (element instanceof PsiLocalVariable) {
         if (met) {
-          statements.add(psiStatement);
+          elements.add(element);
         }
-        if (psiStatement == statement) {
+        if (element == variable) {
           met = true;
         }
       }
-      for (PsiStatement psiStatement : statements) {
-        if (containsRecursiveCalls(psiStatement, method)) {
+    }
+
+    if (parent instanceof PsiForStatement) {
+      PsiForStatement statement = (PsiForStatement)parent;
+      final PsiExpression condition = statement.getCondition();
+      if (condition != null) {
+        elements.add(condition);
+      }
+      final PsiStatement update = statement.getUpdate();
+      if (update != null) {
+        elements.add(update);
+      }
+      final PsiStatement body = statement.getBody();
+      if (body != null) {
+        elements.add(body);
+      }
+    }
+    else if (parent instanceof PsiCodeBlock) {
+      final PsiCodeBlock block = (PsiCodeBlock)parent;
+
+      met = false;
+      for (PsiStatement psiStatement : block.getStatements()) {
+        if (met) {
+          elements.add(psiStatement);
+        }
+        if (psiStatement == declarationStatement) {
+          met = true;
+        }
+      }
+    }
+
+    for (PsiElement element : elements) {
+      if (containsRecursiveCalls(element, method)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  static boolean hasToBeSavedOnStack(@NotNull final PsiDeclarationStatement statement, @NotNull final PsiMethod method) {
+    for (PsiElement element : statement.getDeclaredElements()) {
+      if (element instanceof PsiLocalVariable) {
+        if (hasToBeSavedOnStack((PsiLocalVariable)element, method)) {
           return true;
         }
       }
-      return false;
     }
-    return true;
+    return false;
   }
 }
