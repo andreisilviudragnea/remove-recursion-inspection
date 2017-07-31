@@ -66,16 +66,37 @@ class RecursionUtil {
     return contains.get();
   }
 
-  static boolean hasToBeSavedOnStack(@NotNull final PsiParameter parameter, @NotNull final PsiMethod method) {
+  @NotNull
+  private static List<PsiElement> getElementsInScope(@NotNull final PsiParameter parameter) {
     final PsiElement parent = parameter.getParent();
-    if (!(parent instanceof PsiForeachStatement)) {
-      return true;
+    final List<PsiElement> elements = new ArrayList<>();
+
+    if (parent instanceof PsiParameterList) {
+      final PsiCodeBlock body = ((PsiMethod)parent.getParent()).getBody();
+      if (body != null) {
+        elements.add(body);
+      }
+    } else if (parent instanceof PsiForeachStatement) {
+      final PsiStatement body = ((PsiForeachStatement)parent).getBody();
+      if (body != null) {
+        elements.add(body);
+      }
     }
-    final PsiStatement body = ((PsiLoopStatement)parent).getBody();
-    return body != null && containsRecursiveCalls(body, method);
+
+    return elements;
   }
 
-  static boolean hasToBeSavedOnStack(@NotNull final PsiLocalVariable variable, @NotNull final PsiMethod method) {
+  static boolean hasToBeSavedOnStack(@NotNull final PsiParameter parameter, @NotNull final PsiMethod method) {
+    for (PsiElement element : getElementsInScope(parameter)) {
+      if (containsRecursiveCalls(element, method)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @NotNull
+  private static List<PsiElement> getElementsInScope(@NotNull final PsiLocalVariable variable) {
     final PsiDeclarationStatement declarationStatement = (PsiDeclarationStatement)variable.getParent();
     final PsiElement parent = declarationStatement.getParent();
 
@@ -128,7 +149,11 @@ class RecursionUtil {
       }
     }
 
-    for (PsiElement element : elements) {
+    return elements;
+  }
+
+  static boolean hasToBeSavedOnStack(@NotNull final PsiLocalVariable variable, @NotNull final PsiMethod method) {
+    for (PsiElement element : getElementsInScope(variable)) {
       if (containsRecursiveCalls(element, method)) {
         return true;
       }
