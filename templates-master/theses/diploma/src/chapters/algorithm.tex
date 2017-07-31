@@ -7,8 +7,8 @@ then alters the code.
 \section{Renaming local variables to unique names}
 
 This code transformation is needed in order to avoid name clashes later on, when the static nested class which
-holds the variables of the method (both formal parameters and all the local variables) is generated. The fields of this
-class will simulate the stack frame of the method.
+holds the variables potentially used after returning from a recursive call (both formal parameters and local variables)
+is generated. The fields of this class will simulate the stack frame of the method.
 
 The JVMS (Java Virtual Machine Specification)\abbrev{JVMS}{Java Virtual Machine Specification} states the
 following\footnote{\url{http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-2.html#jvms-2.6.1}}:
@@ -25,32 +25,7 @@ In the context of this refactoring, the recursive call is defined only as a meth
 either absent or \code{this}, so the target reference of the instance method invocation never changes. This is why it is
 not a field of the frame class. In the case of class method invocations, there is no target reference (\code{this}).
 
-The scope of a formal parameter is specified in JLS\footnote{\url{https://docs.oracle.com/javase/specs/jls/se8/html/jls-6.html#jls-6.3}} as:
-\begin{quote}
-    The scope of a formal parameter of a method, constructor, or lambda expression is the entire body of the method,
-    constructor, or lambda expression.
-\end{quote}
-
-The scope of a local variable declaration is specified in JLS\footnote{\url{https://docs.oracle.com/javase/specs/jls/se8/html/jls-6.html#jls-6.3}} as:
-\begin{quote}
-    The scope of a local variable declaration in a block is the rest of the block in which the declaration
-    appears, starting with its own initializer and including any further declarators to the right in the local variable
-    declaration statement.
-
-    The scope of a local variable declared in the \textit{ForInit} part of a basic \code{for} statement includes all of
-    the following:
-\begin{itemize}
-    \item Its own initializer
-    \item Any further declarators to the right in the \textit{ForInit} part of the \code{for} statement
-    \item The \textit{Expression} and \textit{ForUpdate} parts of the \code{for} statement
-    \item The contained \textit{Statement}
-\end{itemize}
-
-    The scope of a local variable declared in the \textit{FormalParameter} part of an enhanced \code{for} statement
-    is the contained \textit{Statement}.
-\end{quote}
-
-JLS also specifies that\footnote{\url{https://docs.oracle.com/javase/specs/jls/se8/html/jls-6.html#jls-6.4}}:
+JLS specifies that\footnote{\url{https://docs.oracle.com/javase/specs/jls/se8/html/jls-6.html#jls-6.4}}:
 \begin{quote}
     It is a compile-time error if the name of a formal parameter is used to declare a new variable within the body of
     the method, constructor, or lambda expression, unless the new variable is declared within a class declaration
@@ -80,11 +55,11 @@ will occur because JLS specifies that\footnote{\url{https://docs.oracle.com/java
     It is a compile-time error for the body of a class declaration to declare two fields with the same name.
 \end{quote}
 
-So all the variables in the method (formal parameters and local variables) will be collected as fields of a static
-nested frame class, which will be used by the recursive method to save the state of the method call when recursing, thus
-simulating the call stack. The rule is that for all the variables with the same name and type, there will be only one
-corresponding field in the frame class, but if there are variables with the same name, but different type, each variable
-in a type group will have a different name and a different corresponding frame class field.
+So all the relevant variables in the method (formal parameters and local variables) will be collected as fields of a
+static nested frame class, which will be used by the recursive method to save the state of the method call when
+recursing, thus simulating the call stack. The rule is that for all the variables with the same name and type, there
+will be only one corresponding field in the frame class, but if there are variables with the same name, but different
+type, each variable in a type group will have a different name and a different corresponding frame class field.
 
 In other words, the first pass ensures that all the variables in a method which have the same name also have the same
 type.
