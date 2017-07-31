@@ -7,7 +7,7 @@ then alters the code.
 \section{Renaming local variables to unique names}
 
 This code transformation is needed in order to avoid name clashes later on, when the static nested class which
-holds the variables of the method (both formal parameters and all the local variables) is generated. The members of this
+holds the variables of the method (both formal parameters and all the local variables) is generated. The fields of this
 class will simulate the stack frame of the method.
 
 The JVMS (Java Virtual Machine Specification)\abbrev{JVMS}{Java Virtual Machine Specification} states the
@@ -22,9 +22,8 @@ following\footnote{\url{http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-2
 \end{quote}
 
 In the context of this refactoring, the recursive call is defined only as a method call expression whose qualifier is
-either absent or \code{this}, so the implicit \code{this} parameter of the instance method invocation never changes.
-This is why it is not a field of the frame class. In the case of class method invocations, there is no implicit
-\code{this} parameter.
+either absent or \code{this}, so the target reference of the instance method invocation never changes. This is why it is
+not a field of the frame class. In the case of class method invocations, there is no target reference (\code{this}).
 
 The scope of a formal parameter is specified in JLS\footnote{\url{https://docs.oracle.com/javase/specs/jls/se8/html/jls-6.html#jls-6.3}} as:
 \begin{quote}
@@ -76,7 +75,7 @@ meaning that its value can be used in the code.
 
 There are still problems if there is another variable in the method which shares the same name with other variable, but
 whose type is different. If this other variable is not renamed, when generating the frame class, a compile-time error
-will later occur because JLS specifies that\footnote{\url{https://docs.oracle.com/javase/specs/jls/se8/html/jls-8.html#jls-FieldDeclaration}}:
+will occur because JLS specifies that\footnote{\url{https://docs.oracle.com/javase/specs/jls/se8/html/jls-8.html#jls-FieldDeclaration}}:
 \begin{quote}
     It is a compile-time error for the body of a class declaration to declare two fields with the same name.
 \end{quote}
@@ -86,3 +85,8 @@ nested frame class, which will be used by the recursive method to save the state
 simulating the call stack. The rule is that for all the variables with the same name and type, there will be only one
 corresponding field in the frame class, but if there are variables with the same name, but different type, each variable
 in a type group will have a different name and a different corresponding frame class field.
+
+In other words, the first pass ensures that all the variables in a method which have the same name also have the same
+type.
+
+TODO: Add example of renaming.

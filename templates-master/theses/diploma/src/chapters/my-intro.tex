@@ -23,8 +23,8 @@ the source code in a file. A PSI (Program Structure Interface)\abbrev{PSI}{Progr
 File\footnote{\url{http://www.jetbrains.org/intellij/sdk/docs/basics/architectural_overview/psi_files.html}} is the root
 of a structure representing the contents of a file as a hierarchy of PSI elements. A PSI
 element\footnote{\url{http://www.jetbrains.org/intellij/sdk/docs/basics/architectural_overview/psi_elements.html}} can
-have child PSI elements. The PsiElement class is the common base class for all PSI elements. There is a PsiElement
-subclass for each element in the Java programming language.
+have child PSI elements. The \code{PsiElement} class is the common base class for all PSI elements. There is a
+\code{PsiElement} subclass for each element in the Java programming language.
 
 In Intellij IDEA, new Java code inspections are created by extending the abstract class\\
 \code{com.siyeh.ig.BaseInspection}\footnote{\url{https://github.com/JetBrains/intellij-community/blob/master/plugins/InspectionGadgets/InspectionGadgetsAnalysis/src/com/siyeh/ig/BaseInspection.java}}.
