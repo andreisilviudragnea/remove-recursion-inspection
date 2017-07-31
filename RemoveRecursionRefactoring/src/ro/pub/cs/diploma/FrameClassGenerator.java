@@ -7,8 +7,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 class FrameClassGenerator {
-  static void addFrameClass(@NotNull final PsiMethod method, @NotNull final String frameClassName, @NotNull final String blockFieldName) {
+  static void addFrameClass(@NotNull final PsiMethod method, @NotNull final NameManager nameManager) {
     final PsiElementFactory factory = Util.getFactory(method);
+    final String frameClassName = nameManager.getFrameClassName();
     final PsiClass frameClass = factory.createClass(frameClassName);
 
     // Set modifiers
@@ -57,7 +58,7 @@ class FrameClassGenerator {
       .map(pair -> factory
         .createFieldFromText("private " + pair.getValue().getType().getPresentableText() + " " + pair.getKey() + ";", null))
       .forEach(frameClass::add);
-    frameClass.add(factory.createField(blockFieldName, PsiPrimitiveType.INT));
+    frameClass.add(factory.createField(nameManager.getBlockFieldName(), PsiPrimitiveType.INT));
 
     // Create constructor
     final PsiMethod constructor = factory.createConstructor(frameClassName);

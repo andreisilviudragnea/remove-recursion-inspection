@@ -79,7 +79,7 @@ class Passes {
     }
   }
 
-  private static Stream<String> getVariablesStream(PsiDeclarationStatement statement, String frameVarName) {
+  private static Stream<String> getVariablesStream(@NotNull final PsiDeclarationStatement statement, @NotNull final String frameVarName) {
     return Arrays
       .stream(statement.getDeclaredElements())
       .filter(element -> element instanceof PsiLocalVariable)
@@ -89,9 +89,9 @@ class Passes {
                        RefactoringUtil.convertInitializerToNormalExpression(variable.getInitializer(), variable.getType()).getText());
   }
 
-  static void replaceDeclarationsWithInitializersWithAssignments(@NotNull final String frameVarName,
-                                                                 @NotNull final PsiMethod method,
-                                                                 @NotNull final PsiCodeBlock block) {
+  static void replaceDeclarationsWithInitializersWithAssignments(@NotNull final PsiMethod method,
+                                                                 @NotNull final PsiCodeBlock block,
+                                                                 @NotNull final NameManager nameManager) {
     final List<PsiDeclarationStatement> declarations = new ArrayList<>();
     block.accept(new JavaRecursiveElementWalkingVisitor() {
       @Override
@@ -112,7 +112,7 @@ class Passes {
     final PsiElementFactory factory = Util.getFactory(block);
     for (final PsiDeclarationStatement statement : declarations) {
       final PsiElement parent = statement.getParent();
-      final Stream<String> stream = getVariablesStream(statement, frameVarName);
+      final Stream<String> stream = getVariablesStream(statement, nameManager.getFrameVarName());
       if (parent instanceof PsiForStatement) {
         statement.replace(Util.statement(factory, stream.collect(Collectors.joining(",")) + ";"));
         continue;

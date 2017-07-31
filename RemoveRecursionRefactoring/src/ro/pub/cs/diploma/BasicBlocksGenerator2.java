@@ -11,34 +11,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
-  @NotNull private final PsiElementFactory factory;
   @NotNull private final PsiMethod method;
-  @NotNull private final String frameClassName;
-  @NotNull private final String frameVarName;
-  @NotNull private final String blockFieldName;
-  @NotNull private final String stackVarName;
-  @NotNull private final PsiType returnType;
-  @NotNull private final String retVarName;
+  @NotNull private final NameManager nameManager;
+
+  @NotNull private final PsiElementFactory factory;
   @NotNull private final List<Block> blocks = new ArrayList<>();
 
   @NotNull private Block currentBlock;
   private int counter;
 
-  BasicBlocksGenerator2(@NotNull final PsiMethod method,
-                        @NotNull final String frameClassName,
-                        @NotNull final String frameVarName,
-                        @NotNull final String blockFieldName,
-                        @NotNull final String stackVarName,
-                        @NotNull final String retVarName) {
-    this.factory = Util.getFactory(method);
+  BasicBlocksGenerator2(@NotNull final PsiMethod method, @NotNull final NameManager nameManager) {
     this.method = method;
+    this.nameManager = nameManager;
+    factory = Util.getFactory(method);
     currentBlock = newBlock();
-    this.frameClassName = frameClassName;
-    this.frameVarName = frameVarName;
-    this.blockFieldName = blockFieldName;
-    this.stackVarName = stackVarName;
-    this.returnType = method.getReturnType();
-    this.retVarName = retVarName;
   }
 
   private Block newBlock() {
@@ -100,7 +86,7 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
 
     final PsiStatement[] statements = block.getStatements();
     // This is a hack, this method gets called only for the method block, not for blocks of block statements.
-    if (PsiPrimitiveType.VOID.equals(returnType) && !(statements[statements.length - 1] instanceof PsiReturnStatement)) {
+    if (PsiPrimitiveType.VOID.equals(method.getReturnType()) && !(statements[statements.length - 1] instanceof PsiReturnStatement)) {
       addReturnStatement((PsiReturnStatement)factory.createStatementFromText("return;", null));
     }
   }
@@ -112,7 +98,7 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
 
   @Override
   public void visitMethodCallExpression(PsiMethodCallExpression expression) {
-    addStatement(IterativeMethodGenerator.createPushStatement(factory, frameClassName, stackVarName,
+    addStatement(IterativeMethodGenerator.createPushStatement(factory, nameManager.getFrameClassName(), nameManager.getStackVarName(),
                                                               expression.getArgumentList().getExpressions(), PsiElement::getText));
 
     final Block block = newBlock();
@@ -122,11 +108,12 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
     currentBlock = block;
 
     final PsiElement parent = expression.getParent();
+    final String retVarName = nameManager.getRetVarName();
     if (parent instanceof PsiAssignmentExpression) {
       PsiAssignmentExpression assignment = (PsiAssignmentExpression)parent;
       addStatement(assignment.getLExpression().getText() + " = " + retVarName + ";");
     }
-    if (parent instanceof PsiLocalVariable) {
+    else if (parent instanceof PsiLocalVariable) {
       PsiLocalVariable variable = (PsiLocalVariable)parent;
       addStatement(variable.getType().getPresentableText() + " " + variable.getName() + " = " + retVarName + ";");
     }
@@ -281,7 +268,7 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
       .collect(Collectors.toList());
 
     return nonTrivialReachableBlocks.stream().filter(block -> !block.isInline()).map(block -> {
-      InlineVisitor inlineVisitor = new InlineVisitor(factory, frameVarName, blockFieldName);
+      InlineVisitor inlineVisitor = new InlineVisitor(factory, nameManager);
       block.accept(inlineVisitor);
       return new Pair(block.getId(), inlineVisitor.getBlock());
     }).collect(Collectors.toList());

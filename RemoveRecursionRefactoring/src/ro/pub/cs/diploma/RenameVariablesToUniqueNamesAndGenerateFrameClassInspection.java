@@ -3,7 +3,6 @@ package ro.pub.cs.diploma;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiMethod;
-import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.siyeh.ig.BaseInspection;
 import com.siyeh.ig.BaseInspectionVisitor;
 import com.siyeh.ig.InspectionGadgetsFix;
@@ -47,9 +46,7 @@ public class RenameVariablesToUniqueNamesAndGenerateFrameClassInspection extends
           return;
         }
         Passes.renameVariablesToUniqueNames(method);
-        final JavaCodeStyleManager styleManager = Util.getStyleManager(method);
-        final String blockFieldName = styleManager.suggestUniqueVariableName(Constants.BLOCK_FIELD_NAME, method, true);
-        FrameClassGenerator.addFrameClass(method, Util.getFrameClassName(method.getName()), blockFieldName);
+        FrameClassGenerator.addFrameClass(method, NameManager.getInstance(method));
       }
 
       @Nls

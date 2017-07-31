@@ -5,6 +5,7 @@ import com.intellij.psi.PsiElementFactory;
 import com.intellij.psi.PsiStatement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ro.pub.cs.diploma.NameManager;
 
 import java.util.Arrays;
 
@@ -37,9 +38,9 @@ public class InlineVisitor implements Visitor {
     addStatement("break;");
   }
 
-  public InlineVisitor(@NotNull final PsiElementFactory factory, @NotNull final String frameVarName, @NotNull final String blockFieldName) {
+  public InlineVisitor(@NotNull final PsiElementFactory factory, @NotNull final NameManager nameManager) {
     this.factory = factory;
-    blockSet = frameVarName + "." + blockFieldName + " = ";
+    blockSet = nameManager.getFrameVarName() + "." + nameManager.getBlockFieldName() + " = ";
     block = newBlock();
 
     currentBlock = block;
