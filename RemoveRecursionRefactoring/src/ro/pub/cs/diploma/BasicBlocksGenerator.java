@@ -159,7 +159,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
 
 
   private void processStatement(PsiStatement statement) {
-    if (Visitors.containsRecursiveCalls(statement, method)) {
+    if (RecursionUtil.containsRecursiveCalls(statement, method)) {
       statement.accept(this);
     }
     else {

@@ -37,14 +37,14 @@ class Passes {
 
       @Override
       public void visitParameter(PsiParameter parameter) {
-        if (Util.hasToBeSavedOnStack(parameter, method)) {
+        if (RecursionUtil.hasToBeSavedOnStack(parameter, method)) {
           processVariable(parameter);
         }
       }
 
       @Override
       public void visitDeclarationStatement(PsiDeclarationStatement statement) {
-        if (Util.hasToBeSavedOnStack(statement, method)) {
+        if (RecursionUtil.hasToBeSavedOnStack(statement, method)) {
           Arrays
             .stream(statement.getDeclaredElements())
             .filter(element -> element instanceof PsiLocalVariable)
@@ -92,7 +92,7 @@ class Passes {
     block.accept(new JavaRecursiveElementWalkingVisitor() {
       @Override
       public void visitDeclarationStatement(PsiDeclarationStatement statement) {
-        if (Util.hasToBeSavedOnStack(statement, method)) {
+        if (RecursionUtil.hasToBeSavedOnStack(statement, method)) {
           declarations.add(statement);
         }
       }

@@ -124,14 +124,14 @@ class IterativeMethodGenerator {
     method.accept(new JavaRecursiveElementVisitor() {
       @Override
       public void visitParameter(PsiParameter parameter) {
-        if (Util.hasToBeSavedOnStack(parameter, method)) {
+        if (RecursionUtil.hasToBeSavedOnStack(parameter, method)) {
           variables.add(parameter);
         }
       }
 
       @Override
       public void visitDeclarationStatement(PsiDeclarationStatement statement) {
-        if (Util.hasToBeSavedOnStack(statement, method)) {
+        if (RecursionUtil.hasToBeSavedOnStack(statement, method)) {
           Arrays
             .stream(statement.getDeclaredElements())
             .filter(element -> element instanceof PsiLocalVariable)

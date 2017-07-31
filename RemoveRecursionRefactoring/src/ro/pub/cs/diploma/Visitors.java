@@ -1,6 +1,5 @@
 package ro.pub.cs.diploma;
 
-import com.intellij.openapi.util.Ref;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,7 +13,7 @@ class Visitors {
       @Override
       public void visitMethodCallExpression(PsiMethodCallExpression expression) {
         super.visitMethodCallExpression(expression);
-        if (Util.isRecursive(expression, method)) {
+        if (RecursionUtil.isRecursive(expression, method)) {
           calls.add(expression);
         }
       }
@@ -48,30 +47,6 @@ class Visitors {
       }
     });
     return returnStatements;
-  }
-
-  static boolean containsRecursiveCalls(@NotNull final PsiElement element, @NotNull final PsiMethod method) {
-    final Ref<Boolean> contains = new Ref<>(false);
-    element.accept(new JavaRecursiveElementWalkingVisitor() {
-      @Override
-      public void visitMethodCallExpression(PsiMethodCallExpression expression) {
-        super.visitMethodCallExpression(expression);
-        if (!Util.isRecursive(expression, method)) {
-          return;
-        }
-        contains.set(true);
-        stopWalking();
-      }
-
-      @Override
-      public void visitClass(PsiClass aClass) {
-      }
-
-      @Override
-      public void visitLambdaExpression(PsiLambdaExpression expression) {
-      }
-    });
-    return contains.get();
   }
 
   static void replaceSingleStatementsWithBlockStatements(PsiMethod method) {
@@ -129,7 +104,7 @@ class Visitors {
       }
     });
     for (PsiForeachStatement foreachStatement : foreachStatements) {
-      if (containsRecursiveCalls(foreachStatement, method)) {
+      if (RecursionUtil.containsRecursiveCalls(foreachStatement, method)) {
         Refactorings.replaceForEachLoopWithIteratorForLoop(foreachStatement, method);
       }
     }
@@ -145,7 +120,7 @@ class Visitors {
       }
     });
     for (PsiForeachStatement foreachStatement : foreachStatements) {
-      if (containsRecursiveCalls(foreachStatement, method)) {
+      if (RecursionUtil.containsRecursiveCalls(foreachStatement, method)) {
         Refactorings.replaceForEachLoopWithIndexedForLoop(foreachStatement, method);
       }
     }

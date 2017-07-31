@@ -77,7 +77,7 @@ public class RemoveRecursionInspection extends BaseInspection {
         if (method == null) {
           return;
         }
-        if (Util.isRecursive(expression, method)) {
+        if (RecursionUtil.isRecursive(expression, method)) {
           registerMethodCallError(expression, method);
         }
       }
