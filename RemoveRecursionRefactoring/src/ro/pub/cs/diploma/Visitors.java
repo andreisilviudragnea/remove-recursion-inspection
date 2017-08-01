@@ -94,35 +94,26 @@ class Visitors {
     });
   }
 
-  static void replaceForEachLoopsWithIteratorForLoops(PsiMethod method) {
-    final List<PsiForeachStatement> foreachStatements = new ArrayList<>();
+  @NotNull
+  private static List<PsiForeachStatement> getPsiForEachStatements(PsiMethod method) {
+    final List<PsiForeachStatement> statements = new ArrayList<>();
     method.accept(new JavaRecursiveElementVisitor() {
       @Override
       public void visitForeachStatement(PsiForeachStatement statement) {
         super.visitForeachStatement(statement);
-        foreachStatements.add(statement);
+        if (RecursionUtil.containsRecursiveCalls(statement, method)) {
+          statements.add(statement);
+        }
       }
     });
-    for (PsiForeachStatement foreachStatement : foreachStatements) {
-      if (RecursionUtil.containsRecursiveCalls(foreachStatement, method)) {
-        Refactorings.replaceForEachLoopWithIteratorForLoop(foreachStatement, method);
-      }
-    }
+    return statements;
+  }
+
+  static void replaceForEachLoopsWithIteratorForLoops(PsiMethod method) {
+    getPsiForEachStatements(method).forEach(statement -> Refactorings.replaceForEachLoopWithIteratorForLoop(statement, method));
   }
 
   static void replaceForEachLoopsWithIndexedForLoops(PsiMethod method) {
-    final List<PsiForeachStatement> foreachStatements = new ArrayList<>();
-    method.accept(new JavaRecursiveElementVisitor() {
-      @Override
-      public void visitForeachStatement(PsiForeachStatement statement) {
-        super.visitForeachStatement(statement);
-        foreachStatements.add(statement);
-      }
-    });
-    for (PsiForeachStatement foreachStatement : foreachStatements) {
-      if (RecursionUtil.containsRecursiveCalls(foreachStatement, method)) {
-        Refactorings.replaceForEachLoopWithIndexedForLoop(foreachStatement, method);
-      }
-    }
+    getPsiForEachStatements(method).forEach(statement -> Refactorings.replaceForEachLoopWithIndexedForLoop(statement, method));
   }
 }
