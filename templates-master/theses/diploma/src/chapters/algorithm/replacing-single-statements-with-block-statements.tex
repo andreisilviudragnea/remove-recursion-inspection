@@ -7,4 +7,20 @@ which the other statement will be added at the right place. The places where thi
 \code{if} statements and the bodies of \code{for}, \code{while}, \code{do-while} and \code{foreach} statements
 which contain single statements. This pass also transforms statements which may not contain recursive calls, because
 there are elements which the refactoring will alter in order to remove recursion and they are not only method calls (for
-example, \code{return} statements).
+example, \code{return} statements). An example is provided in \labelindexref{Figure}{img:replace-single-statements-with-block-statements-before}
+(before) and \labelindexref{Figure}{img:replace-single-statements-with-block-statements-after} (after).
+
+\begin{figure}[htb]
+    \centering
+    \begin{minipage}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[height=0.6in]{src/img/replace-single-statements-with-block-statements-before.png}
+        \caption{Replace single statements with block statements (before) \label{img:replace-single-statements-with-block-statements-before}}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[height=1.44in]{src/img/replace-single-statements-with-block-statements-after.png}
+        \caption{Replace single statements with block statements (after) \label{img:replace-single-statements-with-block-statements-after}}
+    \end{minipage}
+\end{figure}
