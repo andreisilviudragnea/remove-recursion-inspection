@@ -108,13 +108,13 @@ class IterativeMethodGenerator {
       return null;
     }
     final String retVarName = nameManager.getRetVarName();
-    if (isNotVoid(returnType)) {
+    if (!Util.isVoid(returnType)) {
       newBody.add(statement(returnType.getPresentableText() + " " + retVarName + "=" + getInitialValue(returnType) + ";"));
     }
 
     final PsiWhileStatement incorporatedWhileStatement = (PsiWhileStatement)newBody.add(whileStatement);
 
-    if (isNotVoid(returnType)) {
+    if (!Util.isVoid(returnType)) {
       newBody.addAfter(statement("return " + retVarName + ";"), incorporatedWhileStatement);
     }
 
@@ -127,10 +127,6 @@ class IterativeMethodGenerator {
       return null;
     }
     return lastBodyStatement.getCodeBlock();
-  }
-
-  private static boolean isNotVoid(@NotNull final PsiType returnType) {
-    return !(returnType instanceof PsiPrimitiveType) || !(PsiPrimitiveType.VOID.equals(returnType));
   }
 
   private void replaceIdentifierWithFrameAccess(@NotNull final PsiMethod method,

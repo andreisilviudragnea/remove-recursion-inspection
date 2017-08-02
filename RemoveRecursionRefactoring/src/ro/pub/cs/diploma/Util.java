@@ -36,4 +36,8 @@ public class Util {
   static String getFrameClassName(@NotNull final String methodName) {
     return Utilities.capitalize(methodName) + Constants.FRAME;
   }
+
+  public static boolean isVoid(@NotNull final PsiType returnType) {
+    return returnType instanceof PsiPrimitiveType && PsiPrimitiveType.VOID.equals(returnType);
+  }
 }

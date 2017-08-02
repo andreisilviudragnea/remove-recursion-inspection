@@ -26,6 +26,13 @@ public class ExtractRecursiveCallsToStatements implements Pass<PsiMethod, List<P
   @Override
   public List<PsiMethodCallExpression> collect(PsiMethod method) {
     final List<PsiMethodCallExpression> calls = new ArrayList<>();
+    final PsiType returnType = method.getReturnType();
+    if (returnType == null) {
+      return calls;
+    }
+    if (Util.isVoid(returnType)) {
+      return calls;
+    }
     method.accept(new JavaRecursiveElementWalkingVisitor() {
       @Override
       public void visitMethodCallExpression(PsiMethodCallExpression expression) {
