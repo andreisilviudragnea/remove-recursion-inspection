@@ -62,7 +62,10 @@ public class ReplaceSingleStatementsWithBlockStatements implements Pass<PsiMetho
   @Override
   public Object transform(List<PsiStatement> statements) {
     statements.forEach(statement -> {
-      if (!(statement instanceof PsiBlockStatement)) {
+      if (statement instanceof PsiEmptyStatement) {
+        statement.replace(myFactory.createExpressionFromText("{}", null));
+      }
+      else if (!(statement instanceof PsiBlockStatement)) {
         statement.replace(myFactory.createStatementFromText("{" + statement.getText() + "}", null));
       }
     });
