@@ -1,0 +1,7 @@
+\section{Extracting recursive calls to statements}
+
+This pass extracts recursive calls in the method body to separate statements (variable declaration statements with the
+initializer as the method call), if the call is not already the initializer of a variable declaration statement or
+an assignment expression having a expression statement as parent. The pass does not affect recursive methods with
+\code{void} return type, because the recursive calls to these methods are already part of a separate expression
+statement.
