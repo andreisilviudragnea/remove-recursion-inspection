@@ -1,8 +1,9 @@
+import java.util.ArrayDeque;
 import java.util.Deque;
 
 class Dependency3 {
     int calculate(int one, int two, int three) {
-        Deque<CalculateFrame> stack = new java.util.ArrayDeque<>();
+        Deque<CalculateFrame> stack = new ArrayDeque<>();
         stack.push(new CalculateFrame(one, two, three));
         int ret = 0;
         while (!stack.isEmpty()) {

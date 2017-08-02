@@ -1,4 +1,4 @@
-package ro.pub.cs.diploma;
+package ro.pub.cs.diploma.inspections;
 
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.openapi.project.Project;
@@ -9,20 +9,22 @@ import com.siyeh.ig.InspectionGadgetsFix;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ro.pub.cs.diploma.passes.RenameVariablesToUniqueNames;
+import ro.pub.cs.diploma.RemoveRecursionBundle;
+import ro.pub.cs.diploma.Util;
+import ro.pub.cs.diploma.passes.ExtractRecursiveCallsToStatements;
 
-public class RenameVariablesToUniqueNamesAndGenerateFrameClassInspection extends BaseInspection {
+public class ExtractRecursiveCallsToStatementsInspection extends BaseInspection {
   @Nls
   @NotNull
   @Override
   public String getDisplayName() {
-    return RemoveRecursionBundle.message("rename.variables.to.unique.names.and.generate.frame.class.display.name");
+    return RemoveRecursionBundle.message("extract.recursive.calls.to.statements.diplay.name");
   }
 
   @NotNull
   @Override
   protected String buildErrorString(Object... infos) {
-    return RemoveRecursionBundle.message("rename.variables.to.unique.names.and.generate.frame.class.problem.descriptor");
+    return RemoveRecursionBundle.message("extract.recursive.calls.to.statements.problem.descriptor");
   }
 
   @Override
@@ -46,15 +48,14 @@ public class RenameVariablesToUniqueNamesAndGenerateFrameClassInspection extends
         if (method == null) {
           return;
         }
-        RenameVariablesToUniqueNames.getInstace(method).apply(method);
-        FrameClassGenerator.addFrameClass(method, NameManager.getInstance(method));
+        ExtractRecursiveCallsToStatements.getInstace(method).apply(method);
       }
 
       @Nls
       @NotNull
       @Override
       public String getFamilyName() {
-        return RemoveRecursionBundle.message("rename.variables.to.unique.names.and.generate.frame.class.quickfix");
+        return RemoveRecursionBundle.message("extract.recursive.calls.to.statements.quickfix");
       }
     };
   }

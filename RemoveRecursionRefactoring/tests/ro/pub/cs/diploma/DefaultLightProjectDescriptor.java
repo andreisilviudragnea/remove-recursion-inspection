@@ -31,7 +31,7 @@ public class DefaultLightProjectDescriptor extends LightProjectDescriptor {
   public void configureModule(@NotNull Module module, @NotNull ModifiableRootModel model, @NotNull ContentEntry contentEntry) {
     LanguageLevelModuleExtension extension = model.getModuleExtension(LanguageLevelModuleExtension.class);
     if (extension != null) {
-      extension.setLanguageLevel(LanguageLevel.HIGHEST);
+      extension.setLanguageLevel(LanguageLevel.JDK_1_8);
     }
   }
 }

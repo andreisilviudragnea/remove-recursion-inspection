@@ -6,8 +6,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-class FrameClassGenerator {
-  static void addFrameClass(@NotNull final PsiMethod method, @NotNull final NameManager nameManager) {
+public class FrameClassGenerator {
+  public static void addFrameClass(@NotNull final PsiMethod method, @NotNull final NameManager nameManager) {
     final PsiElementFactory factory = Util.getFactory(method);
     final String frameClassName = nameManager.getFrameClassName();
     final PsiClass frameClass = factory.createClass(frameClassName);

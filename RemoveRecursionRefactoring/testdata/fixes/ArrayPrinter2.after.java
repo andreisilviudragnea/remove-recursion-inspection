@@ -1,3 +1,4 @@
+import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 
@@ -9,7 +10,7 @@ class ArrayPrinter2 {
     }
 
     void displayArray(int first, int last, List<Integer> result) {
-        Deque<DisplayArrayFrame> stack = new java.util.ArrayDeque<>();
+        Deque<DisplayArrayFrame> stack = new ArrayDeque<>();
         stack.push(new DisplayArrayFrame(first, last, result));
         while (!stack.isEmpty()) {
             DisplayArrayFrame frame = stack.peek();

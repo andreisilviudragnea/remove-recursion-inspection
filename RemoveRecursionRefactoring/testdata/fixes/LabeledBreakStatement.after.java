@@ -1,10 +1,11 @@
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
 public class LabeledBreakStatement {
     static void labeledBreakStatement(int iter, List<Integer> list) {
-        Deque<LabeledBreakStatementFrame> stack = new java.util.ArrayDeque<>();
+        Deque<LabeledBreakStatementFrame> stack = new ArrayDeque<>();
         stack.push(new LabeledBreakStatementFrame(iter, list));
         while (!stack.isEmpty()) {
             LabeledBreakStatementFrame frame = stack.peek();

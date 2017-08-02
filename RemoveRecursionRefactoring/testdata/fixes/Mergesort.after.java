@@ -1,3 +1,4 @@
+import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class Mergesort {
@@ -14,7 +15,7 @@ public class Mergesort {
     }
 
     private void mergesort(int low, int high) {
-        Deque<MergesortFrame> stack = new java.util.ArrayDeque<>();
+        Deque<MergesortFrame> stack = new ArrayDeque<>();
         stack.push(new MergesortFrame(low, high));
         while (!stack.isEmpty()) {
             MergesortFrame frame = stack.peek();

@@ -1,3 +1,4 @@
+import java.util.ArrayDeque;
 import java.util.Deque;
 
 class Dependency1 {
@@ -6,7 +7,7 @@ class Dependency1 {
     }
 
     private int factorial(int val, int runningVal) {
-        Deque<FactorialFrame> stack = new java.util.ArrayDeque<>();
+        Deque<FactorialFrame> stack = new ArrayDeque<>();
         stack.push(new FactorialFrame(val, runningVal));
         int ret = 0;
         while (!stack.isEmpty()) {

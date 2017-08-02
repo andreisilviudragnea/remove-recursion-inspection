@@ -17,7 +17,7 @@ public class NameManager {
   @Nullable private String retVarName;
 
   @NotNull
-  static NameManager getInstance(@NotNull final PsiMethod method) {
+  public static NameManager getInstance(@NotNull final PsiMethod method) {
     return new NameManager(method);
   }
 

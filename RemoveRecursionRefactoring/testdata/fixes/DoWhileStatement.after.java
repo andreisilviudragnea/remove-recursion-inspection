@@ -1,10 +1,11 @@
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
 public class DoWhileStatement {
     static void doWhileStatement(int iter, List<Integer> list) {
-        Deque<DoWhileStatementFrame> stack = new java.util.ArrayDeque<>();
+        Deque<DoWhileStatementFrame> stack = new ArrayDeque<>();
         stack.push(new DoWhileStatementFrame(iter, list));
         while (!stack.isEmpty()) {
             DoWhileStatementFrame frame = stack.peek();

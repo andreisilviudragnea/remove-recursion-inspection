@@ -1,8 +1,9 @@
+import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class Fib1 {
     static int fib1(int n) {
-        Deque<Fib1Frame> stack = new java.util.ArrayDeque<>();
+        Deque<Fib1Frame> stack = new ArrayDeque<>();
         stack.push(new Fib1Frame(n));
         int ret = 0;
         while (!stack.isEmpty()) {

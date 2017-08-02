@@ -1,10 +1,11 @@
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
 public class ForeachArray {
     static void recursive(int n, List<Integer> result) {
-        Deque<RecursiveFrame> stack = new java.util.ArrayDeque<>();
+        Deque<RecursiveFrame> stack = new ArrayDeque<>();
         stack.push(new RecursiveFrame(n, result));
         while (!stack.isEmpty()) {
             RecursiveFrame frame = stack.peek();

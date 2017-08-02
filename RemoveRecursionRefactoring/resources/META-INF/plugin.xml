@@ -35,12 +35,17 @@
                      bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="rename.variables.to.unique.names.and.generate.frame.class.display.name"
                      groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"
                      enabledByDefault="true" level="WARNING"
-                     implementationClass="ro.pub.cs.diploma.RenameVariablesToUniqueNamesAndGenerateFrameClassInspection"/>
+                     implementationClass="ro.pub.cs.diploma.inspections.RenameVariablesToUniqueNamesAndGenerateFrameClassInspection"/>
     <localInspection groupPath="Java" language="JAVA" shortName="ReplaceSingleStatementsWithBlockStatements"
                      bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="replace.single.statements.with.block.statements.diplay.name"
                      groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"
                      enabledByDefault="true" level="WARNING"
                      implementationClass="ro.pub.cs.diploma.inspections.ReplaceSingleStatementsWithBlockStatementsInspection"/>
+    <localInspection groupPath="Java" language="JAVA" shortName="ExtractRecursiveCallsToStatements"
+                     bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="extract.recursive.calls.to.statements.diplay.name"
+                     groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"
+                     enabledByDefault="true" level="WARNING"
+                     implementationClass="ro.pub.cs.diploma.inspections.ExtractRecursiveCallsToStatementsInspection"/>
   </extensions>
 
   <actions>

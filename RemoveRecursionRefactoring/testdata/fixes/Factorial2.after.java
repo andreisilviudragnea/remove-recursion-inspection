@@ -1,8 +1,9 @@
+import java.util.ArrayDeque;
 import java.util.Deque;
 
 class Factorial2 {
     static int factorial2(int n) {
-        Deque<Factorial2Frame> stack = new java.util.ArrayDeque<>();
+        Deque<Factorial2Frame> stack = new ArrayDeque<>();
         stack.push(new Factorial2Frame(n));
         int ret = 0;
         while (!stack.isEmpty()) {

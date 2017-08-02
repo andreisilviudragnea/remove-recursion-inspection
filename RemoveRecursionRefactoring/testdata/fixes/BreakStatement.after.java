@@ -1,10 +1,11 @@
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
 public class BreakStatement {
     static void breakStatement(int iter, List<Integer> list) {
-        Deque<BreakStatementFrame> stack = new java.util.ArrayDeque<>();
+        Deque<BreakStatementFrame> stack = new ArrayDeque<>();
         stack.push(new BreakStatementFrame(iter, list));
         while (!stack.isEmpty()) {
             BreakStatementFrame frame = stack.peek();

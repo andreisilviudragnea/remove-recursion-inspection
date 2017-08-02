@@ -10,12 +10,7 @@
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Stack;
+import java.util.*;
 
 public class P1 {
 
@@ -50,7 +45,7 @@ public class P1 {
      */
 
     private static void dfsCTC(Graph g, Node node) {
-        Deque<DfsCTCFrame> stack = new java.util.ArrayDeque<>();
+        Deque<DfsCTCFrame> stack = new ArrayDeque<>();
         stack.push(new DfsCTCFrame(g, node));
         while (!stack.isEmpty()) {
             DfsCTCFrame frame = stack.peek();

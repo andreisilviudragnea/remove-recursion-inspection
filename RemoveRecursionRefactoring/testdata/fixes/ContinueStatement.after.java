@@ -1,10 +1,11 @@
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
 public class ContinueStatement {
     static void cont(int iter, List<Integer> list) {
-        Deque<ContFrame> stack = new java.util.ArrayDeque<>();
+        Deque<ContFrame> stack = new ArrayDeque<>();
         stack.push(new ContFrame(iter, list));
         while (!stack.isEmpty()) {
             ContFrame frame = stack.peek();

@@ -1,12 +1,13 @@
 import com.sun.istack.internal.NotNull;
 
+import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Set;
 
 class Dependency2 {
 
     public static boolean intersect(@NotNull Set<String> ids1, @NotNull Set<String> ids2) {
-        Deque<IntersectFrame> stack = new java.util.ArrayDeque<>();
+        Deque<IntersectFrame> stack = new ArrayDeque<>();
         stack.push(new IntersectFrame(ids1, ids2));
         boolean ret = false;
         while (!stack.isEmpty()) {

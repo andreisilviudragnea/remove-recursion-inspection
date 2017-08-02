@@ -1,3 +1,4 @@
+import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class NameClash {
@@ -8,7 +9,7 @@ public class NameClash {
     }
 
     void nameClash(int frame, int stack) {
-        Deque<NameClashFrame> stack1 = new java.util.ArrayDeque<>();
+        Deque<NameClashFrame> stack1 = new ArrayDeque<>();
         stack1.push(new NameClashFrame(frame, stack));
         while (!stack1.isEmpty()) {
             NameClashFrame frame1 = stack1.peek();
