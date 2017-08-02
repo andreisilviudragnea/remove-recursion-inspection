@@ -40,12 +40,6 @@
 
   <actions>
     <!-- Add your actions here -->
-    <action id="ro.pub.cs.diploma.RemoveRecursionRefactoringAction"
-            class="ro.pub.cs.diploma.RemoveRecursionRefactoringAction" text="Remove Recursion"
-            description="Remove Recursion Refactoring">
-      <add-to-group group-id="RefactoringMenu" anchor="last"/>
-      <keyboard-shortcut keymap="$default" first-keystroke="ctrl R" second-keystroke="R"/>
-    </action>
   </actions>
 
 </idea-plugin>

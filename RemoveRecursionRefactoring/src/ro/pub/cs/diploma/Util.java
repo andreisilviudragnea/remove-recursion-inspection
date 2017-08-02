@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-class Util {
+public class Util {
   private Util() {
   }
 
@@ -17,12 +17,12 @@ class Util {
   }
 
   @NotNull
-  static PsiElementFactory getFactory(@NotNull final PsiElement element) {
+  public static PsiElementFactory getFactory(@NotNull final PsiElement element) {
     return JavaPsiFacade.getElementFactory(element.getProject());
   }
 
   @NotNull
-  static JavaCodeStyleManager getStyleManager(@NotNull final PsiElement element) {
+  public static JavaCodeStyleManager getStyleManager(@NotNull final PsiElement element) {
     return JavaCodeStyleManager.getInstance(element.getProject());
   }
 

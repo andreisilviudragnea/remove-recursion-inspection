@@ -9,6 +9,7 @@ import com.siyeh.ig.InspectionGadgetsFix;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ro.pub.cs.diploma.passes.RenameVariablesToUniqueNames;
 
 public class RenameVariablesToUniqueNamesAndGenerateFrameClassInspection extends BaseInspection {
   @Nls
@@ -45,7 +46,7 @@ public class RenameVariablesToUniqueNamesAndGenerateFrameClassInspection extends
         if (method == null) {
           return;
         }
-        Passes.renameVariablesToUniqueNames(method);
+        RenameVariablesToUniqueNames.getInstace(method).apply(method);
         FrameClassGenerator.addFrameClass(method, NameManager.getInstance(method));
       }
 

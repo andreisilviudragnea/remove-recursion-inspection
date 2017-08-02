@@ -1,82 +1,30 @@
 package ro.pub.cs.diploma;
 
 import com.intellij.psi.*;
-import com.intellij.psi.codeStyle.JavaCodeStyleManager;
-import com.intellij.psi.search.LocalSearchScope;
 import com.intellij.refactoring.util.RefactoringUtil;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-class Passes {
-  /**
-   * Rename all the variables (parameters and local variables) to unique names at method level (if necessary),
-   * in order to avoid name clashes when generating the Frame class.
-   */
-  static void renameVariablesToUniqueNames(@NotNull final PsiMethod method) {
-    final Map<String, Map<PsiType, List<PsiVariable>>> names = new LinkedHashMap<>();
+public class Passes {
+
+  @NotNull
+  public static List<PsiForeachStatement> getPsiForEachStatements(PsiMethod method) {
+    final List<PsiForeachStatement> statements = new ArrayList<>();
     method.accept(new JavaRecursiveElementVisitor() {
-      private void processVariable(PsiVariable variable) {
-        final String name = variable.getName();
-        if (name == null) {
-          return;
-        }
-        if (!names.containsKey(name)) {
-          names.put(name, new LinkedHashMap<>());
-        }
-        final Map<PsiType, List<PsiVariable>> typesMap = names.get(name);
-        final PsiType type = variable.getType();
-        if (!typesMap.containsKey(type)) {
-          typesMap.put(type, new ArrayList<>());
-        }
-        final List<PsiVariable> variables = typesMap.get(type);
-        variables.add(variable);
-      }
-
       @Override
-      public void visitParameter(PsiParameter parameter) {
-        if (RecursionUtil.hasToBeSavedOnStack(parameter, method)) {
-          processVariable(parameter);
+      public void visitForeachStatement(PsiForeachStatement statement) {
+        super.visitForeachStatement(statement);
+        if (RecursionUtil.containsRecursiveCalls(statement, method)) {
+          statements.add(statement);
         }
-      }
-
-      @Override
-      public void visitLocalVariable(PsiLocalVariable variable) {
-        if (RecursionUtil.hasToBeSavedOnStack(variable, method)) {
-          processVariable(variable);
-        }
-      }
-
-      @Override
-      public void visitClass(PsiClass aClass) {
-      }
-
-      @Override
-      public void visitLambdaExpression(PsiLambdaExpression expression) {
       }
     });
-    final JavaCodeStyleManager styleManager = Util.getStyleManager(method);
-    for (final Map.Entry<String, Map<PsiType, List<PsiVariable>>> entry : names.entrySet()) {
-      final Map<PsiType, List<PsiVariable>> typesMap = entry.getValue();
-      if (typesMap.size() <= 1) {
-        continue;
-      }
-      boolean first = true;
-      for (final List<PsiVariable> variables : typesMap.values()) {
-        if (first) {
-          first = false;
-          continue;
-        }
-        final String oldName = entry.getKey();
-        final String newName = styleManager.suggestUniqueVariableName(oldName, method, true);
-        for (final PsiVariable variable : variables) {
-          RefactoringUtil.renameVariableReferences(variable, newName, new LocalSearchScope(method));
-          variable.setName(newName);
-        }
-      }
-    }
+    return statements;
   }
 
   private static Stream<String> getVariablesStream(@NotNull final PsiDeclarationStatement statement, @NotNull final String frameVarName) {

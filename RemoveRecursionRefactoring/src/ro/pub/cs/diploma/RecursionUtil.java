@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-class RecursionUtil {
+public class RecursionUtil {
   private RecursionUtil() {
 
   }
@@ -23,7 +23,7 @@ class RecursionUtil {
    * @see com.siyeh.ig.psiutils.RecursionUtils
    * @see com.siyeh.ig.psiutils.RecursionVisitor
    */
-  static boolean isRecursive(@NotNull final PsiMethodCallExpression expression, @NotNull final PsiMethod method) {
+  public static boolean isRecursive(@NotNull final PsiMethodCallExpression expression, @NotNull final PsiMethod method) {
     final PsiReferenceExpression methodExpression = expression.getMethodExpression();
     if (!method.getName().equals(methodExpression.getReferenceName())) {
       return false;
@@ -86,7 +86,7 @@ class RecursionUtil {
     return elements;
   }
 
-  static boolean hasToBeSavedOnStack(@NotNull final PsiParameter parameter, @NotNull final PsiMethod method) {
+  public static boolean hasToBeSavedOnStack(@NotNull final PsiParameter parameter, @NotNull final PsiMethod method) {
     for (PsiElement element : getElementsInScope(parameter)) {
       if (containsRecursiveCalls(element, method)) {
         return true;
@@ -152,7 +152,7 @@ class RecursionUtil {
     return elements;
   }
 
-  static boolean hasToBeSavedOnStack(@NotNull final PsiLocalVariable variable, @NotNull final PsiMethod method) {
+  public static boolean hasToBeSavedOnStack(@NotNull final PsiLocalVariable variable, @NotNull final PsiMethod method) {
     for (PsiElement element : getElementsInScope(variable)) {
       if (containsRecursiveCalls(element, method)) {
         return true;

@@ -10,12 +10,12 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-class Refactorings {
+public class Refactorings {
 
   /**
    * @see com.siyeh.ipp.forloop.ReplaceForEachLoopWithIteratorForLoopIntention#processIntention(PsiElement)
    */
-  static void replaceForEachLoopWithIteratorForLoop(PsiForeachStatement statement, PsiMethod method) {
+  public static void replaceForEachLoopWithIteratorForLoop(PsiForeachStatement statement, PsiMethod method) {
     final PsiExpression iteratedValue = statement.getIteratedValue();
     if (iteratedValue == null) {
       return;
@@ -75,7 +75,7 @@ class Refactorings {
   /**
    * @see com.siyeh.ipp.forloop.ReplaceForEachLoopWithIndexedForLoopIntention#processIntention(PsiElement)
    */
-  static void replaceForEachLoopWithIndexedForLoop(PsiForeachStatement statement, PsiMethod method) {
+  public static void replaceForEachLoopWithIndexedForLoop(PsiForeachStatement statement, PsiMethod method) {
     final PsiExpression iteratedValue = statement.getIteratedValue();
     if (iteratedValue == null) {
       return;
