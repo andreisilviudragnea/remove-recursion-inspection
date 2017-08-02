@@ -1,0 +1,10 @@
+\section{Replacing single statements with block statements}
+
+Given the fact that Java allows some statements to appear outside of a block, they may cause problems in later steps of
+the algorithm when processing the statements of a block. For example, if a new statement needs to be added before or
+after another statement which is not part of a block, the initial statement needs to be first enclosed in a block, in
+which the other statement will be added at the right place. The places where this pass is applied are the branches of
+\code{if} statements and the bodies of \code{for}, \code{while}, \code{do-while} and \code{foreach} statements
+which contain single statements. This pass also transforms statements which may not contain recursive calls, because
+there are elements which the refactoring will alter in order to remove recursion and they are not only method calls (for
+example, \code{return} statements).

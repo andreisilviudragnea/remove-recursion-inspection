@@ -34,8 +34,22 @@ body. In other words, a compile-time error occurs for the program in
 \labelindexref{Figure}{img:attempted-shadowing-of-a-local-variable}, but not for the program in
 \labelindexref{Figure}{img:no-shadow}.
 
-\fig[width=4in]{src/img/attempted-shadowing-of-a-local-variable.png}{img:attempted-shadowing-of-a-local-variable}{Attempted shadowing of a local variable}
-\fig[width=4in]{src/img/no-shadow.png}{img:no-shadow}{Two non-overlapping scopes}
+%\fig[width=4in]{src/img/attempted-shadowing-of-a-local-variable.png}{img:attempted-shadowing-of-a-local-variable}{Attempted shadowing of a local variable}
+%\fig[width=4in]{src/img/no-shadow.png}{img:no-shadow}{Two non-overlapping scopes}
+\begin{figure}[htb]
+    \centering
+    \begin{minipage}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{src/img/attempted-shadowing-of-a-local-variable.png}
+        \caption{Attempted shadowing of a local variable \label{img:attempted-shadowing-of-a-local-variable}}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{src/img/no-shadow.png}
+        \caption{Two non-overlapping scopes \label{img:no-shadow}}
+    \end{minipage}
+\end{figure}
 
 In the second example, it also means that the storage for the first \code{i} variable can be reused as the storage for
 the second \code{i} variable, thus reducing the number of fields in the generated frame class, as at any moment during
