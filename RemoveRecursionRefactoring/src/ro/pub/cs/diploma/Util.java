@@ -27,7 +27,7 @@ public class Util {
   }
 
   @Nullable
-  static PsiMethod getContainingMethod(@NotNull final PsiElement element) {
+  public static PsiMethod getContainingMethod(@NotNull final PsiElement element) {
     return PsiTreeUtil.getParentOfType(element, PsiMethod.class, true, PsiClass.class, PsiLambdaExpression.class);
   }
 

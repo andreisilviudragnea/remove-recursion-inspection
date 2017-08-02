@@ -36,6 +36,11 @@
                      groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"
                      enabledByDefault="true" level="WARNING"
                      implementationClass="ro.pub.cs.diploma.RenameVariablesToUniqueNamesAndGenerateFrameClassInspection"/>
+    <localInspection groupPath="Java" language="JAVA" shortName="ReplaceSingleStatementsWithBlockStatements"
+                     bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="replace.single.statements.with.block.statements.diplay.name"
+                     groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"
+                     enabledByDefault="true" level="WARNING"
+                     implementationClass="ro.pub.cs.diploma.inspections.ReplaceSingleStatementsWithBlockStatementsInspection"/>
   </extensions>
 
   <actions>
