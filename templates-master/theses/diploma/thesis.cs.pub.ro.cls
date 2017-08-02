@@ -251,4 +251,6 @@
 % mathematical formulas
 \usepackage{amsmath}
 
+\usepackage[bottom]{footmisc}
+
 \def\code#1{\texttt{#1}}
