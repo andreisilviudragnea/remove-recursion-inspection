@@ -104,8 +104,8 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
 
   @Override
   public void visitMethodCallExpression(PsiMethodCallExpression expression) {
-    addStatement(IterativeMethodGenerator.createPushStatement(factory, nameManager.getFrameClassName(), nameManager.getStackVarName(),
-                                                              expression.getArgumentList().getExpressions(), PsiElement::getText));
+    addStatement(Util.createPushStatement(factory, nameManager.getFrameClassName(), nameManager.getStackVarName(),
+                                          expression.getArgumentList().getExpressions(), PsiElement::getText));
 
     final Block block = newBlock();
     block.setAfterRecursiveCall(true);

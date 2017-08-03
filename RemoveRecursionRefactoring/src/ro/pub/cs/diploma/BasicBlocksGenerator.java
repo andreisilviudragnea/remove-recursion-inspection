@@ -258,7 +258,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
 
   @Override
   public void visitMethodCallExpression(PsiMethodCallExpression expression) {
-    currentPair.block.add(IterativeMethodGenerator.createPushStatement(
+    currentPair.block.add(Util.createPushStatement(
       factory, frameClassName, stackVarName, expression.getArgumentList().getExpressions(), PsiElement::getText));
     final Pair newPair = newPair();
     createJump(newPair);

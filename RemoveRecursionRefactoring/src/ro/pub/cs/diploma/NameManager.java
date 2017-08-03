@@ -59,7 +59,7 @@ public class NameManager {
   }
 
   @NotNull
-  String getStackVarName() {
+  public String getStackVarName() {
     if (stackVarName == null) {
       stackVarName = getName(Constants.STACK_VAR_NAME);
     }
@@ -67,7 +67,7 @@ public class NameManager {
   }
 
   @NotNull
-  String getRetVarName() {
+  public String getRetVarName() {
     if (retVarName == null) {
       retVarName = getName(Constants.RET_VAR_NAME);
     }

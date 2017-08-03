@@ -7,6 +7,10 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 public class Util {
   private Util() {
   }
@@ -39,5 +43,15 @@ public class Util {
 
   public static boolean isVoid(@NotNull final PsiType returnType) {
     return returnType instanceof PsiPrimitiveType && PsiPrimitiveType.VOID.equals(returnType);
+  }
+
+  @NotNull
+  public static <T extends PsiElement> PsiStatement createPushStatement(@NotNull final PsiElementFactory factory,
+                                                                        @NotNull final String frameClassName,
+                                                                        @NotNull final String stackVarName,
+                                                                        @NotNull final T[] arguments,
+                                                                        @NotNull final Function<T, String> function) {
+    final String argumentsString = Arrays.stream(arguments).map(function).collect(Collectors.joining(","));
+    return factory.createStatementFromText(stackVarName + ".push(new " + frameClassName + "(" + argumentsString + "));", null);
   }
 }

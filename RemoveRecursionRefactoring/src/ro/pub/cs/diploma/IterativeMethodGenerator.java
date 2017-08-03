@@ -7,16 +7,13 @@ import com.intellij.psi.search.LocalSearchScope;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ro.pub.cs.diploma.passes.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
-class IterativeMethodGenerator {
+public class IterativeMethodGenerator {
   @NotNull private final PsiElementFactory myFactory;
   @NotNull private final JavaCodeStyleManager myStyleManager;
   @NotNull private final PsiMethod myMethod;
@@ -61,7 +58,7 @@ class IterativeMethodGenerator {
 
     AddFrameClass.getInstance(myMethod, myNameManager).apply(myMethod);
 
-    final PsiCodeBlock incorporatedBody = incorporateBody(myMethod, myNameManager);
+    final PsiCodeBlock incorporatedBody = IncorporateBody.getInstance(myNameManager, myFactory, myStyleManager).apply(myMethod);
     if (incorporatedBody == null) {
       return;
     }
@@ -82,53 +79,6 @@ class IterativeMethodGenerator {
     incorporatedBody.replace(statement(
       (atLeastOneLabeledBreak.get() ? myNameManager.getSwitchLabelName() + ":" : "") +
       "switch(" + myNameManager.getFrameVarName() + "." + myNameManager.getBlockFieldName() + "){" + casesString + "}"));
-  }
-
-  @Nullable
-  private PsiCodeBlock incorporateBody(@NotNull final PsiMethod method,
-                                       @NotNull final NameManager nameManager) {
-    final PsiCodeBlock body = method.getBody();
-    if (body == null) {
-      return null;
-    }
-    final String stackVarName = nameManager.getStackVarName();
-    final String frameClassName = nameManager.getFrameClassName();
-    final PsiWhileStatement whileStatement = (PsiWhileStatement)statement(
-      "while(!" + stackVarName + ".isEmpty()){" +
-      frameClassName + " " + nameManager.getFrameVarName() + "=" + stackVarName + ".peek();" + body.getText() + "}");
-
-    final PsiCodeBlock newBody = (PsiCodeBlock)body.replace(myFactory.createCodeBlock());
-
-    newBody.add(myStyleManager.shortenClassReferences(statement(
-      "java.util.Deque<" + frameClassName + "> " + stackVarName + " = new java.util.ArrayDeque<>();")));
-    newBody
-      .add(
-        createPushStatement(myFactory, frameClassName, stackVarName, method.getParameterList().getParameters(), PsiNamedElement::getName));
-    final PsiType returnType = method.getReturnType();
-    if (returnType == null) {
-      return null;
-    }
-    final String retVarName = nameManager.getRetVarName();
-    if (!Util.isVoid(returnType)) {
-      newBody.add(myStyleManager.shortenClassReferences(
-        statement(returnType.getCanonicalText() + " " + retVarName + "=" + getInitialValue(returnType) + ";")));
-    }
-
-    final PsiWhileStatement incorporatedWhileStatement = (PsiWhileStatement)newBody.add(whileStatement);
-
-    if (!Util.isVoid(returnType)) {
-      newBody.addAfter(statement("return " + retVarName + ";"), incorporatedWhileStatement);
-    }
-
-    final PsiBlockStatement whileStatementBody = (PsiBlockStatement)incorporatedWhileStatement.getBody();
-    if (whileStatementBody == null) {
-      return null;
-    }
-    final PsiBlockStatement lastBodyStatement = (PsiBlockStatement)whileStatementBody.getCodeBlock().getLastBodyElement();
-    if (lastBodyStatement == null) {
-      return null;
-    }
-    return lastBodyStatement.getCodeBlock();
   }
 
   private void replaceIdentifierWithFrameAccess(@NotNull final PsiMethod method,
@@ -194,44 +144,5 @@ class IterativeMethodGenerator {
 
       statement.delete();
     }
-  }
-
-  @NotNull
-  private static String getInitialValue(@NotNull final PsiType type) {
-    if (PsiPrimitiveType.BYTE.equals(type)) {
-      return "(byte) 0";
-    }
-    if (PsiPrimitiveType.SHORT.equals(type)) {
-      return "(short) 0";
-    }
-    if (PsiPrimitiveType.INT.equals(type)) {
-      return "0";
-    }
-    if (PsiPrimitiveType.LONG.equals(type)) {
-      return "0L";
-    }
-    if (PsiPrimitiveType.FLOAT.equals(type)) {
-      return "0.0f";
-    }
-    if (PsiPrimitiveType.DOUBLE.equals(type)) {
-      return "0.0d";
-    }
-    if (PsiPrimitiveType.CHAR.equals(type)) {
-      return "'\u0000'";
-    }
-    if (PsiPrimitiveType.BOOLEAN.equals(type)) {
-      return "false";
-    }
-    return "null";
-  }
-
-  @NotNull
-  static <T extends PsiElement> PsiStatement createPushStatement(@NotNull final PsiElementFactory factory,
-                                                                 @NotNull final String frameClassName,
-                                                                 @NotNull final String stackVarName,
-                                                                 @NotNull final T[] arguments,
-                                                                 @NotNull final Function<T, String> function) {
-    final String argumentsString = Arrays.stream(arguments).map(function).collect(Collectors.joining(","));
-    return factory.createStatementFromText(stackVarName + ".push(new " + frameClassName + "(" + argumentsString + "));", null);
   }
 }
