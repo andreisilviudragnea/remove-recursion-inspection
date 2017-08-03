@@ -240,7 +240,7 @@
 \usepackage{multicol}
 
 % suport for subfloats
-\usepackage{subfig}
+%\usepackage{subfig}
 
 % booktabs (professional tables)
 \usepackage{booktabs}
@@ -252,5 +252,7 @@
 \usepackage{amsmath}
 
 \usepackage[bottom]{footmisc}
+
+\usepackage{subcaption}
 
 \def\code#1{\texttt{#1}}

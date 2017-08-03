@@ -20,6 +20,29 @@ after another pass. Until they are initialized in the method body, they will hav
 that the method compiles without errors before the refactoring, there will not be any problems involving using
 uninitialized local variables.
 
-There is an aditional \code{int} field named \code{block} in the frame class, which will represent the index of the
+There is an additional \code{int} field named \code{block} in the frame class, which will represent the index of the
 block of code to which the method will jump when returning from the callee to continue executing the statements in the
 caller after the recursive call.
+
+An example of a frame class in provided in \labelindexref{Figure}{img:add-frame-class}.
+The frame class contains the formal parameters of the method as fields. The field \code{iterator} has been generated
+because the \code{foreach} loop has been converted to a \code{for} loop, since it contains a recursive call. It can also
+be seen that the variable \code{n} gets added only once, even though it is declared twice in different scopes in the
+method body. The local variable \code{ctc} does not have a corresponding field in the frame class because its scope does
+not include a recursive call. Finally, the \code{block} field is added to the fields of the frame class.
+
+\begin{figure}[htb]
+    \makebox[\linewidth][c]{%
+    \begin{subfigure}[b]{.6\textwidth}
+        \centering
+        \includegraphics[height=2in]{src/img/add-frame-class-before.png}
+        \caption{Before}
+    \end{subfigure}%
+    \begin{subfigure}[b]{.6\textwidth}
+        \centering
+        \includegraphics[height=3.03in]{src/img/add-frame-class-after.png}
+        \caption{After}
+    \end{subfigure}%
+    }\\
+    \caption{Adding the frame class \label{img:add-frame-class}}
+\end{figure}
