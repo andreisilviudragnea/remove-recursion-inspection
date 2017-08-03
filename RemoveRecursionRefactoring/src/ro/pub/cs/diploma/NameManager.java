@@ -33,7 +33,7 @@ public class NameManager {
   }
 
   @NotNull
-  String getFrameClassName() {
+  public String getFrameClassName() {
     return frameClassName;
   }
 

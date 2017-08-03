@@ -20,20 +20,23 @@ class IterativeMethodGenerator {
   @NotNull private final PsiElementFactory myFactory;
   @NotNull private final JavaCodeStyleManager myStyleManager;
   @NotNull private final PsiMethod myMethod;
+  @NotNull private final NameManager myNameManager;
 
   private IterativeMethodGenerator(@NotNull PsiElementFactory factory,
                                    @NotNull JavaCodeStyleManager styleManager,
-                                   @NotNull PsiMethod method) {
+                                   @NotNull PsiMethod method, @NotNull NameManager nameManager) {
     myFactory = factory;
     myStyleManager = styleManager;
     myMethod = method;
+    myNameManager = nameManager;
   }
 
   @NotNull
   static IterativeMethodGenerator getInstance(@NotNull final PsiElementFactory factory,
                                               @NotNull final JavaCodeStyleManager styleManager,
-                                              @NotNull final PsiMethod method) {
-    return new IterativeMethodGenerator(factory, styleManager, method);
+                                              @NotNull final PsiMethod method,
+                                              @NotNull final NameManager nameManager) {
+    return new IterativeMethodGenerator(factory, styleManager, method, nameManager);
   }
 
   @NotNull
@@ -56,31 +59,29 @@ class IterativeMethodGenerator {
 
     ExtractRecursiveCallsToStatements.getInstance(myMethod).apply(myMethod);
 
-    final NameManager nameManager = NameManager.getInstance(myMethod);
+    AddFrameClass.getInstance(myMethod, myNameManager).apply(myMethod);
 
-    FrameClassGenerator.addFrameClass(myMethod, nameManager);
-
-    final PsiCodeBlock incorporatedBody = incorporateBody(myMethod, nameManager);
+    final PsiCodeBlock incorporatedBody = incorporateBody(myMethod, myNameManager);
     if (incorporatedBody == null) {
       return;
     }
 
-    replaceIdentifierWithFrameAccess(myMethod, incorporatedBody, nameManager);
-    Passes.replaceDeclarationsWithInitializersWithAssignments(myMethod, incorporatedBody, nameManager);
+    replaceIdentifierWithFrameAccess(myMethod, incorporatedBody, myNameManager);
+    Passes.replaceDeclarationsWithInitializersWithAssignments(myMethod, incorporatedBody, myNameManager);
 
-    final BasicBlocksGenerator2 basicBlocksGenerator = new BasicBlocksGenerator2(myMethod, nameManager);
+    final BasicBlocksGenerator2 basicBlocksGenerator = new BasicBlocksGenerator2(myMethod, myNameManager);
     incorporatedBody.accept(basicBlocksGenerator);
     final List<BasicBlocksGenerator2.Pair> pairs = basicBlocksGenerator.getBlocks();
 
     final Ref<Boolean> atLeastOneLabeledBreak = new Ref<>(false);
-    pairs.forEach(pair -> replaceReturnStatements(pair.getBlock(), nameManager, atLeastOneLabeledBreak));
+    pairs.forEach(pair -> replaceReturnStatements(pair.getBlock(), myNameManager, atLeastOneLabeledBreak));
 
     final String casesString = pairs.stream().map(pair -> "case " + pair.getId() + ":" + pair.getBlock().getText())
       .collect(Collectors.joining(""));
 
     incorporatedBody.replace(statement(
-      (atLeastOneLabeledBreak.get() ? nameManager.getSwitchLabelName() + ":" : "") +
-      "switch(" + nameManager.getFrameVarName() + "." + nameManager.getBlockFieldName() + "){" + casesString + "}"));
+      (atLeastOneLabeledBreak.get() ? myNameManager.getSwitchLabelName() + ":" : "") +
+      "switch(" + myNameManager.getFrameVarName() + "." + myNameManager.getBlockFieldName() + "){" + casesString + "}"));
   }
 
   @Nullable

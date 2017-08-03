@@ -9,10 +9,10 @@ import com.siyeh.ig.InspectionGadgetsFix;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ro.pub.cs.diploma.FrameClassGenerator;
 import ro.pub.cs.diploma.NameManager;
 import ro.pub.cs.diploma.RemoveRecursionBundle;
 import ro.pub.cs.diploma.Util;
+import ro.pub.cs.diploma.passes.AddFrameClass;
 import ro.pub.cs.diploma.passes.RenameVariablesToUniqueNames;
 
 public class RenameVariablesToUniqueNamesAndGenerateFrameClassInspection extends BaseInspection {
@@ -51,7 +51,7 @@ public class RenameVariablesToUniqueNamesAndGenerateFrameClassInspection extends
           return;
         }
         RenameVariablesToUniqueNames.getInstance(method).apply(method);
-        FrameClassGenerator.addFrameClass(method, NameManager.getInstance(method));
+        AddFrameClass.getInstance(method, NameManager.getInstance(method)).apply(method);
       }
 
       @Nls
