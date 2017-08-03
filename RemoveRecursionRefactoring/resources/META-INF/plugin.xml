@@ -51,6 +51,11 @@
                      groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"
                      enabledByDefault="true" level="WARNING"
                      implementationClass="ro.pub.cs.diploma.inspections.ExtractRecursiveCallsToStatementsInspection"/>
+    <localInspection groupPath="Java" language="JAVA" shortName="IncorporateBody"
+                     bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="incorporate.body.diplay.name"
+                     groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"
+                     enabledByDefault="true" level="WARNING"
+                     implementationClass="ro.pub.cs.diploma.inspections.IncorporateBodyInspection"/>
   </extensions>
 
   <actions>
