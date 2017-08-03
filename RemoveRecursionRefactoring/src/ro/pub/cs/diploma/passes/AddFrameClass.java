@@ -29,22 +29,19 @@ public class AddFrameClass implements Pass<PsiMethod, Map<String, PsiVariable>, 
     final Map<String, PsiVariable> variables = new LinkedHashMap<>();
     method.accept(new JavaRecursiveElementVisitor() {
       private void processVariable(PsiVariable variable) {
-        final String name = variable.getName();
-        if (!variables.containsKey(name)) {
-          variables.put(name, variable);
-        }
+        variables.put(variable.getName(), variable);
       }
 
       @Override
       public void visitParameter(PsiParameter parameter) {
-        if (RecursionUtil.hasToBeSavedOnStack(parameter, method)) {
+        if (!variables.containsKey(parameter.getName()) && RecursionUtil.hasToBeSavedOnStack(parameter, method)) {
           processVariable(parameter);
         }
       }
 
       @Override
       public void visitLocalVariable(PsiLocalVariable variable) {
-        if (RecursionUtil.hasToBeSavedOnStack(variable, method)) {
+        if (!variables.containsKey(variable.getName()) && RecursionUtil.hasToBeSavedOnStack(variable, method)) {
           processVariable(variable);
         }
       }
