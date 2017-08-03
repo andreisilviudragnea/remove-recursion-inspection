@@ -25,7 +25,7 @@ public class RenameVariablesToUniqueNames implements Pass<PsiMethod, Map<String,
   }
 
   @NotNull
-  public static RenameVariablesToUniqueNames getInstace(@NotNull PsiMethod method) {
+  public static RenameVariablesToUniqueNames getInstance(@NotNull PsiMethod method) {
     return new RenameVariablesToUniqueNames(method);
   }
 

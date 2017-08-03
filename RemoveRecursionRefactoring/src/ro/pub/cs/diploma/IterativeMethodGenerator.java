@@ -47,7 +47,7 @@ class IterativeMethodGenerator {
   }
 
   void createIterativeBody() {
-    RenameVariablesToUniqueNames.getInstace(myMethod).apply(myMethod);
+    RenameVariablesToUniqueNames.getInstance(myMethod).apply(myMethod);
 
     ReplaceForEachLoopsWithIteratorForLoops.getInstance(myMethod).apply(myMethod);
     ReplaceForEachLoopsWithIndexedForLoops.getInstance(myMethod).apply(myMethod);

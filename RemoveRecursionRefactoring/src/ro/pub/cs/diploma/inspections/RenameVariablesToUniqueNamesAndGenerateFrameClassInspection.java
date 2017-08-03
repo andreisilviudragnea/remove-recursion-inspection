@@ -50,7 +50,7 @@ public class RenameVariablesToUniqueNamesAndGenerateFrameClassInspection extends
         if (method == null) {
           return;
         }
-        RenameVariablesToUniqueNames.getInstace(method).apply(method);
+        RenameVariablesToUniqueNames.getInstance(method).apply(method);
         FrameClassGenerator.addFrameClass(method, NameManager.getInstance(method));
       }
 
