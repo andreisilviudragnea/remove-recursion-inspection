@@ -77,8 +77,7 @@ public class AddFrameClass implements Pass<PsiMethod, Map<String, PsiVariable>, 
     variables.entrySet()
       .stream()
       .map(entry -> styleManager.shortenClassReferences(
-        factory.createFieldFromText("private " + entry.getValue().getType().getCanonicalText() + " " + entry.getKey() + ";",
-                                    null)))
+        factory.createFieldFromText("private " + entry.getValue().getType().getCanonicalText() + " " + entry.getKey() + ";", null)))
       .forEach(frameClass::add);
     frameClass.add(factory.createField(myNameManager.getBlockFieldName(), PsiPrimitiveType.INT));
 
