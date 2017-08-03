@@ -3,17 +3,14 @@ package ro.pub.cs.diploma;
 import com.intellij.openapi.util.Ref;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
-import com.intellij.psi.search.LocalSearchScope;
-import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import ro.pub.cs.diploma.passes.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class IterativeMethodGenerator {
+class IterativeMethodGenerator {
   @NotNull private final PsiElementFactory myFactory;
   @NotNull private final JavaCodeStyleManager myStyleManager;
   @NotNull private final PsiMethod myMethod;
@@ -41,11 +38,6 @@ public class IterativeMethodGenerator {
     return myFactory.createStatementFromText(text, null);
   }
 
-  @NotNull
-  private PsiExpression expression(@NotNull String text) {
-    return myFactory.createExpressionFromText(text, null);
-  }
-
   void createIterativeBody() {
     RenameVariablesToUniqueNames.getInstance(myMethod).apply(myMethod);
 
@@ -63,7 +55,8 @@ public class IterativeMethodGenerator {
       return;
     }
 
-    replaceIdentifierWithFrameAccess(myMethod, incorporatedBody, myNameManager);
+    ReplaceIdentifierWithFrameAccess.getInstance(myNameManager, myFactory, incorporatedBody).apply(myMethod);
+
     Passes.replaceDeclarationsWithInitializersWithAssignments(myMethod, incorporatedBody, myNameManager);
 
     final BasicBlocksGenerator2 basicBlocksGenerator = new BasicBlocksGenerator2(myMethod, myNameManager);
@@ -79,48 +72,6 @@ public class IterativeMethodGenerator {
     incorporatedBody.replace(statement(
       (atLeastOneLabeledBreak.get() ? myNameManager.getSwitchLabelName() + ":" : "") +
       "switch(" + myNameManager.getFrameVarName() + "." + myNameManager.getBlockFieldName() + "){" + casesString + "}"));
-  }
-
-  private void replaceIdentifierWithFrameAccess(@NotNull final PsiMethod method,
-                                                @NotNull final PsiCodeBlock body,
-                                                @NotNull final NameManager nameManager) {
-    final List<PsiVariable> variables = new ArrayList<>();
-    final String frameVarName = nameManager.getFrameVarName();
-    method.accept(new JavaRecursiveElementVisitor() {
-      @Override
-      public void visitParameter(PsiParameter parameter) {
-        if (RecursionUtil.hasToBeSavedOnStack(parameter, method)) {
-          variables.add(parameter);
-        }
-      }
-
-      @Override
-      public void visitLocalVariable(PsiLocalVariable variable) {
-        final String name = variable.getName();
-        if (frameVarName.equals(name) || nameManager.getStackVarName().equals(name)) {
-          return;
-        }
-        if (RecursionUtil.hasToBeSavedOnStack(variable, method)) {
-          variables.add(variable);
-        }
-      }
-
-      @Override
-      public void visitClass(PsiClass aClass) {
-      }
-
-      @Override
-      public void visitLambdaExpression(PsiLambdaExpression expression) {
-      }
-    });
-
-    for (final PsiVariable variable : variables) {
-      for (final PsiReference reference : ReferencesSearch.search(variable, new LocalSearchScope(body))) {
-        if (reference instanceof PsiReferenceExpression) {
-          ((PsiReferenceExpression)reference).setQualifierExpression(expression(frameVarName));
-        }
-      }
-    }
   }
 
   private void replaceReturnStatements(@NotNull final PsiCodeBlock block,
