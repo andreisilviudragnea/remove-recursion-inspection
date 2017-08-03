@@ -11,11 +11,6 @@ public class ReplaceSingleStatementsWithBlockStatementsFixTest extends IGQuickFi
     myDefaultHint = RemoveRecursionBundle.message("replace.single.statements.with.block.statements.quickfix");
   }
 
-  @Override
-  protected String getTestDataPath() {
-    return "testdata";
-  }
-
   public void testReplaceSingleStatementsWithBlockStatements() {
     doTest();
   }

@@ -48,7 +48,7 @@ public class ExtractRecursiveCallsToStatementsInspection extends BaseInspection 
         if (method == null) {
           return;
         }
-        ExtractRecursiveCallsToStatements.getInstace(method).apply(method);
+        ExtractRecursiveCallsToStatements.getInstance(method).apply(method);
       }
 
       @Nls

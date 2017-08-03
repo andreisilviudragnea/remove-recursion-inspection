@@ -12,11 +12,6 @@ public class RemoveRecursionFixTest extends IGQuickFixesTestCase {
     myDefaultHint = RemoveRecursionBundle.message("remove.recursion.replace.quickfix");
   }
 
-  @Override
-  protected String getTestDataPath() {
-    return "testdata";
-  }
-
   public void testCallOnOtherInstance1() {
     doTest();
   }

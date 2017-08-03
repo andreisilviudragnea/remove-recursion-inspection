@@ -54,7 +54,7 @@ class IterativeMethodGenerator {
 
     ReplaceSingleStatementsWithBlockStatements.getInstance(myFactory).apply(myMethod);
 
-    ExtractRecursiveCallsToStatements.getInstace(myMethod).apply(myMethod);
+    ExtractRecursiveCallsToStatements.getInstance(myMethod).apply(myMethod);
 
     final NameManager nameManager = NameManager.getInstance(myMethod);
 

@@ -19,7 +19,7 @@ public class ExtractRecursiveCallsToStatements implements Pass<PsiMethod, List<P
   }
 
   @NotNull
-  public static ExtractRecursiveCallsToStatements getInstace(@NotNull PsiMethod method) {
+  public static ExtractRecursiveCallsToStatements getInstance(@NotNull PsiMethod method) {
     return new ExtractRecursiveCallsToStatements(method);
   }
 
@@ -33,7 +33,7 @@ public class ExtractRecursiveCallsToStatements implements Pass<PsiMethod, List<P
     if (Util.isVoid(returnType)) {
       return calls;
     }
-    method.accept(new JavaRecursiveElementWalkingVisitor() {
+    method.accept(new JavaRecursiveElementVisitor() {
       @Override
       public void visitMethodCallExpression(PsiMethodCallExpression expression) {
         super.visitMethodCallExpression(expression);
@@ -61,10 +61,23 @@ public class ExtractRecursiveCallsToStatements implements Pass<PsiMethod, List<P
     if (returnType == null) {
       return null;
     }
+    calls:
     for (final PsiMethodCallExpression call : expressions) {
       final PsiStatement parentStatement = PsiTreeUtil.getParentOfType(call, PsiStatement.class, true);
-      if (parentStatement == call.getParent() && parentStatement instanceof PsiExpressionStatement) {
-        continue;
+      if (parentStatement instanceof PsiDeclarationStatement) {
+        for (PsiElement element : ((PsiDeclarationStatement)parentStatement).getDeclaredElements()) {
+          if (element instanceof PsiLocalVariable) {
+            if (((PsiLocalVariable)element).getInitializer() == call) {
+              continue calls;
+            }
+          }
+        }
+      }
+      if (parentStatement instanceof PsiExpressionStatement) {
+        PsiExpression expression = ((PsiExpressionStatement)parentStatement).getExpression();
+        if (expression instanceof PsiAssignmentExpression && ((PsiAssignmentExpression)expression).getRExpression() == call) {
+          continue;
+        }
       }
       final PsiCodeBlock parentBlock = PsiTreeUtil.getParentOfType(call, PsiCodeBlock.class, true);
       if (parentBlock == null) {

@@ -20,6 +20,11 @@ public abstract class IGQuickFixesTestCase extends LightCodeInsightFixtureTestCa
     LanguageLevelProjectExtension.getInstance(getProject()).setLanguageLevel(LanguageLevel.JDK_1_8);
   }
 
+  @Override
+  protected String getTestDataPath() {
+    return "testdata";
+  }
+
   void doTest() {
     doTest(getTestName(false));
   }
