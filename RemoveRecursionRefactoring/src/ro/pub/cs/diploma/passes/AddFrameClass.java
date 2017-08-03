@@ -1,6 +1,7 @@
 package ro.pub.cs.diploma.passes;
 
 import com.intellij.psi.*;
+import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import org.jetbrains.annotations.NotNull;
 import ro.pub.cs.diploma.Constants;
 import ro.pub.cs.diploma.NameManager;
@@ -72,10 +73,12 @@ public class AddFrameClass implements Pass<PsiMethod, Map<String, PsiVariable>, 
     modifierList.setModifierProperty(PsiModifier.STATIC, true);
 
     // Add fields
+    JavaCodeStyleManager styleManager = Util.getStyleManager(myMethod);
     variables.entrySet()
       .stream()
-      .map(pair -> factory
-        .createFieldFromText("private " + pair.getValue().getType().getPresentableText() + " " + pair.getKey() + ";", null))
+      .map(entry -> styleManager.shortenClassReferences(
+        factory.createFieldFromText("private " + entry.getValue().getType().getCanonicalText() + " " + entry.getKey() + ";",
+                                    null)))
       .forEach(frameClass::add);
     frameClass.add(factory.createField(myNameManager.getBlockFieldName(), PsiPrimitiveType.INT));
 

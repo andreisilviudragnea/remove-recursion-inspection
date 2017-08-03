@@ -2,6 +2,7 @@ package ro.pub.cs.diploma;
 
 import com.intellij.openapi.util.Ref;
 import com.intellij.psi.*;
+import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import org.jetbrains.annotations.NotNull;
 import ro.pub.cs.diploma.ir.*;
 
@@ -33,12 +34,17 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
     return block;
   }
 
+  @NotNull
+  private PsiStatement statement(String text) {
+    return factory.createStatementFromText(text, null);
+  }
+
   private void addStatement(PsiStatement statement) {
     currentBlock.add(statement);
   }
 
   private void addStatement(String text) {
-    currentBlock.add(factory.createStatementFromText(text, null));
+    currentBlock.add(statement(text));
   }
 
   private void addUnconditionalJumpStatement(Block block) {
@@ -115,7 +121,9 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
     }
     else if (parent instanceof PsiLocalVariable) {
       PsiLocalVariable variable = (PsiLocalVariable)parent;
-      addStatement(variable.getType().getPresentableText() + " " + variable.getName() + " = " + retVarName + ";");
+      JavaCodeStyleManager styleManager = Util.getStyleManager(expression);
+      addStatement((PsiStatement)styleManager.shortenClassReferences(statement(
+        variable.getType().getCanonicalText() + " " + variable.getName() + " = " + retVarName + ";")));
     }
   }
 

@@ -110,7 +110,8 @@ class IterativeMethodGenerator {
     }
     final String retVarName = nameManager.getRetVarName();
     if (!Util.isVoid(returnType)) {
-      newBody.add(statement(returnType.getPresentableText() + " " + retVarName + "=" + getInitialValue(returnType) + ";"));
+      newBody.add(myStyleManager.shortenClassReferences(
+        statement(returnType.getCanonicalText() + " " + retVarName + "=" + getInitialValue(returnType) + ";")));
     }
 
     final PsiWhileStatement incorporatedWhileStatement = (PsiWhileStatement)newBody.add(whileStatement);
