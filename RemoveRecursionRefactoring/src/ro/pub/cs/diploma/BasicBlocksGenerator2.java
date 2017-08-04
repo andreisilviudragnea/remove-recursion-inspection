@@ -74,7 +74,8 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
   private void processStatement(PsiStatement statement) {
     if (RecursionUtil.containsRecursiveCalls(statement, method)) {
       statement.accept(this);
-    } else if(statement instanceof PsiReturnStatement) {
+    }
+    else if (statement instanceof PsiReturnStatement) {
       addReturnStatement((PsiReturnStatement)statement);
     }
     else {
@@ -148,40 +149,47 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
     currentBlock = mergeBlock;
   }
 
-  @Override
-  public void visitWhileStatement(PsiWhileStatement statement) {
+  private void visitLoop(@NotNull final PsiExpression condition, @NotNull final PsiStatement body, final boolean atLeastOnce) {
     final Block conditionBlock = newBlock();
     final Block bodyBlock = newBlock();
     final Block mergeBlock = newBlock();
 
-    addUnconditionalJumpStatement(conditionBlock);
+    addUnconditionalJumpStatement(atLeastOnce ? bodyBlock : conditionBlock);
 
     currentBlock = conditionBlock;
-    addConditionalJumpStatement(statement.getCondition(), bodyBlock, mergeBlock);
+    addConditionalJumpStatement(condition, bodyBlock, mergeBlock);
 
     currentBlock = bodyBlock;
-    statement.getBody().accept(this);
+    body.accept(this);
     addUnconditionalJumpStatement(conditionBlock);
 
     currentBlock = mergeBlock;
   }
 
   @Override
+  public void visitWhileStatement(PsiWhileStatement statement) {
+    final PsiExpression condition = statement.getCondition();
+    if (condition == null) {
+      return;
+    }
+    final PsiStatement body = statement.getBody();
+    if (body == null) {
+      return;
+    }
+    visitLoop(condition, body, false);
+  }
+
+  @Override
   public void visitDoWhileStatement(PsiDoWhileStatement statement) {
-    final Block conditionBlock = newBlock();
-    final Block bodyBlock = newBlock();
-    final Block mergeBlock = newBlock();
-
-    addUnconditionalJumpStatement(bodyBlock);
-
-    currentBlock = bodyBlock;
-    statement.getBody().accept(this);
-    addUnconditionalJumpStatement(conditionBlock);
-
-    currentBlock = conditionBlock;
-    addConditionalJumpStatement(statement.getCondition(), bodyBlock, mergeBlock);
-
-    currentBlock = mergeBlock;
+    final PsiExpression condition = statement.getCondition();
+    if (condition == null) {
+      return;
+    }
+    final PsiStatement body = statement.getBody();
+    if (body == null) {
+      return;
+    }
+    visitLoop(condition, body, true);
   }
 
   private void addStatements(@NotNull final PsiStatement statement) {
