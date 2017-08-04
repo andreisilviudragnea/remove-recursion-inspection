@@ -1,0 +1,21 @@
+\section{Replacing declarations having initializers with assignments}
+
+This pass replaces the local variable declarations in the method body which have initializers with assignments to the
+corresponding fields of the \code{frame} object. An example of this pass is provided in
+\labelindexref{Figure}{img:replace-declaration}.
+
+\begin{figure}[htb]
+    \makebox[\linewidth][c]{%
+    \begin{subfigure}[b]{.6\textwidth}
+        \centering
+        \includegraphics[height=3.7in]{src/img/replace-identifier-after.png}
+        \caption{Before}
+    \end{subfigure}%
+    \begin{subfigure}[b]{.6\textwidth}
+        \centering
+        \includegraphics[height=3.7in]{src/img/replace-declaration-after.png}
+        \caption{After}
+    \end{subfigure}%
+    }\\
+    \caption{Replacing declarations having initializers with assignments \label{img:replace-declaration}}
+\end{figure}
