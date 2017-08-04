@@ -133,3 +133,44 @@ The description above is depicted in \labelindexref{Figure}{img:do-while-stateme
         \caption{Do-while statement CFG\label{img:do-while-statement}}
     \end{minipage}
 \end{figure}
+
+\subsection{Visiting a \code{PsiForStatement}}
+
+If the \code{PsiForStatement} has any initialization, the corresponding \code{PsiStatement}s are added to the
+\code{currentBlock}. There are three cases here, based on how Intellij IDEA parses the initialization part of a
+\code{for} statement. If the initialization is an instance of \code{PsiEmptyStatement}, there is no actual statement to
+add. If the initialization is an instance of\\
+\code{PsiExpressionStatement}, this statement is added to the \code{currentBlock}. Finally, if the initialization is an
+instance of \code{PsiExpressionListStatement}, each expression in this list is added as a statement to the
+\code{currentBlock}. The case when the initialization is a \code{PsiDeclarationStatement} is not valid here, because of
+the \textit{Replace declarations having initializers with assignments} pass.
+
+Then an \code{UnconditionalJumpStatement} to the \code{actualConditionBlock} is added to the \code{currentBlock}. The
+\code{actualConditionBlock} is either the \code{conditionBlock} if the \code{for} statement has a condition or the
+\code{bodyBlock} otherwise.
+
+If the \code{for} statement has a condition, the \code{currentBlock} is set to the \code{conditionBlock} and a
+\code{ConditionalJumpStatement} is added to the \code{currentBlock}. It jumps to either the \code{bodyBlock} or the
+\code{mergeBlock} based on the condition of the \code{for} statement.
+
+If the \code{for} statement has an update, the \code{currentBlock} is set to the \code{updateBlock}. The statements
+corresponding to the update of the \code{for} statement are added to the \code{currentBlock}, in a similar fashion to
+the statements corresponding to the initialization of the \code{for} statement. Then an \code{UnconditionalJumpStatement}
+to the \code{actualConditionBlock} is added to the \code{currentBlock}.
+
+The \code{currentBlock} is then set to the \code{bodyBlock} and the visitor visits the body of the \code{for} statement.
+After this, an \code{UnconditionalJumpStatement} to the \code{actualUpdateBlock} is added to the \code{currentBlock}, which
+may not be the \code{bodyBlock} anymore, because of the visitor possibly changing it when visiting the body of the
+\code{for} statement. The \code{actualUpdateBlock} is either the \code{updateBlock} if the \code{for} statement has
+an update or the \code{actualConditionBlock} otherwise.
+
+Finally, the \code{currentBlock} is set to the \code{mergeBlock}.
+
+The description above is depicted in \labelindexref{Figure}{img:for-statement}. The grey boxes represent basic blocks
+which are optional and the dotted lines represent arbitrary subgraphs.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{src/graph/for.pdf}
+    \caption{For statement CFG\label{img:for-statement}}
+\end{figure}

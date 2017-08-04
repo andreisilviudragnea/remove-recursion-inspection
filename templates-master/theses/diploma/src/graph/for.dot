@@ -1,0 +1,15 @@
+digraph G {
+    node [shape=box];
+    currentBlock [label=<currentBlock<BR/>...<BR/>initializationStatements<BR/>UnconditionalJumpStatement(conditionBlock)>];
+    conditionBlock [label=<conditionBlock<BR/>ConditionalJumpStatement(condition, bodyBlock, mergeBlock)>,style=filled,color=grey];
+    updateBlock [label=<updateBlock<BR/>updateStatements<BR/>UnconditionalJumpStatement(conditionBlock)>,style=filled,color=grey];
+    currentBlockAfterVisitingBodyBlock [label=<currentBlockAfterVisitingBodyBlock<BR/>...<BR/>UnconditionalJumpStatement(updateBlock)>];
+    bodyBlock [label=<bodyBlock<BR/>...>];
+    mergeBlock [label=<mergeBlock<BR/>...>];
+    currentBlock -> conditionBlock;
+    conditionBlock -> bodyBlock;
+    conditionBlock -> mergeBlock;
+    bodyBlock -> currentBlockAfterVisitingBodyBlock [style=dotted];
+    currentBlockAfterVisitingBodyBlock -> updateBlock;
+    updateBlock -> conditionBlock;
+}
