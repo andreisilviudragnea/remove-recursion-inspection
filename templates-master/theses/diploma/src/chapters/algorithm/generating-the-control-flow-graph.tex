@@ -92,7 +92,7 @@ which are optional and the dotted lines represent arbitrary subgraphs.
     \caption{If statement CFG\label{img:if-statement}}
 \end{figure}
 
-\subsection{Visiting a \code{WhileStatement}}
+\subsection{Visiting a \code{PsiWhileStatement}}
 
 Three new blocks are generated: the \code{conditionBlock}, the \code{bodyBlock} and the \code{mergeBlock}. Then an
 \code{UnconditionalJumpStatement} to the \code{conditionBlock} is added to the\\
@@ -111,8 +111,25 @@ Finally, the \code{currentBlock} is set to the \code{mergeBlock}.
 
 The description above is depicted in \labelindexref{Figure}{img:while-statement}. The dotted lines represent arbitrary subgraphs.
 
-\begin{figure}
+\subsection{Visiting a \code{PsiDoWhileStatement}}
+
+Visiting a \code{PsiDoWhileStatement} is analogous to visiting a \code{PsiWhileStatement}. The only difference is that
+the initial \code{UnconditionalJumpStatement} is to the \code{bodyBlock} instead of to the \code{conditionBlock},
+because a \code{do-while} statement executes its body at least once.
+
+The description above is depicted in \labelindexref{Figure}{img:do-while-statement}. The dotted lines represent arbitrary subgraphs.
+
+\begin{figure}[htb]
     \centering
-    \includegraphics[width=\textwidth]{src/graph/while.pdf}
-    \caption{While statement CFG\label{img:while-statement}}
+    \begin{minipage}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{src/graph/while.pdf}
+        \caption{While statement CFG\label{img:while-statement}}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{src/graph/do-while.pdf}
+        \caption{Do-while statement CFG\label{img:do-while-statement}}
+    \end{minipage}
 \end{figure}
