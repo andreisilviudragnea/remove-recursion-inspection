@@ -2,7 +2,7 @@ package ro.pub.cs.diploma;
 
 import com.intellij.openapi.util.Ref;
 import com.intellij.psi.*;
-import com.intellij.psi.codeStyle.JavaCodeStyleManager;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import ro.pub.cs.diploma.ir.*;
 
@@ -72,18 +72,14 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
   }
 
   private void processStatement(PsiStatement statement) {
-    if (RecursionUtil.containsRecursiveCalls(statement, method) || statement instanceof PsiReturnStatement) {
+    if (RecursionUtil.containsRecursiveCalls(statement, method)) {
       statement.accept(this);
+    } else if(statement instanceof PsiReturnStatement) {
+      addReturnStatement((PsiReturnStatement)statement);
     }
     else {
       addStatement(statement);
     }
-  }
-
-  @Override
-  public void visitReturnStatement(PsiReturnStatement statement) {
-    super.visitReturnStatement(statement);
-    addReturnStatement(statement);
   }
 
   @Override
@@ -113,17 +109,14 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
 
     currentBlock = block;
 
-    final PsiElement parent = expression.getParent();
-    final String retVarName = nameManager.getRetVarName();
-    if (parent instanceof PsiAssignmentExpression) {
-      PsiAssignmentExpression assignment = (PsiAssignmentExpression)parent;
-      addStatement(assignment.getLExpression().getText() + " = " + retVarName + ";");
+    final PsiType returnType = method.getReturnType();
+    if (returnType == null) {
+      return;
     }
-    else if (parent instanceof PsiLocalVariable) {
-      PsiLocalVariable variable = (PsiLocalVariable)parent;
-      JavaCodeStyleManager styleManager = Util.getStyleManager(expression);
-      addStatement((PsiStatement)styleManager.shortenClassReferences(statement(
-        variable.getType().getCanonicalText() + " " + variable.getName() + " = " + retVarName + ";")));
+    if (!Util.isVoid(returnType)) {
+      final PsiStatement parent = PsiTreeUtil.getParentOfType(expression, PsiStatement.class, true);
+      expression.replace(factory.createExpressionFromText(nameManager.getRetVarName(), null));
+      addStatement(parent);
     }
   }
 
