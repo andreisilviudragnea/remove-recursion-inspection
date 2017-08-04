@@ -1,0 +1,16 @@
+digraph G {
+	node [shape=box]
+	currentBlock [label=<currentBlock<BR/>...<BR/>ConditionalJumpStatement(ifCondition, thenBlock, elseBlock)>];
+	thenBlock [label=<thenBlock<BR/>...>];
+	elseBlock [label=<elseBlock<BR/>...>];
+	currentBlockAfterVisitingThenBlock [label=<currentBlockAfterVisitingThenBlock<BR/>...<BR/>UnconditionalJumpStatement(mergeBlock)>];
+	currentBlockAfterVisitingElseBlock [label=<currentBlockAfterVisitingElseBlock<BR/>...<BR/>UnconditionalJumpStatement(mergeBlock)>];
+	mergeBlock [label=<mergeBlock<BR/>...<BR/>>];
+	elseBlock, currentBlockAfterVisitingElseBlock [shape=box,style=filled,color=grey];
+	currentBlock -> thenBlock;
+	currentBlock -> elseBlock;
+	thenBlock -> currentBlockAfterVisitingThenBlock [style=dotted];
+	elseBlock -> currentBlockAfterVisitingElseBlock [style=dotted];
+	currentBlockAfterVisitingThenBlock -> mergeBlock;
+	currentBlockAfterVisitingElseBlock -> mergeBlock;
+}
