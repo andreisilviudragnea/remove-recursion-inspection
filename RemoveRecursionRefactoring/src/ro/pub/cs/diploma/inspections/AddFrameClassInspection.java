@@ -1,13 +1,13 @@
 package ro.pub.cs.diploma.inspections;
 
-public class IncorporateBodyInspection extends DummyInspection {
+public class AddFrameClassInspection extends DummyInspection {
   @Override
   protected String getKey() {
-    return "incorporate.body";
+    return "add.frame.class";
   }
 
   @Override
   protected int getSteps() {
-    return 6;
+    return 5;
   }
 }

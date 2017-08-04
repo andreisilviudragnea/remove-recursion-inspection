@@ -10,7 +10,7 @@ import ro.pub.cs.diploma.passes.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-class IterativeMethodGenerator {
+public class IterativeMethodGenerator {
   @NotNull private final PsiElementFactory myFactory;
   @NotNull private final JavaCodeStyleManager myStyleManager;
   @NotNull private final PsiMethod myMethod;
@@ -26,10 +26,10 @@ class IterativeMethodGenerator {
   }
 
   @NotNull
-  static IterativeMethodGenerator getInstance(@NotNull final PsiElementFactory factory,
-                                              @NotNull final JavaCodeStyleManager styleManager,
-                                              @NotNull final PsiMethod method,
-                                              @NotNull final NameManager nameManager) {
+  public static IterativeMethodGenerator getInstance(@NotNull final PsiElementFactory factory,
+                                                     @NotNull final JavaCodeStyleManager styleManager,
+                                                     @NotNull final PsiMethod method,
+                                                     @NotNull final NameManager nameManager) {
     return new IterativeMethodGenerator(factory, styleManager, method, nameManager);
   }
 
@@ -38,24 +38,45 @@ class IterativeMethodGenerator {
     return myFactory.createStatementFromText(text, null);
   }
 
-  void createIterativeBody() {
+  public void createIterativeBody(int steps) {
     RenameVariablesToUniqueNames.getInstance(myMethod).apply(myMethod);
+    if (steps == 1) {
+      return;
+    }
 
     ReplaceForEachLoopsWithIteratorForLoops.getInstance(myMethod).apply(myMethod);
     ReplaceForEachLoopsWithIndexedForLoops.getInstance(myMethod).apply(myMethod);
+    if (steps == 2) {
+      return;
+    }
 
     ReplaceSingleStatementsWithBlockStatements.getInstance(myFactory).apply(myMethod);
+    if (steps == 3) {
+      return;
+    }
 
     ExtractRecursiveCallsToStatements.getInstance(myMethod).apply(myMethod);
+    if (steps == 4) {
+      return;
+    }
 
     AddFrameClass.getInstance(myMethod, myNameManager).apply(myMethod);
+    if (steps == 5) {
+      return;
+    }
 
     final PsiCodeBlock incorporatedBody = IncorporateBody.getInstance(myNameManager, myFactory, myStyleManager).apply(myMethod);
     if (incorporatedBody == null) {
       return;
     }
+    if (steps == 6) {
+      return;
+    }
 
     ReplaceIdentifierWithFrameAccess.getInstance(myNameManager, myFactory, incorporatedBody).apply(myMethod);
+    if (steps == 7) {
+      return;
+    }
 
     Passes.replaceDeclarationsWithInitializersWithAssignments(myMethod, incorporatedBody, myNameManager);
 

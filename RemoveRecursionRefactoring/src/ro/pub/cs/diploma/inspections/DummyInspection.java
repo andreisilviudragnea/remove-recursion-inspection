@@ -9,24 +9,23 @@ import com.siyeh.ig.InspectionGadgetsFix;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ro.pub.cs.diploma.IterativeMethodGenerator;
 import ro.pub.cs.diploma.NameManager;
 import ro.pub.cs.diploma.RemoveRecursionBundle;
 import ro.pub.cs.diploma.Util;
-import ro.pub.cs.diploma.passes.AddFrameClass;
-import ro.pub.cs.diploma.passes.RenameVariablesToUniqueNames;
 
-public class RenameVariablesToUniqueNamesAndGenerateFrameClassInspection extends BaseInspection {
+public abstract class DummyInspection extends BaseInspection {
   @Nls
   @NotNull
   @Override
   public String getDisplayName() {
-    return RemoveRecursionBundle.message("rename.variables.to.unique.names.and.generate.frame.class.display.name");
+    return RemoveRecursionBundle.message(getKey());
   }
 
   @NotNull
   @Override
   protected String buildErrorString(Object... infos) {
-    return RemoveRecursionBundle.message("rename.variables.to.unique.names.and.generate.frame.class.problem.descriptor");
+    return RemoveRecursionBundle.message(getKey());
   }
 
   @Override
@@ -50,16 +49,19 @@ public class RenameVariablesToUniqueNamesAndGenerateFrameClassInspection extends
         if (method == null) {
           return;
         }
-        RenameVariablesToUniqueNames.getInstance(method).apply(method);
-        AddFrameClass.getInstance(method, NameManager.getInstance(method)).apply(method);
+        IterativeMethodGenerator.getInstance(Util.getFactory(method), Util.getStyleManager(method), method, NameManager.getInstance(method))
+          .createIterativeBody(getSteps());
       }
 
       @Nls
       @NotNull
       @Override
       public String getFamilyName() {
-        return RemoveRecursionBundle.message("rename.variables.to.unique.names.and.generate.frame.class.quickfix");
+        return RemoveRecursionBundle.message(getKey());
       }
     };
   }
+
+  protected abstract String getKey();
+  protected abstract int getSteps();
 }

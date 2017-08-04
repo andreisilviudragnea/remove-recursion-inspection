@@ -31,31 +31,41 @@
                      groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"
                      enabledByDefault="true" level="WARNING"
                      implementationClass="ro.pub.cs.diploma.RemoveRecursionInspection"/>
-    <localInspection groupPath="Java" language="JAVA" shortName="RenameVariablesToUniqueNamesAndGenerateFrameClass"
-                     bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="rename.variables.to.unique.names.and.generate.frame.class.display.name"
+    <localInspection groupPath="Java" language="JAVA" shortName="RenameVariablesToUniqueNames"
+                     bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="rename.variables.to.unique.names"
                      groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"
                      enabledByDefault="true" level="WARNING"
-                     implementationClass="ro.pub.cs.diploma.inspections.RenameVariablesToUniqueNamesAndGenerateFrameClassInspection"/>
+                     implementationClass="ro.pub.cs.diploma.inspections.RenameVariablesToUniqueNamesInspection"/>
     <localInspection groupPath="Java" language="JAVA" shortName="ReplaceForEachLoopsWithForLoops"
-                     bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="replace.foreach.loops.with.for.loops.display.name"
+                     bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="replace.foreach.loops.with.for.loops"
                      groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"
                      enabledByDefault="true" level="WARNING"
                      implementationClass="ro.pub.cs.diploma.inspections.ReplaceForEachLoopsWithForLoopsInspection"/>
     <localInspection groupPath="Java" language="JAVA" shortName="ReplaceSingleStatementsWithBlockStatements"
-                     bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="replace.single.statements.with.block.statements.diplay.name"
+                     bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="replace.single.statements.with.block.statements"
                      groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"
                      enabledByDefault="true" level="WARNING"
                      implementationClass="ro.pub.cs.diploma.inspections.ReplaceSingleStatementsWithBlockStatementsInspection"/>
     <localInspection groupPath="Java" language="JAVA" shortName="ExtractRecursiveCallsToStatements"
-                     bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="extract.recursive.calls.to.statements.diplay.name"
+                     bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="extract.recursive.calls.to.statements"
                      groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"
                      enabledByDefault="true" level="WARNING"
                      implementationClass="ro.pub.cs.diploma.inspections.ExtractRecursiveCallsToStatementsInspection"/>
+    <localInspection groupPath="Java" language="JAVA" shortName="AddFrameClass"
+                     bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="add.frame.class"
+                     groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"
+                     enabledByDefault="true" level="WARNING"
+                     implementationClass="ro.pub.cs.diploma.inspections.AddFrameClassInspection"/>
     <localInspection groupPath="Java" language="JAVA" shortName="IncorporateBody"
-                     bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="incorporate.body.diplay.name"
+                     bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="incorporate.body"
                      groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"
                      enabledByDefault="true" level="WARNING"
                      implementationClass="ro.pub.cs.diploma.inspections.IncorporateBodyInspection"/>
+    <localInspection groupPath="Java" language="JAVA" shortName="ReplaceIdentifierWithFrameAccess"
+                     bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="replace.identifier.with.frame.access"
+                     groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"
+                     enabledByDefault="true" level="WARNING"
+                     implementationClass="ro.pub.cs.diploma.inspections.ReplaceIdentifierWithFrameAccessInspection"/>
   </extensions>
 
   <actions>
