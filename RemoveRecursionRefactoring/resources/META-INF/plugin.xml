@@ -66,6 +66,11 @@
                      groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"
                      enabledByDefault="true" level="WARNING"
                      implementationClass="ro.pub.cs.diploma.inspections.ReplaceIdentifierWithFrameAccessInspection"/>
+    <localInspection groupPath="Java" language="JAVA" shortName="ReplaceDeclarationsHavingInitializersWithAssignments"
+                     bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="replace.declarations.having.initializers.with.assignments"
+                     groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"
+                     enabledByDefault="true" level="WARNING"
+                     implementationClass="ro.pub.cs.diploma.inspections.ReplaceDeclarationsHavingInitializersWithAssignmentsInspection"/>
   </extensions>
 
   <actions>

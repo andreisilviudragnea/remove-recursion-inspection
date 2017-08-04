@@ -78,7 +78,10 @@ public class IterativeMethodGenerator {
       return;
     }
 
-    Passes.replaceDeclarationsWithInitializersWithAssignments(myMethod, incorporatedBody, myNameManager);
+    ReplaceDeclarationsHavingInitializersWithAssignments.getInstance(myMethod, myNameManager, myFactory).apply(incorporatedBody);
+    if (steps == 8) {
+      return;
+    }
 
     final BasicBlocksGenerator2 basicBlocksGenerator = new BasicBlocksGenerator2(myMethod, myNameManager);
     incorporatedBody.accept(basicBlocksGenerator);

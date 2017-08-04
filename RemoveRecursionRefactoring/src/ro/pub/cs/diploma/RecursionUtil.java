@@ -161,7 +161,7 @@ public class RecursionUtil {
     return false;
   }
 
-  static boolean hasToBeSavedOnStack(@NotNull final PsiDeclarationStatement statement, @NotNull final PsiMethod method) {
+  public static boolean hasToBeSavedOnStack(@NotNull final PsiDeclarationStatement statement, @NotNull final PsiMethod method) {
     for (PsiElement element : statement.getDeclaredElements()) {
       if (element instanceof PsiLocalVariable) {
         if (hasToBeSavedOnStack((PsiLocalVariable)element, method)) {

@@ -7,7 +7,9 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -16,7 +18,7 @@ public class Util {
   }
 
   @NotNull
-  static PsiStatement statement(@NotNull final PsiElementFactory factory, @NotNull final String text) {
+  public static PsiStatement statement(@NotNull final PsiElementFactory factory, @NotNull final String text) {
     return factory.createStatementFromText(text, null);
   }
 
@@ -53,5 +55,20 @@ public class Util {
                                                                         @NotNull final Function<T, String> function) {
     final String argumentsString = Arrays.stream(arguments).map(function).collect(Collectors.joining(","));
     return factory.createStatementFromText(stackVarName + ".push(new " + frameClassName + "(" + argumentsString + "));", null);
+  }
+
+  @NotNull
+  public static List<PsiForeachStatement> getPsiForEachStatements(PsiMethod method) {
+    final List<PsiForeachStatement> statements = new ArrayList<>();
+    method.accept(new JavaRecursiveElementVisitor() {
+      @Override
+      public void visitForeachStatement(PsiForeachStatement statement) {
+        super.visitForeachStatement(statement);
+        if (RecursionUtil.containsRecursiveCalls(statement, method)) {
+          statements.add(statement);
+        }
+      }
+    });
+    return statements;
   }
 }
