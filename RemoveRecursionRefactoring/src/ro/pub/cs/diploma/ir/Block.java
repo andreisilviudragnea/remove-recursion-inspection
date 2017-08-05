@@ -30,16 +30,33 @@ public class Block implements Statement {
     references.add(blockRef);
   }
 
+  void removeReference(@NotNull final Ref<Block> blockRef) {
+    references.remove(blockRef);
+  }
+
   public boolean isFinished() {
     return statements.size() != 0 && statements.get(statements.size() - 1) instanceof TerminatorStatement;
   }
 
-  public boolean isInline() {
+  public boolean isInlinable() {
     return references.size() == 1 && !afterRecursiveCall;
   }
 
-  public boolean isReachable() {
-    return id == 0 || references.size() > 0;
+  public boolean removeIfUnreachable() {
+    if (id != 0 && references.size() == 0) {
+      if (statements.size() == 0) {
+        return false;
+      }
+      final Statement statement = statements.get(statements.size() - 1);
+      if (statement instanceof JumpStatement) {
+        ((JumpStatement)statement).detach();
+        return false;
+      }
+      if (statement instanceof ReturnStatement) {
+        return false;
+      }
+    }
+    return true;
   }
 
   public int getId() {

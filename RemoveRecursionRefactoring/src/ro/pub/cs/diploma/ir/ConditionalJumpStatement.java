@@ -4,7 +4,7 @@ import com.intellij.openapi.util.Ref;
 import com.intellij.psi.PsiExpression;
 import org.jetbrains.annotations.NotNull;
 
-public class ConditionalJumpStatement implements TerminatorStatement {
+public class ConditionalJumpStatement implements JumpStatement {
   @NotNull private final PsiExpression condition;
   @NotNull private final Ref<Block> thenBlockRef;
   @NotNull private final Ref<Block> elseBlockRef;
@@ -35,5 +35,11 @@ public class ConditionalJumpStatement implements TerminatorStatement {
   @NotNull
   Block getElseBlock() {
     return elseBlockRef.get();
+  }
+
+  @Override
+  public void detach() {
+    thenBlockRef.get().removeReference(thenBlockRef);
+    elseBlockRef.get().removeReference(elseBlockRef);
   }
 }

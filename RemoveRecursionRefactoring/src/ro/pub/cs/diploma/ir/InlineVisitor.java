@@ -59,7 +59,7 @@ public class InlineVisitor implements Visitor {
   @Nullable
   private PsiCodeBlock inline(@NotNull final Block block) {
     PsiCodeBlock psiBlock = null;
-    if (block.isInline()) {
+    if (block.isInlinable()) {
       psiBlock = newBlock();
       final PsiCodeBlock oldCurrentBlock = currentBlock;
       currentBlock = psiBlock;

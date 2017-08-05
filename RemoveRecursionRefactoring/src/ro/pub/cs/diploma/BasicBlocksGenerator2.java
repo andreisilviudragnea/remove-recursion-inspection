@@ -5,6 +5,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import ro.pub.cs.diploma.ir.*;
+import ro.pub.cs.diploma.passes.RemoveUnreachableBlocks;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -270,13 +271,14 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
   }
 
   List<Pair> getBlocks() {
-    final List<Block> nonTrivialReachableBlocks = blocks
+    final List<Block> reachableBlocks = RemoveUnreachableBlocks.getInstance().apply(blocks);
+
+    final List<Block> nonTrivialReachableBlocks = reachableBlocks
       .stream()
-      .filter(Block::isReachable)
       .filter(Block::inlineIfTrivial)
       .collect(Collectors.toList());
 
-    return nonTrivialReachableBlocks.stream().filter(block -> !block.isInline()).map(block -> {
+    return nonTrivialReachableBlocks.stream().filter(block -> !block.isInlinable()).map(block -> {
       InlineVisitor inlineVisitor = new InlineVisitor(factory, nameManager);
       block.accept(inlineVisitor);
       return new Pair(block.getId(), inlineVisitor.getBlock());
