@@ -174,3 +174,23 @@ which are optional and the dotted lines represent arbitrary subgraphs.
     \includegraphics[width=\textwidth]{src/graph/for.pdf}
     \caption{For statement CFG\label{img:for-statement}}
 \end{figure}
+
+An example of the generated basic blocks is provided in \labelindexref{Figure}{img:blocks}. Each block is assigned to
+a case inside a \code{switch} statement which replaces the incorporated body of the method. The \code{switch} statement
+has the \code{block} field of the \code{frame} object as its expression.
+
+\begin{figure}[htb]
+    \makebox[\linewidth][c]{%
+    \begin{subfigure}[b]{.6\textwidth}
+        \centering
+        \includegraphics[height=3in]{src/img/blocks-before.png}
+        \caption{Before}
+    \end{subfigure}%
+    \begin{subfigure}[b]{.6\textwidth}
+        \centering
+        \includegraphics[height=5.25in]{src/img/blocks-after.png}
+        \caption{After}
+    \end{subfigure}%
+    }\\
+    \caption{Generating the control flow graph \label{img:blocks}}
+\end{figure}
