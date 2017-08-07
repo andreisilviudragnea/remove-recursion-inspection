@@ -13,10 +13,11 @@ import java.util.stream.Collectors;
 class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
   @NotNull private final PsiMethod method;
   @NotNull private final NameManager nameManager;
-
   @NotNull private final PsiElementFactory factory;
+
   @NotNull private final List<Block> blocks = new ArrayList<>();
   @NotNull private final Map<PsiStatement, Block> breakTargets = new HashMap<>();
+  @NotNull private final Map<PsiStatement, Block> continueTargets = new HashMap<>();
 
   @NotNull private Block currentBlock;
   private int counter;
@@ -95,8 +96,22 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
       addUnconditionalJumpStatement(block);
       return;
     }
-    final BreakReplacerVisitor breakReplacerVisitor = new BreakReplacerVisitor(breakTargets, factory);
-    statement.accept(breakReplacerVisitor);
+    if (statement instanceof PsiContinueStatement) {
+      final PsiStatement continuedStatement = ((PsiContinueStatement)statement).findContinuedStatement();
+      if (continuedStatement == null) {
+        return;
+      }
+      final Block block = continueTargets.get(continuedStatement);
+      if (block == null) {
+        addStatement(statement);
+        return;
+      }
+      addUnconditionalJumpStatement(block);
+      return;
+    }
+    final BreakContinueReplacerVisitor breakContinueReplacerVisitor = new BreakContinueReplacerVisitor(breakTargets, continueTargets,
+                                                                                                       factory);
+    statement.accept(breakContinueReplacerVisitor);
     addStatement(statement);
   }
 
@@ -172,6 +187,7 @@ class BasicBlocksGenerator2 extends JavaRecursiveElementVisitor {
     final Block mergeBlock = newBlock();
 
     breakTargets.put(statement, mergeBlock);
+    continueTargets.put(statement, conditionBlock);
 
     addUnconditionalJumpStatement(atLeastOnce ? bodyBlock : conditionBlock);
 
