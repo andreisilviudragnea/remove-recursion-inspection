@@ -12,33 +12,33 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
-  @NotNull private final PsiMethod method;
-  @NotNull private final NameManager nameManager;
-  @NotNull private final PsiElementFactory factory;
+  @NotNull private final PsiMethod myMethod;
+  @NotNull private final NameManager myNameManager;
+  @NotNull private final PsiElementFactory myFactory;
 
-  @NotNull private final List<Block> blocks = new ArrayList<>();
-  @NotNull private final Map<PsiStatement, Block> breakTargets = new HashMap<>();
-  @NotNull private final Map<PsiStatement, Block> continueTargets = new HashMap<>();
+  @NotNull private final List<Block> myBlocks = new ArrayList<>();
+  @NotNull private final Map<PsiStatement, Block> myBreakTargets = new HashMap<>();
+  @NotNull private final Map<PsiStatement, Block> myContinueTargets = new HashMap<>();
 
   @NotNull private Block currentBlock;
   private int counter;
 
-  BasicBlocksGenerator(@NotNull final PsiMethod method, @NotNull final NameManager nameManager) {
-    this.method = method;
-    this.nameManager = nameManager;
-    factory = Util.getFactory(method);
+  BasicBlocksGenerator(@NotNull final PsiMethod method, @NotNull final NameManager nameManager, @NotNull final PsiElementFactory factory) {
+    myMethod = method;
+    myNameManager = nameManager;
+    myFactory = factory;
     currentBlock = newBlock();
   }
 
   private Block newBlock() {
     final Block block = new Block(counter++);
-    blocks.add(block);
+    myBlocks.add(block);
     return block;
   }
 
   @NotNull
   private PsiStatement statement(String text) {
-    return factory.createStatementFromText(text, null);
+    return myFactory.createStatementFromText(text, null);
   }
 
   private void addStatement(PsiStatement statement) {
@@ -76,7 +76,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   }
 
   private void processStatement(PsiStatement statement) {
-    if (RecursionUtil.containsRecursiveCalls(statement, method)) {
+    if (RecursionUtil.containsRecursiveCalls(statement, myMethod)) {
       statement.accept(this);
       return;
     }
@@ -89,7 +89,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
       if (exitedStatement == null) {
         return;
       }
-      final Block block = breakTargets.get(exitedStatement);
+      final Block block = myBreakTargets.get(exitedStatement);
       if (block == null) {
         addStatement(statement);
         return;
@@ -102,7 +102,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
       if (continuedStatement == null) {
         return;
       }
-      final Block block = continueTargets.get(continuedStatement);
+      final Block block = myContinueTargets.get(continuedStatement);
       if (block == null) {
         addStatement(statement);
         return;
@@ -110,8 +110,8 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
       addUnconditionalJumpStatement(block);
       return;
     }
-    final BreakContinueReplacerVisitor breakContinueReplacerVisitor = new BreakContinueReplacerVisitor(breakTargets, continueTargets,
-                                                                                                       factory);
+    final BreakContinueReplacerVisitor breakContinueReplacerVisitor = new BreakContinueReplacerVisitor(myBreakTargets, myContinueTargets,
+                                                                                                       myFactory);
     statement.accept(breakContinueReplacerVisitor);
     addStatement(statement);
   }
@@ -122,8 +122,8 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
 
     final PsiStatement[] statements = block.getStatements();
     // This is a hack, this method gets called only for the method block, not for blocks of block statements.
-    if (PsiPrimitiveType.VOID.equals(method.getReturnType()) && !(statements[statements.length - 1] instanceof PsiReturnStatement)) {
-      addReturnStatement((PsiReturnStatement)factory.createStatementFromText("return;", null));
+    if (PsiPrimitiveType.VOID.equals(myMethod.getReturnType()) && !(statements[statements.length - 1] instanceof PsiReturnStatement)) {
+      addReturnStatement((PsiReturnStatement)myFactory.createStatementFromText("return;", null));
     }
   }
 
@@ -134,7 +134,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
 
   @Override
   public void visitMethodCallExpression(PsiMethodCallExpression expression) {
-    addStatement(Util.createPushStatement(factory, nameManager.getFrameClassName(), nameManager.getStackVarName(),
+    addStatement(Util.createPushStatement(myFactory, myNameManager.getFrameClassName(), myNameManager.getStackVarName(),
                                           expression.getArgumentList().getExpressions(), PsiElement::getText));
 
     final Block block = newBlock();
@@ -143,13 +143,13 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
 
     currentBlock = block;
 
-    final PsiType returnType = method.getReturnType();
+    final PsiType returnType = myMethod.getReturnType();
     if (returnType == null) {
       return;
     }
     if (!Util.isVoid(returnType)) {
       final PsiStatement parent = PsiTreeUtil.getParentOfType(expression, PsiStatement.class, true);
-      expression.replace(factory.createExpressionFromText(nameManager.getRetVarName(), null));
+      expression.replace(myFactory.createExpressionFromText(myNameManager.getRetVarName(), null));
       addStatement(parent);
     }
   }
@@ -167,10 +167,18 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
       jumpBlock = elseBlock;
     }
 
-    addConditionalJumpStatement(statement.getCondition(), thenBlock, jumpBlock);
+    final PsiExpression condition = statement.getCondition();
+    if (condition == null) {
+      return;
+    }
+    addConditionalJumpStatement(condition, thenBlock, jumpBlock);
 
     currentBlock = thenBlock;
-    statement.getThenBranch().accept(this);
+    final PsiStatement thenBranch = statement.getThenBranch();
+    if (thenBranch == null) {
+      return;
+    }
+    thenBranch.accept(this);
     addUnconditionalJumpStatement(mergeBlock);
 
     if (elseBranch != null) {
@@ -187,8 +195,8 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     final Block bodyBlock = newBlock();
     final Block mergeBlock = newBlock();
 
-    breakTargets.put(statement, mergeBlock);
-    continueTargets.put(statement, conditionBlock);
+    myBreakTargets.put(statement, mergeBlock);
+    myContinueTargets.put(statement, conditionBlock);
 
     addUnconditionalJumpStatement(atLeastOnce ? bodyBlock : conditionBlock);
 
@@ -196,7 +204,11 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     addConditionalJumpStatement(condition, bodyBlock, mergeBlock);
 
     currentBlock = bodyBlock;
-    statement.getBody().accept(this);
+    final PsiStatement body = statement.getBody();
+    if (body == null) {
+      return;
+    }
+    body.accept(this);
     addUnconditionalJumpStatement(conditionBlock);
 
     currentBlock = mergeBlock;
@@ -264,7 +276,11 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     }
 
     currentBlock = bodyBlock;
-    statement.getBody().accept(this);
+    final PsiStatement body = statement.getBody();
+    if (body == null) {
+      return;
+    }
+    body.accept(this);
     addUnconditionalJumpStatement(actualUpdateBlock);
 
     currentBlock = mergeBlock;
@@ -279,7 +295,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   }
 
   List<Pair<Integer, PsiCodeBlock>> getBlocks() {
-    final List<Block> reachableBlocks = RemoveUnreachableBlocks.getInstance().apply(blocks);
+    final List<Block> reachableBlocks = RemoveUnreachableBlocks.getInstance().apply(myBlocks);
 
     final List<Block> nonTrivialReachableBlocks = reachableBlocks
       .stream()
@@ -287,7 +303,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
       .collect(Collectors.toList());
 
     return nonTrivialReachableBlocks.stream().filter(block -> !block.isInlinable()).map(block -> {
-      InlineVisitor inlineVisitor = new InlineVisitor(factory, nameManager);
+      InlineVisitor inlineVisitor = new InlineVisitor(myFactory, myNameManager);
       block.accept(inlineVisitor);
       return Pair.create(block.getId(), inlineVisitor.getBlock());
     }).collect(Collectors.toList());

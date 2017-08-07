@@ -84,7 +84,7 @@ public class IterativeMethodGenerator {
       return;
     }
 
-    final BasicBlocksGenerator basicBlocksGenerator = new BasicBlocksGenerator(myMethod, myNameManager);
+    final BasicBlocksGenerator basicBlocksGenerator = new BasicBlocksGenerator(myMethod, myNameManager, myFactory);
     incorporatedBody.accept(basicBlocksGenerator);
     final List<Pair<Integer, PsiCodeBlock>> pairs = basicBlocksGenerator.getBlocks();
 
