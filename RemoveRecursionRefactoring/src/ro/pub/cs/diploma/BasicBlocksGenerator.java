@@ -1,5 +1,6 @@
 package ro.pub.cs.diploma;
 
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.Ref;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -277,26 +278,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   public void visitClass(PsiClass aClass) {
   }
 
-  class Pair {
-    private int id;
-    @NotNull private PsiCodeBlock block;
-
-    Pair(final int id, @NotNull final PsiCodeBlock block) {
-      this.id = id;
-      this.block = block;
-    }
-
-    int getId() {
-      return id;
-    }
-
-    @NotNull
-    public PsiCodeBlock getBlock() {
-      return block;
-    }
-  }
-
-  List<Pair> getBlocks() {
+  List<Pair<Integer, PsiCodeBlock>> getBlocks() {
     final List<Block> reachableBlocks = RemoveUnreachableBlocks.getInstance().apply(blocks);
 
     final List<Block> nonTrivialReachableBlocks = reachableBlocks
@@ -307,7 +289,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     return nonTrivialReachableBlocks.stream().filter(block -> !block.isInlinable()).map(block -> {
       InlineVisitor inlineVisitor = new InlineVisitor(factory, nameManager);
       block.accept(inlineVisitor);
-      return new Pair(block.getId(), inlineVisitor.getBlock());
+      return Pair.create(block.getId(), inlineVisitor.getBlock());
     }).collect(Collectors.toList());
   }
 }

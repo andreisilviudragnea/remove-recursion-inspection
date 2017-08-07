@@ -1,5 +1,6 @@
 package ro.pub.cs.diploma;
 
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.Ref;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
@@ -85,12 +86,12 @@ public class IterativeMethodGenerator {
 
     final BasicBlocksGenerator basicBlocksGenerator = new BasicBlocksGenerator(myMethod, myNameManager);
     incorporatedBody.accept(basicBlocksGenerator);
-    final List<BasicBlocksGenerator.Pair> pairs = basicBlocksGenerator.getBlocks();
+    final List<Pair<Integer, PsiCodeBlock>> pairs = basicBlocksGenerator.getBlocks();
 
     final Ref<Boolean> atLeastOneLabeledBreak = new Ref<>(false);
-    pairs.forEach(pair -> replaceReturnStatements(pair.getBlock(), myNameManager, atLeastOneLabeledBreak));
+    pairs.forEach(pair -> replaceReturnStatements(pair.getSecond(), myNameManager, atLeastOneLabeledBreak));
 
-    final String casesString = pairs.stream().map(pair -> "case " + pair.getId() + ":" + pair.getBlock().getText())
+    final String casesString = pairs.stream().map(pair -> "case " + pair.getFirst() + ":" + pair.getSecond().getText())
       .collect(Collectors.joining(""));
 
     incorporatedBody.replace(statement(
