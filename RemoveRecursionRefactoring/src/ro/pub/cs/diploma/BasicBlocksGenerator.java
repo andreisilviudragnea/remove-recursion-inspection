@@ -5,6 +5,7 @@ import com.intellij.openapi.util.Ref;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ro.pub.cs.diploma.ir.*;
 import ro.pub.cs.diploma.passes.RemoveUnreachableBlocks;
 
@@ -190,48 +191,6 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     currentBlock = mergeBlock;
   }
 
-  private void visitLoop(@NotNull final PsiExpression condition, @NotNull final PsiLoopStatement statement, final boolean atLeastOnce) {
-    final Block conditionBlock = newBlock();
-    final Block bodyBlock = newBlock();
-    final Block mergeBlock = newBlock();
-
-    myBreakTargets.put(statement, mergeBlock);
-    myContinueTargets.put(statement, conditionBlock);
-
-    addUnconditionalJumpStatement(atLeastOnce ? bodyBlock : conditionBlock);
-
-    currentBlock = conditionBlock;
-    addConditionalJumpStatement(condition, bodyBlock, mergeBlock);
-
-    currentBlock = bodyBlock;
-    final PsiStatement body = statement.getBody();
-    if (body == null) {
-      return;
-    }
-    body.accept(this);
-    addUnconditionalJumpStatement(conditionBlock);
-
-    currentBlock = mergeBlock;
-  }
-
-  @Override
-  public void visitWhileStatement(PsiWhileStatement statement) {
-    final PsiExpression condition = statement.getCondition();
-    if (condition == null) {
-      return;
-    }
-    visitLoop(condition, statement, false);
-  }
-
-  @Override
-  public void visitDoWhileStatement(PsiDoWhileStatement statement) {
-    final PsiExpression condition = statement.getCondition();
-    if (condition == null) {
-      return;
-    }
-    visitLoop(condition, statement, true);
-  }
-
   private void addStatements(@NotNull final PsiStatement statement) {
     if (statement instanceof PsiExpressionStatement) {
       addStatement(((PsiExpressionStatement)statement).getExpression().getText() + ";");
@@ -244,16 +203,10 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     }
   }
 
-  @Override
-  public void visitForStatement(PsiForStatement statement) {
-    final PsiStatement initialization = statement.getInitialization();
-    if (initialization != null && !(initialization instanceof PsiEmptyStatement)) {
-      addStatements(initialization);
-    }
-
-    final PsiExpression condition = statement.getCondition();
-    final PsiStatement update = statement.getUpdate();
-
+  private void visitLoop(@Nullable final PsiExpression condition,
+                         @Nullable final PsiStatement update,
+                         @NotNull final PsiLoopStatement statement,
+                         final boolean atLeastOnce) {
     final Block conditionBlock = condition != null ? newBlock() : null;
     final Block bodyBlock = newBlock();
     final Block updateBlock = update != null ? newBlock() : null;
@@ -262,7 +215,10 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     final Block actualConditionBlock = conditionBlock != null ? conditionBlock : bodyBlock;
     final Block actualUpdateBlock = updateBlock != null ? updateBlock : actualConditionBlock;
 
-    addUnconditionalJumpStatement(actualConditionBlock);
+    myBreakTargets.put(statement, mergeBlock);
+    myContinueTargets.put(statement, actualUpdateBlock);
+
+    addUnconditionalJumpStatement(atLeastOnce ? bodyBlock : actualConditionBlock);
 
     if (conditionBlock != null) {
       currentBlock = conditionBlock;
@@ -284,6 +240,34 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     addUnconditionalJumpStatement(actualUpdateBlock);
 
     currentBlock = mergeBlock;
+  }
+
+  @Override
+  public void visitWhileStatement(PsiWhileStatement statement) {
+    final PsiExpression condition = statement.getCondition();
+    if (condition == null) {
+      return;
+    }
+    visitLoop(condition, null, statement, false);
+  }
+
+  @Override
+  public void visitDoWhileStatement(PsiDoWhileStatement statement) {
+    final PsiExpression condition = statement.getCondition();
+    if (condition == null) {
+      return;
+    }
+    visitLoop(condition, null, statement, true);
+  }
+
+  @Override
+  public void visitForStatement(PsiForStatement statement) {
+    final PsiStatement initialization = statement.getInitialization();
+    if (initialization != null && !(initialization instanceof PsiEmptyStatement)) {
+      addStatements(initialization);
+    }
+
+    visitLoop(statement.getCondition(), statement.getUpdate(), statement, false);
   }
 
   @Override
