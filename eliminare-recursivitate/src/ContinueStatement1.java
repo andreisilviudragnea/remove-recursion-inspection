@@ -8,10 +8,10 @@ public class ContinueStatement1 {
         int count = iter;
         while (true) {
             count--;
-            if (count > 2)
-                continue;
             list.add(iter);
             cont(iter - 1, list);
+            if (count > 2)
+                continue;
             if (count == 0)
                 break;
         }
