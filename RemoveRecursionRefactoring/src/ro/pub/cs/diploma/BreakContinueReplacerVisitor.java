@@ -20,13 +20,10 @@ public class BreakContinueReplacerVisitor extends JavaRecursiveElementVisitor {
     myFactory = factory;
   }
 
-  @Override
-  public void visitBreakStatement(PsiBreakStatement statement) {
-    final PsiStatement exitedStatement = statement.findExitedStatement();
-    if (exitedStatement == null) {
-      return;
-    }
-    final Block block = myBreakTargets.get(exitedStatement);
+  private void replaceWithUnconditionalJump(@NotNull final PsiStatement targetStatement,
+                                            @NotNull final Map<PsiStatement, Block> targets,
+                                            @NotNull final PsiStatement statement) {
+    final Block block = targets.get(targetStatement);
     if (block == null) {
       return;
     }
@@ -36,17 +33,20 @@ public class BreakContinueReplacerVisitor extends JavaRecursiveElementVisitor {
   }
 
   @Override
+  public void visitBreakStatement(PsiBreakStatement statement) {
+    final PsiStatement exitedStatement = statement.findExitedStatement();
+    if (exitedStatement == null) {
+      return;
+    }
+    replaceWithUnconditionalJump(exitedStatement, myBreakTargets, statement);
+  }
+
+  @Override
   public void visitContinueStatement(PsiContinueStatement statement) {
     final PsiStatement continuedStatement = statement.findContinuedStatement();
     if (continuedStatement == null) {
       return;
     }
-    final Block block = myContinueTargets.get(continuedStatement);
-    if (block == null) {
-      return;
-    }
-    block.addReference(Ref.create(block));
-    statement.getParent().addBefore(myFactory.createStatementFromText("frame.block = " + block.getId() + ";", null), statement);
-    statement.replace(myFactory.createStatementFromText("break;", null));
+    replaceWithUnconditionalJump(continuedStatement, myContinueTargets, statement);
   }
 }
