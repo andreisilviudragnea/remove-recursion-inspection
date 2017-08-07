@@ -12,7 +12,7 @@ public class BreakStatementTest {
     public void breakStatement() throws Exception {
         final List<Integer> list = new ArrayList<>();
         BreakStatement.breakStatement(4, list);
-        assertEquals(Arrays.asList(4, 4, 4, 4, 3, 3, 3, 2, 2, 1), list);
+        assertEquals(Arrays.asList(4, 3, 2, 1, 1, 2, 1, 1, 2, 3, 2, 1, 1, 2, 1, 1, 2, 3, 2, 1, 1, 2, 1, 1, 2, 3, 4, 3, 2, 1, 1, 2, 1, 1, 2, 3, 2, 1, 1, 2, 1, 1, 2, 3, 2, 1, 1, 2, 1, 1, 2, 3, 4, 3, 2, 1, 1, 2, 1, 1, 2, 3, 2, 1, 1, 2, 1, 1, 2, 3, 2, 1, 1, 2, 1, 1, 2, 3, 4, 3, 2, 1, 1, 2, 1, 1, 2, 3, 2, 1, 1, 2, 1, 1, 2, 3, 2, 1, 1, 2, 1, 1, 2, 3, 4), list);
     }
 
 }

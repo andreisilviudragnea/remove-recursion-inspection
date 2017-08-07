@@ -9,10 +9,11 @@ public class BreakStatement {
         while (true) {
             list.add(iter);
             count--;
+            breakStatement(iter - 1, list);
             if (count == 0)
                 break;
         }
-        breakStatement(iter - 1, list);
+        list.add(iter);
     }
 
     public static void main(String[] args) {
