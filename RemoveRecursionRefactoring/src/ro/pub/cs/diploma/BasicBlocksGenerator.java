@@ -2,171 +2,127 @@ package ro.pub.cs.diploma;
 
 import com.intellij.openapi.util.Ref;
 import com.intellij.psi.*;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
+import ro.pub.cs.diploma.ir.*;
+import ro.pub.cs.diploma.passes.RemoveUnreachableBlocks;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
-  @Override
-  public void visitLambdaExpression(PsiLambdaExpression expression) {
+  @NotNull private final PsiMethod method;
+  @NotNull private final NameManager nameManager;
+  @NotNull private final PsiElementFactory factory;
+
+  @NotNull private final List<Block> blocks = new ArrayList<>();
+  @NotNull private final Map<PsiStatement, Block> breakTargets = new HashMap<>();
+  @NotNull private final Map<PsiStatement, Block> continueTargets = new HashMap<>();
+
+  @NotNull private Block currentBlock;
+  private int counter;
+
+  BasicBlocksGenerator(@NotNull final PsiMethod method, @NotNull final NameManager nameManager) {
+    this.method = method;
+    this.nameManager = nameManager;
+    factory = Util.getFactory(method);
+    currentBlock = newBlock();
   }
 
-  @Override
-  public void visitClass(PsiClass aClass) {
-  }
-
-  class Pair {
-    private final PsiCodeBlock block;
-    private final int id;
-    private JumpBase jump;
-    private final List<Ref<Integer>> references = new ArrayList<>();
-    private boolean isFinished = false;
-
-    Pair(final PsiCodeBlock block, final int id) {
-      this.block = block;
-      this.id = id;
-    }
-
-    PsiCodeBlock getBlock() {
-      return block;
-    }
-
-    int getId() {
-      return id;
-    }
-
-    void setJump(JumpBase jump) {
-      this.jump = jump;
-    }
-
-    void addReference(Ref<Integer> reference) {
-      references.add(reference);
-    }
-
-    void terminate() {
-      jump.terminatePair(this);
-    }
-  }
-
-  private abstract class JumpBase {
-    abstract void terminatePair(Pair pair);
-  }
-
-  private class Jump extends JumpBase {
-    private Ref<Integer> ref;
-
-    private Jump(Ref<Integer> ref) {
-      this.ref = ref;
-    }
-
-    @Override
-    void terminatePair(Pair pair) {
-      pair.block.add(createStatement(frameVarName + "." + blockFieldName + " = " + ref + ";"));
-      pair.block.add(createStatement("break;"));
-    }
-  }
-
-  private class ConditionalJump extends JumpBase {
-    private String condition;
-    private Ref<Integer> ref1;
-    private Ref<Integer> ref2;
-
-    private ConditionalJump(String condition, Ref<Integer> ref1, Ref<Integer> ref2) {
-      this.condition = condition;
-      this.ref1 = ref1;
-      this.ref2 = ref2;
-    }
-
-    @Override
-    void terminatePair(Pair pair) {
-      pair.block.add(createStatement("if (" + condition + ") {" +
-                                     frameVarName + "." + blockFieldName + " = " + ref1 + ";break;} else {" +
-                                     frameVarName + "." + blockFieldName + "=" + ref2 + ";break;}"));
-    }
-  }
-
-  private Pair currentPair;
-  private final PsiElementFactory factory;
-  private final PsiMethod method;
-  private int blockCounter;
-  private final String frameClassName;
-  private final String frameVarName;
-  private final String blockFieldName;
-  private final String stackVarName;
-  private final PsiType returnType;
-  private final String retVarName;
-  private final Map<PsiStatement, Pair> breakJumps = new HashMap<>();
-  private final Map<PsiStatement, Pair> continueJumps = new HashMap<>();
-  private final Set<Pair> reachableBlocks = new LinkedHashSet<>();
-
-  private Pair newPair() {
-    return new Pair(factory.createCodeBlock(), blockCounter++);
+  private Block newBlock() {
+    final Block block = new Block(counter++);
+    blocks.add(block);
+    return block;
   }
 
   @NotNull
-  private PsiStatement createStatement(@NotNull final String text) {
+  private PsiStatement statement(String text) {
     return factory.createStatementFromText(text, null);
   }
 
-  private void createJump(Pair pair) {
-    if (currentPair.isFinished) {
+  private void addStatement(PsiStatement statement) {
+    currentBlock.add(statement);
+  }
+
+  private void addStatement(String text) {
+    currentBlock.add(statement(text));
+  }
+
+  private void addUnconditionalJumpStatement(@NotNull final Block block) {
+    if (currentBlock.isFinished()) {
       return;
     }
-    currentPair.isFinished = true;
-    if (reachableBlocks.contains(currentPair)) {
-      final Ref<Integer> ref = new Ref<>(pair.id);
-      currentPair.setJump(new Jump(ref));
-      pair.addReference(ref);
-      reachableBlocks.add(pair);
-    }
+    final Ref<Block> blockRef = Ref.create(block);
+    currentBlock.add(new UnconditionalJumpStatement(blockRef));
+    block.addReference(blockRef);
   }
 
-  private void createConditionalJump(PsiExpression condition, Pair thenPair, Pair elsePair) {
-    if (currentPair.isFinished) {
+  private void addConditionalJumpStatement(@NotNull final PsiExpression condition,
+                                           @NotNull final Block thenBlock,
+                                           @NotNull final Block jumpBlock) {
+    if (currentBlock.isFinished()) {
       return;
     }
-    currentPair.isFinished = true;
-    if (reachableBlocks.contains(currentPair)) {
-      final Ref<Integer> ref1 = new Ref<>(thenPair.id);
-      final Ref<Integer> ref2 = new Ref<>(elsePair.id);
-      currentPair.setJump(new ConditionalJump(condition.getText(), ref1, ref2));
-      thenPair.addReference(ref1);
-      reachableBlocks.add(thenPair);
-      elsePair.addReference(ref2);
-      reachableBlocks.add(elsePair);
-    }
+    final Ref<Block> thenBlockRef = Ref.create(thenBlock);
+    final Ref<Block> jumpBlockRef = Ref.create(jumpBlock);
+    currentBlock.add(new ConditionalJumpStatement(condition, thenBlockRef, jumpBlockRef));
+    thenBlock.addReference(thenBlockRef);
+    jumpBlock.addReference(jumpBlockRef);
   }
 
-  BasicBlocksGenerator(final PsiElementFactory factory,
-                       final PsiMethod method,
-                       final String frameClassName,
-                       final String frameVarName,
-                       final String blockFieldName,
-                       final String stackVarName,
-                       final PsiType returnType,
-                       final String retVarName) {
-    this.factory = factory;
-    this.method = method;
-    currentPair = newPair();
-    reachableBlocks.add(currentPair);
-    this.frameClassName = frameClassName;
-    this.frameVarName = frameVarName;
-    this.blockFieldName = blockFieldName;
-    this.stackVarName = stackVarName;
-    this.returnType = returnType;
-    this.retVarName = retVarName;
+  private void addReturnStatement(PsiReturnStatement statement) {
+    currentBlock.add(new ReturnStatement(statement));
   }
-
 
   private void processStatement(PsiStatement statement) {
     if (RecursionUtil.containsRecursiveCalls(statement, method)) {
       statement.accept(this);
-    }
-    else {
-      currentPair.block.add(statement);
+      return;
     }
     if (statement instanceof PsiReturnStatement) {
-      currentPair.isFinished = true;
+      addReturnStatement((PsiReturnStatement)statement);
+      return;
+    }
+    if (statement instanceof PsiBreakStatement) {
+      final PsiStatement exitedStatement = ((PsiBreakStatement)statement).findExitedStatement();
+      if (exitedStatement == null) {
+        return;
+      }
+      final Block block = breakTargets.get(exitedStatement);
+      if (block == null) {
+        addStatement(statement);
+        return;
+      }
+      addUnconditionalJumpStatement(block);
+      return;
+    }
+    if (statement instanceof PsiContinueStatement) {
+      final PsiStatement continuedStatement = ((PsiContinueStatement)statement).findContinuedStatement();
+      if (continuedStatement == null) {
+        return;
+      }
+      final Block block = continueTargets.get(continuedStatement);
+      if (block == null) {
+        addStatement(statement);
+        return;
+      }
+      addUnconditionalJumpStatement(block);
+      return;
+    }
+    final BreakContinueReplacerVisitor breakContinueReplacerVisitor = new BreakContinueReplacerVisitor(breakTargets, continueTargets,
+                                                                                                       factory);
+    statement.accept(breakContinueReplacerVisitor);
+    addStatement(statement);
+  }
+
+  @Override
+  public void visitCodeBlock(PsiCodeBlock block) {
+    Arrays.stream(block.getStatements()).forEach(this::processStatement);
+
+    final PsiStatement[] statements = block.getStatements();
+    // This is a hack, this method gets called only for the method block, not for blocks of block statements.
+    if (PsiPrimitiveType.VOID.equals(method.getReturnType()) && !(statements[statements.length - 1] instanceof PsiReturnStatement)) {
+      addReturnStatement((PsiReturnStatement)factory.createStatementFromText("return;", null));
     }
   }
 
@@ -176,143 +132,182 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   }
 
   @Override
-  public void visitCodeBlock(PsiCodeBlock block) {
-    Arrays.stream(block.getStatements()).forEach(this::processStatement);
+  public void visitMethodCallExpression(PsiMethodCallExpression expression) {
+    addStatement(Util.createPushStatement(factory, nameManager.getFrameClassName(), nameManager.getStackVarName(),
+                                          expression.getArgumentList().getExpressions(), PsiElement::getText));
 
-    final PsiStatement[] statements = block.getStatements();
-    // This is a hack, this method gets called only for the method block, not for blocks of block statements.
-    if (PsiPrimitiveType.VOID.equals(returnType) && !(statements[statements.length - 1] instanceof PsiReturnStatement)) {
-      currentPair.block.add(createStatement("return;"));
+    final Block block = newBlock();
+    block.setAfterRecursiveCall(true);
+    addUnconditionalJumpStatement(block);
+
+    currentBlock = block;
+
+    final PsiType returnType = method.getReturnType();
+    if (returnType == null) {
+      return;
+    }
+    if (!Util.isVoid(returnType)) {
+      final PsiStatement parent = PsiTreeUtil.getParentOfType(expression, PsiStatement.class, true);
+      expression.replace(factory.createExpressionFromText(nameManager.getRetVarName(), null));
+      addStatement(parent);
     }
   }
 
   @Override
   public void visitIfStatement(PsiIfStatement statement) {
-    final Pair thenPair = newPair();
-    final Pair mergePair = newPair();
-    Pair jumpPair = mergePair;
-    Pair elsePair = null;
+    final Block thenBlock = newBlock();
+    final Block mergeBlock = newBlock();
+    Block jumpBlock = mergeBlock;
+    Block elseBlock = null;
 
     final PsiStatement elseBranch = statement.getElseBranch();
     if (elseBranch != null) {
-      elsePair = newPair();
-      jumpPair = elsePair;
+      elseBlock = newBlock();
+      jumpBlock = elseBlock;
     }
 
-    createConditionalJump(statement.getCondition(), thenPair, jumpPair);
+    addConditionalJumpStatement(statement.getCondition(), thenBlock, jumpBlock);
 
-    currentPair = thenPair;
+    currentBlock = thenBlock;
     statement.getThenBranch().accept(this);
-    createJump(mergePair);
+    addUnconditionalJumpStatement(mergeBlock);
 
     if (elseBranch != null) {
-      currentPair = elsePair;
+      currentBlock = elseBlock;
       elseBranch.accept(this);
-      createJump(mergePair);
+      addUnconditionalJumpStatement(mergeBlock);
     }
 
-    currentPair = mergePair;
+    currentBlock = mergeBlock;
+  }
+
+  private void visitLoop(@NotNull final PsiExpression condition, @NotNull final PsiLoopStatement statement, final boolean atLeastOnce) {
+    final Block conditionBlock = newBlock();
+    final Block bodyBlock = newBlock();
+    final Block mergeBlock = newBlock();
+
+    breakTargets.put(statement, mergeBlock);
+    continueTargets.put(statement, conditionBlock);
+
+    addUnconditionalJumpStatement(atLeastOnce ? bodyBlock : conditionBlock);
+
+    currentBlock = conditionBlock;
+    addConditionalJumpStatement(condition, bodyBlock, mergeBlock);
+
+    currentBlock = bodyBlock;
+    statement.getBody().accept(this);
+    addUnconditionalJumpStatement(conditionBlock);
+
+    currentBlock = mergeBlock;
   }
 
   @Override
   public void visitWhileStatement(PsiWhileStatement statement) {
-    final Pair conditionPair = newPair();
-    final Pair bodyPair = newPair();
-    final Pair mergePair = newPair();
-
-    breakJumps.put(statement, mergePair);
-    continueJumps.put(statement, conditionPair);
-
-    createJump(conditionPair);
-
-    currentPair = conditionPair;
-    createConditionalJump(statement.getCondition(), bodyPair, mergePair);
-
-    currentPair = bodyPair;
-    statement.getBody().accept(this);
-    createJump(conditionPair);
-
-    currentPair = mergePair;
+    final PsiExpression condition = statement.getCondition();
+    if (condition == null) {
+      return;
+    }
+    visitLoop(condition, statement, false);
   }
 
   @Override
   public void visitDoWhileStatement(PsiDoWhileStatement statement) {
-    final Pair conditionPair = newPair();
-    final Pair bodyPair = newPair();
-    final Pair mergePair = newPair();
+    final PsiExpression condition = statement.getCondition();
+    if (condition == null) {
+      return;
+    }
+    visitLoop(condition, statement, true);
+  }
 
-    breakJumps.put(statement, mergePair);
-    continueJumps.put(statement, conditionPair);
+  private void addStatements(@NotNull final PsiStatement statement) {
+    if (statement instanceof PsiExpressionStatement) {
+      addStatement(((PsiExpressionStatement)statement).getExpression().getText() + ";");
+      return;
+    }
+    if (statement instanceof PsiExpressionListStatement) {
+      for (PsiExpression expression : ((PsiExpressionListStatement)statement).getExpressionList().getExpressions()) {
+        addStatement(expression.getText() + ";");
+      }
+    }
+  }
 
-    createJump(bodyPair);
+  @Override
+  public void visitForStatement(PsiForStatement statement) {
+    final PsiStatement initialization = statement.getInitialization();
+    if (initialization != null && !(initialization instanceof PsiEmptyStatement)) {
+      addStatements(initialization);
+    }
 
-    currentPair = bodyPair;
+    final PsiExpression condition = statement.getCondition();
+    final PsiStatement update = statement.getUpdate();
+
+    final Block conditionBlock = condition != null ? newBlock() : null;
+    final Block bodyBlock = newBlock();
+    final Block updateBlock = update != null ? newBlock() : null;
+    final Block mergeBlock = newBlock();
+
+    final Block actualConditionBlock = conditionBlock != null ? conditionBlock : bodyBlock;
+    final Block actualUpdateBlock = updateBlock != null ? updateBlock : actualConditionBlock;
+
+    addUnconditionalJumpStatement(actualConditionBlock);
+
+    if (conditionBlock != null) {
+      currentBlock = conditionBlock;
+      addConditionalJumpStatement(condition, bodyBlock, mergeBlock);
+    }
+
+    if (updateBlock != null) {
+      currentBlock = updateBlock;
+      addStatements(update);
+      addUnconditionalJumpStatement(actualConditionBlock);
+    }
+
+    currentBlock = bodyBlock;
     statement.getBody().accept(this);
-    createJump(conditionPair);
+    addUnconditionalJumpStatement(actualUpdateBlock);
 
-    currentPair = conditionPair;
-    createConditionalJump(statement.getCondition(), bodyPair, mergePair);
-
-    currentPair = mergePair;
+    currentBlock = mergeBlock;
   }
 
   @Override
-  public void visitMethodCallExpression(PsiMethodCallExpression expression) {
-    currentPair.block.add(Util.createPushStatement(
-      factory, frameClassName, stackVarName, expression.getArgumentList().getExpressions(), PsiElement::getText));
-    final Pair newPair = newPair();
-    createJump(newPair);
-
-    currentPair = newPair;
-
-    final PsiElement parent = expression.getParent();
-    if (parent instanceof PsiAssignmentExpression) {
-      PsiAssignmentExpression assignment = (PsiAssignmentExpression)parent;
-      currentPair.block.add(createStatement(assignment.getLExpression().getText() + " = " + retVarName + ";"));
-    }
+  public void visitLambdaExpression(PsiLambdaExpression expression) {
   }
 
   @Override
-  public void visitBreakStatement(PsiBreakStatement statement) {
-    super.visitBreakStatement(statement);
-    final PsiStatement exitedStatement = statement.findExitedStatement();
-    if (exitedStatement == null) {
-      return;
-    }
-    createJump(breakJumps.get(exitedStatement));
+  public void visitClass(PsiClass aClass) {
   }
 
-  @Override
-  public void visitContinueStatement(PsiContinueStatement statement) {
-    super.visitContinueStatement(statement);
-    final PsiStatement continuedStatement = statement.findContinuedStatement();
-    if (continuedStatement == null) {
-      return;
+  class Pair {
+    private int id;
+    @NotNull private PsiCodeBlock block;
+
+    Pair(final int id, @NotNull final PsiCodeBlock block) {
+      this.id = id;
+      this.block = block;
     }
-    createJump(continueJumps.get(continuedStatement));
+
+    int getId() {
+      return id;
+    }
+
+    @NotNull
+    public PsiCodeBlock getBlock() {
+      return block;
+    }
   }
 
   List<Pair> getBlocks() {
-    final List<Pair> pairs = new ArrayList<>();
+    final List<Block> reachableBlocks = RemoveUnreachableBlocks.getInstance().apply(blocks);
 
-    // Remove trivial blocks (which contain only an unconditional jump)
-    for (Pair theBlock : reachableBlocks) {
-      if (theBlock.id != 0 && theBlock.block.getStatements().length == 0 && theBlock.jump instanceof Jump) {
-        Jump jump = (Jump)theBlock.jump;
-        for (Ref<Integer> reference : theBlock.references) {
-          reference.set(jump.ref.get());
-        }
-        continue;
-      }
-      pairs.add(theBlock);
-    }
+    final List<Block> nonTrivialReachableBlocks = reachableBlocks
+      .stream()
+      .filter(Block::inlineIfTrivial)
+      .collect(Collectors.toList());
 
-    for (Pair pair : pairs) {
-      if (pair.jump != null) {
-        pair.terminate();
-      }
-    }
-
-    return pairs;
+    return nonTrivialReachableBlocks.stream().filter(block -> !block.isInlinable()).map(block -> {
+      InlineVisitor inlineVisitor = new InlineVisitor(factory, nameManager);
+      block.accept(inlineVisitor);
+      return new Pair(block.getId(), inlineVisitor.getBlock());
+    }).collect(Collectors.toList());
   }
 }

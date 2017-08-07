@@ -83,9 +83,9 @@ public class IterativeMethodGenerator {
       return;
     }
 
-    final BasicBlocksGenerator2 basicBlocksGenerator = new BasicBlocksGenerator2(myMethod, myNameManager);
+    final BasicBlocksGenerator basicBlocksGenerator = new BasicBlocksGenerator(myMethod, myNameManager);
     incorporatedBody.accept(basicBlocksGenerator);
-    final List<BasicBlocksGenerator2.Pair> pairs = basicBlocksGenerator.getBlocks();
+    final List<BasicBlocksGenerator.Pair> pairs = basicBlocksGenerator.getBlocks();
 
     final Ref<Boolean> atLeastOneLabeledBreak = new Ref<>(false);
     pairs.forEach(pair -> replaceReturnStatements(pair.getBlock(), myNameManager, atLeastOneLabeledBreak));
