@@ -84,7 +84,9 @@ public class IterativeMethodGenerator {
       return;
     }
 
-    final BasicBlocksGenerator basicBlocksGenerator = new BasicBlocksGenerator(myMethod, myNameManager, myFactory);
+    final BasicBlocksGenerator basicBlocksGenerator =
+      new BasicBlocksGenerator(myMethod, myNameManager, myFactory,
+                               RecursionUtil.extractStatementsContainingRecursiveCalls(incorporatedBody, myMethod));
     incorporatedBody.accept(basicBlocksGenerator);
     final List<Pair<Integer, PsiCodeBlock>> pairs = basicBlocksGenerator.getBlocks();
 

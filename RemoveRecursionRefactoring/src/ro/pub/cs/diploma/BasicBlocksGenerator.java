@@ -17,6 +17,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   @NotNull private final PsiMethod myMethod;
   @NotNull private final NameManager myNameManager;
   @NotNull private final PsiElementFactory myFactory;
+  @NotNull private final Set<PsiStatement> myStatementsContainingRecursiveCalls;
 
   @NotNull private final List<Block> myBlocks = new ArrayList<>();
   @NotNull private final Map<PsiStatement, Block> myBreakTargets = new HashMap<>();
@@ -25,10 +26,14 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   @NotNull private Block currentBlock;
   private int counter;
 
-  BasicBlocksGenerator(@NotNull final PsiMethod method, @NotNull final NameManager nameManager, @NotNull final PsiElementFactory factory) {
+  BasicBlocksGenerator(@NotNull final PsiMethod method,
+                       @NotNull final NameManager nameManager,
+                       @NotNull final PsiElementFactory factory,
+                       @NotNull final Set<PsiStatement> statementsContainingRecursiveCalls) {
     myMethod = method;
     myNameManager = nameManager;
     myFactory = factory;
+    myStatementsContainingRecursiveCalls = statementsContainingRecursiveCalls;
     currentBlock = newBlock();
   }
 
@@ -78,7 +83,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   }
 
   private void processStatement(PsiStatement statement) {
-    if (RecursionUtil.containsRecursiveCalls(statement, myMethod)) {
+    if (myStatementsContainingRecursiveCalls.contains(statement)) {
       statement.accept(this);
       return;
     }

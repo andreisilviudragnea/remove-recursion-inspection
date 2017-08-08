@@ -8,7 +8,9 @@ import com.siyeh.ig.psiutils.ParenthesesUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class RecursionUtil {
   private RecursionUtil() {
@@ -67,6 +69,34 @@ public class RecursionUtil {
   }
 
   @NotNull
+  static Set<PsiStatement> extractStatementsContainingRecursiveCalls(@NotNull final PsiCodeBlock incorporatedBody,
+                                                                     @NotNull final PsiMethod method) {
+    List<PsiMethodCallExpression> recursiveCalls = new ArrayList<>();
+    incorporatedBody.accept(new JavaRecursiveElementVisitor() {
+      @Override
+      public void visitMethodCallExpression(PsiMethodCallExpression expression) {
+        super.visitMethodCallExpression(expression);
+        if (RecursionUtil.isRecursive(expression, method)) {
+          recursiveCalls.add(expression);
+        }
+      }
+    });
+
+    Set<PsiStatement> statementsContainingRecursiveCalls = new HashSet<>();
+    for (final PsiMethodCallExpression call : recursiveCalls) {
+      PsiElement parent = call.getParent();
+      while (parent != incorporatedBody) {
+        if (parent instanceof PsiStatement) {
+          statementsContainingRecursiveCalls.add((PsiStatement)parent);
+        }
+        parent = parent.getParent();
+      }
+    }
+
+    return statementsContainingRecursiveCalls;
+  }
+
+  @NotNull
   private static List<PsiElement> getElementsInScope(@NotNull final PsiParameter parameter) {
     final PsiElement parent = parameter.getParent();
     final List<PsiElement> elements = new ArrayList<>();
@@ -76,7 +106,8 @@ public class RecursionUtil {
       if (body != null) {
         elements.add(body);
       }
-    } else if (parent instanceof PsiForeachStatement) {
+    }
+    else if (parent instanceof PsiForeachStatement) {
       final PsiStatement body = ((PsiForeachStatement)parent).getBody();
       if (body != null) {
         elements.add(body);
