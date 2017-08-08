@@ -80,6 +80,14 @@ public class RecursionUtil {
           recursiveCalls.add(expression);
         }
       }
+
+      @Override
+      public void visitClass(PsiClass aClass) {
+      }
+
+      @Override
+      public void visitLambdaExpression(PsiLambdaExpression expression) {
+      }
     });
 
     Set<PsiStatement> statementsContainingRecursiveCalls = new HashSet<>();
