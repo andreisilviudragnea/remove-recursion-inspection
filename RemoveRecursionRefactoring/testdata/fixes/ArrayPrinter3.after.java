@@ -20,23 +20,18 @@ class ArrayPrinter3 {
                     break;
                 }
                 case 1: {
-                    if (true) {
-                        if (frame.first == frame.last) {
-                            frame.result.add(array[frame.first]);
-                            stack.pop();
-                            break;
-                        } else {
-                            frame.mid = frame.first + (frame.last - frame.first) / 2;
-                            stack.push(new DisplayArrayFrame(frame.first, frame.mid, frame.result));
-                            frame.block = 7;
-                            break;
-                        }
-                    } else {
+                    if (frame.first == frame.last) {
+                        frame.result.add(array[frame.first]);
                         stack.pop();
+                        break;
+                    } else {
+                        frame.mid = frame.first + (frame.last - frame.first) / 2;
+                        stack.push(new DisplayArrayFrame(frame.first, frame.mid, frame.result));
+                        frame.block = 6;
                         break;
                     }
                 }
-                case 7: {
+                case 6: {
                     frame.first = frame.mid + 1;
                     frame.block = 1;
                     break;

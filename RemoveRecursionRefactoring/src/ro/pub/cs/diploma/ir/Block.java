@@ -12,7 +12,7 @@ public class Block implements Statement {
   @NotNull private final List<Statement> statements = new ArrayList<>();
   @NotNull private final List<Ref<Block>> references = new ArrayList<>();
 
-  private boolean afterRecursiveCall;
+  private boolean doNotInline;
 
   public Block(final int id) {
     this.id = id;
@@ -39,7 +39,7 @@ public class Block implements Statement {
   }
 
   public boolean isInlinable() {
-    return references.size() == 1 && !afterRecursiveCall;
+    return references.size() == 1 && !doNotInline;
   }
 
   public boolean removeIfUnreachable() {
@@ -68,8 +68,8 @@ public class Block implements Statement {
     return statements;
   }
 
-  public void setAfterRecursiveCall(final boolean afterRecursiveCall) {
-    this.afterRecursiveCall = afterRecursiveCall;
+  public void setDoNotInline(final boolean doNotInline) {
+    this.doNotInline = doNotInline;
   }
 
   public boolean inlineIfTrivial() {
@@ -78,8 +78,8 @@ public class Block implements Statement {
       for (final Ref<Block> reference : references) {
         reference.set(jumpBlock);
       }
-      if (afterRecursiveCall) {
-        jumpBlock.afterRecursiveCall = true;
+      if (doNotInline) {
+        jumpBlock.doNotInline = true;
       }
       return false;
     }

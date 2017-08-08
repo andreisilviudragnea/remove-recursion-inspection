@@ -20,25 +20,20 @@ public class BreakStatement1 {
                     break;
                 }
                 case 1: {
-                    if (true) {
-                        frame.list.add(frame.iter);
-                        frame.count--;
-                        stack.push(new BreakStatementFrame(frame.iter - 1, frame.list));
-                        frame.block = 4;
-                        break;
-                    } else {
-                        frame.block = 3;
-                        break;
-                    }
+                    frame.list.add(frame.iter);
+                    frame.count--;
+                    stack.push(new BreakStatementFrame(frame.iter - 1, frame.list));
+                    frame.block = 3;
+                    break;
                 }
-                case 3: {
+                case 2: {
                     frame.list.add(frame.iter);
                     stack.pop();
                     break;
                 }
-                case 4: {
+                case 3: {
                     if (frame.count == 0) {
-                        frame.block = 3;
+                        frame.block = 2;
                         break;
                     }
                     frame.block = 1;

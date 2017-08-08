@@ -28,6 +28,7 @@ public class BreakContinueReplacerVisitor extends JavaRecursiveElementVisitor {
       return;
     }
     block.addReference(Ref.create(block));
+    block.setDoNotInline(true);
     statement.getParent().addBefore(myFactory.createStatementFromText("frame.block = " + block.getId() + ";", null), statement);
     statement.replace(myFactory.createStatementFromText("break;", null));
   }

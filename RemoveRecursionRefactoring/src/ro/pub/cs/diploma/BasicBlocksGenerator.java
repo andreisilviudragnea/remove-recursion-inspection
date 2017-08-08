@@ -4,6 +4,7 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.Ref;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.siyeh.ig.psiutils.ExpressionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ro.pub.cs.diploma.ir.*;
@@ -139,7 +140,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
                                           expression.getArgumentList().getExpressions(), PsiElement::getText));
 
     final Block block = newBlock();
-    block.setAfterRecursiveCall(true);
+    block.setDoNotInline(true);
     addUnconditionalJumpStatement(block);
 
     currentBlock = block;
@@ -207,7 +208,16 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
                          @Nullable final PsiStatement update,
                          @NotNull final PsiLoopStatement statement,
                          final boolean atLeastOnce) {
-    final Block conditionBlock = condition != null ? newBlock() : null;
+    final Object expression = ExpressionUtils.computeConstantExpression(condition);
+    final PsiExpression theCondition;
+    if (expression instanceof Boolean && expression.equals(Boolean.TRUE)) {
+      theCondition = null;
+    }
+    else {
+      theCondition = condition;
+    }
+
+    final Block conditionBlock = theCondition != null ? newBlock() : null;
     final Block bodyBlock = newBlock();
     final Block updateBlock = update != null ? newBlock() : null;
     final Block mergeBlock = newBlock();
@@ -222,7 +232,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
 
     if (conditionBlock != null) {
       currentBlock = conditionBlock;
-      addConditionalJumpStatement(condition, bodyBlock, mergeBlock);
+      addConditionalJumpStatement(theCondition, bodyBlock, mergeBlock);
     }
 
     if (updateBlock != null) {
