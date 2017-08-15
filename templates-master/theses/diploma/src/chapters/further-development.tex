@@ -2,9 +2,10 @@
 
 The refactoring does not support \code{try} statements in the method body, given the complex control flow involving
 these statements. They can however be supported by the refactoring with some more effort, but they are not usually used
-in the context of recursive methods.
+in the context of recursive methods. Recursive calls inside switch statements are not supported either, because they are
+rather uncommon.
 
-A special to be considered is \texit{tail recursion}. In the case of tail recursive methods, that is methods
+A special case to be considered is \texit{tail recursion}. In the case of tail recursive methods, that is methods
 whose last statement is a recursive call, they can have the recursion removed by placing the body of the method inside a
 \code{while} loop and then replacing the \code{return} statements with assignments to the formal parameters of the
 method, ensuring that the order of assignments respects the order of evaluation of the arguments to the recursive call.
