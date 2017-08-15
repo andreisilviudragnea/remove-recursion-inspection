@@ -32,18 +32,27 @@ different operations for each type of \code{PsiElement} encountered. Each \code{
 represents the label of its corresponding \code{case}.
 
 The visitor initializes a \code{currentBlock} before visiting the actual body of the method. This is the entry block of
-the function. The following subsections present how the visitor processes each type of relevant \code{PsiElement}
-encountered.
+the function. The visitor also keeps two private mappings (\code{breakTargets} and \code{continueTargets}) from
+potential \code{break} and \code{continue} target statements (\code{for}, \code{while} and \code{do-while} loops) to
+the basic blocks to which control flow jumps after executing the corresponding \code{break} or \code{continue} statement.
+The following subsections present how the visitor processes each type of relevant \code{PsiElement} encountered.
 
 \subsection{Visiting a \code{PsiCodeBlock}}
 
 The body of a method is represented as a \code{PsiCodeBlock}. The visitor processes each\\
 \code{PsiStatement} in the \code{PsiCodeBlock}.
 
-In this context, processing means that if the \code{PsiStatement} contains recursive calls, it
-accepts the visitor for further processing. If the \code{PsiStatement} is an instance of \code{PsiReturnStatement}, a
-\code{ReturnStatement} wrapper over the \code{PsiStatement} is added to the \code{currentBlock}. Otherwise, a
-\code{NormalStatement} wrapper over the \code{PsiStatement} is added to the \code{currentBlock}.
+In this context, processing means that if the \code{PsiStatement} contains recursive calls or is an instance of
+\code{PsiReturnStatement}, \code{PsiBreakStatement} or \code{PsiContinueStatement},
+it accepts the visitor for further processing.
+
+Otherwise, a \code{BreakContinueReplacerVisitor} visits the \code{PsiStatement} in order to replace the \code{break} and
+\code{continue} statements with inlined \code{UnconditionalJumpStatement}s to the target \code{block}s of these
+statements. The target \code{block}s of these statements also get their \code{doNotInline} flag set to \code{true},
+so as not to be inlined by later passes. Here, an inlined \code{UnconditionalJumpStatement} means an assignment to the
+\code{block} field of the \code{frame} object with the \code{id} of the target \code{block}, followed by a \code{break}
+statement. After the replacer visitor processing finishes, a \code{NormalStatement} wrapper over the
+\code{PsiStatement} is added to the \code{currentBlock}.
 
 An important last step after processing all the \code{PsiStatement}s in the \code{PsiCodeBlock} of the method is adding
 an explicit \code{ReturnStatement} to the \code{currentBlock}, if the return type of the method is \code{void} and the
@@ -53,6 +62,24 @@ do not specify a final \code{return} statement, since it is redundant.
 \subsection{Visiting a \code{PsiBlockStatement}}
 Since the \code{PsiBlockStatement} is merely a wrapper over a \code{PsiCodeBlock}, visiting it translates to processing
 the statements of its contained \code{PsiCodeBlock}, just as already specified above.
+
+\subsection{Visiting a \code{PsiReturnStatement}}
+
+A \code{ReturnStatement} wrapper over the \code{PsiReturnStatement} is added to the \code{currentBlock}.
+
+\subsection{Visiting a \code{PsiBreakStatement}}
+
+The \code{exitedStatement} corresponding to the \code{break} statement is computed. If the \code{exitedStatement} is
+not contained in the \code{breakTargets} map, a \code{NormalStatement} wrapper over the \code{PsiBreakStatement} is
+added to the \code{currentBlock}. Otherwise, an \code{UnconditionalJumpStatement} to the target \code{block} is added
+to the \code{currentBlock}.
+
+\subsection{Visiting a \code{PsiContinueStatement}}
+
+The \code{continuedStatement} corresponding to the \code{continue} statement is computed. If the \code{continuedStatement}
+is not contained in the \code{continueTargets} map, a \code{NormalStatement} wrapper over the \code{PsiContinueStatement}
+is added to the \code{currentBlock}. Otherwise, an \code{UnconditionalJumpStatement} to the target \code{block} is added
+to the \code{currentBlock}.
 
 \subsection{Visiting a \code{PsiMethodCallExpression}}
 
