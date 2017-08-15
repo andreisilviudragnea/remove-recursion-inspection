@@ -83,44 +83,52 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   }
 
   private void processStatement(PsiStatement statement) {
-    if (myStatementsContainingRecursiveCalls.contains(statement)) {
+    if (myStatementsContainingRecursiveCalls.contains(statement) ||
+        statement instanceof PsiReturnStatement ||
+        statement instanceof PsiBreakStatement ||
+        statement instanceof PsiContinueStatement) {
       statement.accept(this);
       return;
     }
-    if (statement instanceof PsiReturnStatement) {
-      addReturnStatement((PsiReturnStatement)statement);
-      return;
-    }
-    if (statement instanceof PsiBreakStatement) {
-      final PsiStatement exitedStatement = ((PsiBreakStatement)statement).findExitedStatement();
-      if (exitedStatement == null) {
-        return;
-      }
-      final Block block = myBreakTargets.get(exitedStatement);
-      if (block == null) {
-        addStatement(statement);
-        return;
-      }
-      addUnconditionalJumpStatement(block);
-      return;
-    }
-    if (statement instanceof PsiContinueStatement) {
-      final PsiStatement continuedStatement = ((PsiContinueStatement)statement).findContinuedStatement();
-      if (continuedStatement == null) {
-        return;
-      }
-      final Block block = myContinueTargets.get(continuedStatement);
-      if (block == null) {
-        addStatement(statement);
-        return;
-      }
-      addUnconditionalJumpStatement(block);
-      return;
-    }
+
     final BreakContinueReplacerVisitor breakContinueReplacerVisitor = new BreakContinueReplacerVisitor(myBreakTargets, myContinueTargets,
                                                                                                        myFactory);
     statement.accept(breakContinueReplacerVisitor);
     addStatement(statement);
+  }
+
+  @Override
+  public void visitReturnStatement(PsiReturnStatement statement) {
+    addReturnStatement(statement);
+  }
+
+  private void processStatement(@NotNull final PsiStatement statement,
+                                @NotNull final PsiStatement targetStatement,
+                                @NotNull final Map<PsiStatement, Block> targets) {
+    final Block block = targets.get(targetStatement);
+    if (block == null) {
+      addStatement(statement);
+      return;
+    }
+    addUnconditionalJumpStatement(block);
+  }
+
+  @Override
+  public void visitBreakStatement(PsiBreakStatement statement) {
+    final PsiStatement exitedStatement = statement.findExitedStatement();
+    if (exitedStatement == null) {
+      return;
+    }
+    processStatement(statement, exitedStatement, myBreakTargets);
+  }
+
+  @Override
+  public void visitContinueStatement(PsiContinueStatement statement) {
+    final PsiStatement continuedStatement = statement.findContinuedStatement();
+    if (continuedStatement == null) {
+      return;
+    }
+    processStatement(statement, continuedStatement, myContinueTargets);
   }
 
   @Override
