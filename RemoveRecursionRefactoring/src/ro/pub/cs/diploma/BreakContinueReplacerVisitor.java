@@ -11,13 +11,16 @@ public class BreakContinueReplacerVisitor extends JavaRecursiveElementVisitor {
   @NotNull private final Map<PsiStatement, Block> myBreakTargets;
   @NotNull private final Map<PsiStatement, Block> myContinueTargets;
   @NotNull private final PsiElementFactory myFactory;
+  @NotNull private final Block myCurrentBlock;
 
   BreakContinueReplacerVisitor(@NotNull final Map<PsiStatement, Block> breakTargets,
                                @NotNull final Map<PsiStatement, Block> continueTargets,
-                               @NotNull final PsiElementFactory factory) {
+                               @NotNull final PsiElementFactory factory,
+                               @NotNull final Block currentBlock) {
     myBreakTargets = breakTargets;
     myContinueTargets = continueTargets;
     myFactory = factory;
+    myCurrentBlock = currentBlock;
   }
 
   private void replaceWithUnconditionalJump(@NotNull final PsiStatement targetStatement,
@@ -29,6 +32,7 @@ public class BreakContinueReplacerVisitor extends JavaRecursiveElementVisitor {
     }
     block.addReference(Ref.create(block));
     block.setDoNotInline(true);
+    myCurrentBlock.addChild(block);
     statement.getParent().addBefore(myFactory.createStatementFromText("frame.block = " + block.getId() + ";", null), statement);
     statement.replace(myFactory.createStatementFromText("break;", null));
   }

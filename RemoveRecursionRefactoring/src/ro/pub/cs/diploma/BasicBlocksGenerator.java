@@ -7,7 +7,8 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.siyeh.ig.psiutils.ExpressionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ro.pub.cs.diploma.ir.*;
+import ro.pub.cs.diploma.ir.Block;
+import ro.pub.cs.diploma.ir.InlineVisitor;
 import ro.pub.cs.diploma.passes.RemoveUnreachableBlocks;
 
 import java.util.*;
@@ -61,7 +62,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
       return;
     }
     final Ref<Block> blockRef = Ref.create(block);
-    currentBlock.add(new UnconditionalJumpStatement(blockRef));
+    currentBlock.addUnconditionalJump(blockRef);
     block.addReference(blockRef);
   }
 
@@ -73,13 +74,13 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     }
     final Ref<Block> thenBlockRef = Ref.create(thenBlock);
     final Ref<Block> jumpBlockRef = Ref.create(jumpBlock);
-    currentBlock.add(new ConditionalJumpStatement(condition, thenBlockRef, jumpBlockRef));
+    currentBlock.addConditionalJump(condition, thenBlockRef, jumpBlockRef);
     thenBlock.addReference(thenBlockRef);
     jumpBlock.addReference(jumpBlockRef);
   }
 
   private void addReturnStatement(PsiReturnStatement statement) {
-    currentBlock.add(new ReturnStatement(statement));
+    currentBlock.addReturnStatement(statement);
   }
 
   private void processStatement(PsiStatement statement) {
@@ -92,7 +93,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     }
 
     final BreakContinueReplacerVisitor breakContinueReplacerVisitor = new BreakContinueReplacerVisitor(myBreakTargets, myContinueTargets,
-                                                                                                       myFactory);
+                                                                                                       myFactory, currentBlock);
     statement.accept(breakContinueReplacerVisitor);
     addStatement(statement);
   }

@@ -3,7 +3,7 @@ package ro.pub.cs.diploma.passes;
 import org.jetbrains.annotations.NotNull;
 import ro.pub.cs.diploma.ir.Block;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class RemoveUnreachableBlocks implements Pass<List<Block>, List<Block>, List<Block>> {
@@ -22,16 +22,31 @@ public class RemoveUnreachableBlocks implements Pass<List<Block>, List<Block>, L
     return blocks;
   }
 
+  @NotNull
+  private static Set<Block> getReachableBlocks(@NotNull final Block root) {
+    final Set<Block> reachableBlocks = new HashSet<>();
+    reachableBlocks.add(root);
+
+    final Queue<Block> queue = new ArrayDeque<>();
+    queue.add(root);
+
+    while (!queue.isEmpty()) {
+      final Block current = queue.remove();
+      for (Block child : current.getChildren()) {
+        if (!reachableBlocks.contains(child)) {
+          reachableBlocks.add(child);
+          queue.add(child);
+        }
+      }
+    }
+
+    return reachableBlocks;
+  }
+
   @Override
   @NotNull
   public List<Block> transform(@NotNull final List<Block> blocks) {
-    List<Block> before;
-    List<Block> after = blocks;
-    do {
-      before = after;
-      after = before.stream().filter(Block::removeIfUnreachable).collect(Collectors.toList());
-    }
-    while (after.size() != before.size());
-    return after;
+    final Set<Block> reachableBlocks = getReachableBlocks(blocks.get(0));
+    return blocks.stream().filter(reachableBlocks::contains).collect(Collectors.toList());
   }
 }

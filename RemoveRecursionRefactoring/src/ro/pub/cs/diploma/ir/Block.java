@@ -1,6 +1,8 @@
 package ro.pub.cs.diploma.ir;
 
 import com.intellij.openapi.util.Ref;
+import com.intellij.psi.PsiExpression;
+import com.intellij.psi.PsiReturnStatement;
 import com.intellij.psi.PsiStatement;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,15 +13,33 @@ public class Block implements Statement {
   private final int id;
   @NotNull private final List<Statement> statements = new ArrayList<>();
   @NotNull private final List<Ref<Block>> references = new ArrayList<>();
+  @NotNull private final List<Block> children = new ArrayList<>();
 
   private boolean doNotInline;
+  private boolean finished;
 
   public Block(final int id) {
     this.id = id;
   }
 
-  public void add(@NotNull final Statement statement) {
-    statements.add(statement);
+  public void addConditionalJump(@NotNull final PsiExpression condition,
+                                 @NotNull final Ref<Block> thenBlockRef,
+                                 @NotNull final Ref<Block> elseBlockRef) {
+    statements.add(new ConditionalJumpStatement(condition, thenBlockRef, elseBlockRef));
+    children.add(thenBlockRef.get());
+    children.add(elseBlockRef.get());
+    finished = true;
+  }
+
+  public void addUnconditionalJump(@NotNull final Ref<Block> blockRef) {
+    statements.add(new UnconditionalJumpStatement(blockRef));
+    children.add(blockRef.get());
+    finished = true;
+  }
+
+  public void addReturnStatement(@NotNull final PsiReturnStatement statement) {
+    statements.add(new ReturnStatement(statement));
+    finished = true;
   }
 
   public void add(@NotNull final PsiStatement statement) {
@@ -30,33 +50,21 @@ public class Block implements Statement {
     references.add(blockRef);
   }
 
-  void removeReference(@NotNull final Ref<Block> blockRef) {
-    references.remove(blockRef);
+  public void addChild(@NotNull final Block child) {
+    children.add(child);
   }
 
   public boolean isFinished() {
-    return statements.size() != 0 && statements.get(statements.size() - 1) instanceof TerminatorStatement;
+    return finished;
   }
 
   public boolean isInlinable() {
     return references.size() == 1 && !doNotInline;
   }
 
-  public boolean removeIfUnreachable() {
-    if (id != 0 && references.size() == 0) {
-      if (statements.size() == 0) {
-        return false;
-      }
-      final Statement statement = statements.get(statements.size() - 1);
-      if (statement instanceof JumpStatement) {
-        ((JumpStatement)statement).detach();
-        return false;
-      }
-      if (statement instanceof ReturnStatement) {
-        return false;
-      }
-    }
-    return true;
+  @NotNull
+  public List<Block> getChildren() {
+    return children;
   }
 
   public int getId() {
@@ -74,7 +82,7 @@ public class Block implements Statement {
 
   public boolean inlineIfTrivial() {
     if (id != 0 && statements.size() == 1 && statements.get(0) instanceof UnconditionalJumpStatement) {
-      final Block jumpBlock = ((UnconditionalJumpStatement) statements.get(0)).getBlock();
+      final Block jumpBlock = ((UnconditionalJumpStatement)statements.get(0)).getBlock();
       for (final Ref<Block> reference : references) {
         reference.set(jumpBlock);
       }
