@@ -4,7 +4,8 @@ The Java programming language compiler \code{javac} does not perform any kind of
 are known to potentially exhaust the call stack space. The purpose of this thesis is to create a refactoring which
 automatically transforms a recursive method into an iterative one, by simulating the call stack with a stack in the user
 program. The refactoring alters the initial recursive method as little as possible while still preserving the semantics
-of the code.
+of the code. Since the main purpose of the refactoring is to avoid \code{StackOverflowError}s, the performance of the
+transformed method may be worse than the performance of the original one.
 
 \section{Project Description}
 

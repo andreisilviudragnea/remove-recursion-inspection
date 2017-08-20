@@ -2,5 +2,9 @@
 
 The algorithm for transforming recursion in iteration is composed of thirteen passes which gradually transform the body
 of the method. The end result is a method which is functionally equivalent to the initial method, but the recursion does
-not take place implicitly, but explicitly by simulating it in the user program with a stack of frames. This is how
-\code{StackOverflowError}s can be avoided, at the cost of obfuscating the code.
+not take place implicitly anymore, but explicitly by simulating it in the user program with a stack of frames. This is
+how \code{StackOverflowError}s can be avoided, at the cost of obfuscating the code.
+
+The performance of the generated code is generally worse than the performance of the original code, but this is
+generally acceptable, because this refactoring should only be used as a temporary solution to
+\code{StackOverflowError}s.
