@@ -1,7 +1,6 @@
-import org.jetbrains.annotations.Contract;
-
 public class Primes {
-  @Contract(pure = true)
+  private static final int NUM_ITERATIONS = 10;
+
   private static boolean isPrime(long x) {
     long limit = (long) Math.sqrt(x);
     for (long i = 2; i <= limit; i++) {
@@ -23,6 +22,12 @@ public class Primes {
   }
 
   public static void main(String[] args) {
-    System.out.println(sumOfPrimes(2_000_000));
+    final long before = System.nanoTime();
+    for (int i = 0; i < NUM_ITERATIONS; i++) {
+      sumOfPrimes(10_000);
+    }
+    final long after = System.nanoTime();
+    System.out.println("Elapsed time: " +
+      (after - before) / 1_000 / NUM_ITERATIONS + "us");
   }
 }
