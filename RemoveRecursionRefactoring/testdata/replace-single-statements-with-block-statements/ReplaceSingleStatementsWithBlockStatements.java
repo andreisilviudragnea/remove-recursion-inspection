@@ -28,5 +28,38 @@ class ReplaceSingleStatementsWithBlockStatements {
         for (int x : a)
             for (int y : a)
                 System.out.println(x + y);
+        int x = 7;
+        switch (x) {
+            case 0:
+                System.out.println();
+                switch (x) {
+                    case 1:
+                        System.out.println();
+                    default:
+                        System.out.println();
+                }
+            case 1:
+                System.out.println();
+                break;
+            case 2: {
+                System.out.println();
+            }
+            case 3: {
+                System.out.println();
+                break;
+            }
+            case 7:
+                ;
+                break;
+            case 6:
+                ;
+            case 5:
+            case 4: {
+                System.out.println();
+            }
+            break;
+            default:
+                System.out.println();
+        }
     }
 }

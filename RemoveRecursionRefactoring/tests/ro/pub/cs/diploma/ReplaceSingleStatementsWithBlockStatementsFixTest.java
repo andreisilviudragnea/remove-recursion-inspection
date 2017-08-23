@@ -8,7 +8,7 @@ public class ReplaceSingleStatementsWithBlockStatementsFixTest extends IGQuickFi
     super.setUp();
     myFixture.enableInspections(new ReplaceSingleStatementsWithBlockStatementsInspection());
     myRelativePath = "replace-single-statements-with-block-statements";
-    myDefaultHint = RemoveRecursionBundle.message("replace.single.statements.with.block.statements.quickfix");
+    myDefaultHint = RemoveRecursionBundle.message("replace.single.statements.with.block.statements");
   }
 
   public void testReplaceSingleStatementsWithBlockStatements() {
