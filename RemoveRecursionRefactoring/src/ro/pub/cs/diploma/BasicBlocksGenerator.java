@@ -24,8 +24,8 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   @NotNull private final Map<PsiStatement, Block> myBreakTargets = new HashMap<>();
   @NotNull private final Map<PsiStatement, Block> myContinueTargets = new HashMap<>();
 
-  @NotNull private Block currentBlock;
-  private int counter;
+  @NotNull private Block myCurrentBlock;
+  private int myCounter;
 
   BasicBlocksGenerator(@NotNull final PsiMethod method,
                        @NotNull final NameManager nameManager,
@@ -35,52 +35,35 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     myNameManager = nameManager;
     myFactory = factory;
     myStatementsContainingRecursiveCalls = statementsContainingRecursiveCalls;
-    currentBlock = newBlock();
+    myCurrentBlock = newBlock();
   }
 
   private Block newBlock() {
-    final Block block = new Block(counter++);
+    final Block block = new Block(myCounter++);
     myBlocks.add(block);
     return block;
   }
 
-  @NotNull
-  private PsiStatement statement(String text) {
-    return myFactory.createStatementFromText(text, null);
-  }
-
   private void addStatement(PsiStatement statement) {
-    currentBlock.add(statement);
+    myCurrentBlock.add(statement);
   }
 
   private void addStatement(String text) {
-    currentBlock.add(statement(text));
+    myCurrentBlock.add(myFactory.createStatementFromText(text, null));
   }
 
   private void addUnconditionalJumpStatement(@NotNull final Block block) {
-    if (currentBlock.isFinished()) {
-      return;
-    }
-    final Ref<Block> blockRef = Ref.create(block);
-    currentBlock.addUnconditionalJump(blockRef);
-    block.addReference(blockRef);
+    myCurrentBlock.addUnconditionalJump(Ref.create(block));
   }
 
   private void addConditionalJumpStatement(@NotNull final PsiExpression condition,
                                            @NotNull final Block thenBlock,
                                            @NotNull final Block jumpBlock) {
-    if (currentBlock.isFinished()) {
-      return;
-    }
-    final Ref<Block> thenBlockRef = Ref.create(thenBlock);
-    final Ref<Block> jumpBlockRef = Ref.create(jumpBlock);
-    currentBlock.addConditionalJump(condition, thenBlockRef, jumpBlockRef);
-    thenBlock.addReference(thenBlockRef);
-    jumpBlock.addReference(jumpBlockRef);
+    myCurrentBlock.addConditionalJump(condition, Ref.create(thenBlock), Ref.create(jumpBlock));
   }
 
   private void addReturnStatement(PsiReturnStatement statement) {
-    currentBlock.addReturnStatement(statement);
+    myCurrentBlock.addReturnStatement(statement);
   }
 
   private void processStatement(PsiStatement statement) {
@@ -93,7 +76,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     }
 
     final BreakContinueReplacerVisitor breakContinueReplacerVisitor = new BreakContinueReplacerVisitor(myBreakTargets, myContinueTargets,
-                                                                                                       myFactory, currentBlock);
+                                                                                                       myFactory, myCurrentBlock);
     statement.accept(breakContinueReplacerVisitor);
     addStatement(statement);
   }
@@ -157,7 +140,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     block.setDoNotInline(true);
     addUnconditionalJumpStatement(block);
 
-    currentBlock = block;
+    myCurrentBlock = block;
 
     final PsiType returnType = myMethod.getReturnType();
     if (returnType == null) {
@@ -189,7 +172,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     }
     addConditionalJumpStatement(condition, thenBlock, jumpBlock);
 
-    currentBlock = thenBlock;
+    myCurrentBlock = thenBlock;
     final PsiStatement thenBranch = statement.getThenBranch();
     if (thenBranch == null) {
       return;
@@ -198,12 +181,12 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     addUnconditionalJumpStatement(mergeBlock);
 
     if (elseBranch != null) {
-      currentBlock = elseBlock;
+      myCurrentBlock = elseBlock;
       elseBranch.accept(this);
       addUnconditionalJumpStatement(mergeBlock);
     }
 
-    currentBlock = mergeBlock;
+    myCurrentBlock = mergeBlock;
   }
 
   private void addStatements(@NotNull final PsiStatement statement) {
@@ -245,17 +228,17 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     addUnconditionalJumpStatement(atLeastOnce ? bodyBlock : actualConditionBlock);
 
     if (conditionBlock != null) {
-      currentBlock = conditionBlock;
+      myCurrentBlock = conditionBlock;
       addConditionalJumpStatement(theCondition, bodyBlock, mergeBlock);
     }
 
     if (updateBlock != null) {
-      currentBlock = updateBlock;
+      myCurrentBlock = updateBlock;
       addStatements(update);
       addUnconditionalJumpStatement(actualConditionBlock);
     }
 
-    currentBlock = bodyBlock;
+    myCurrentBlock = bodyBlock;
     final PsiStatement body = statement.getBody();
     if (body == null) {
       return;
@@ -263,7 +246,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     body.accept(this);
     addUnconditionalJumpStatement(actualUpdateBlock);
 
-    currentBlock = mergeBlock;
+    myCurrentBlock = mergeBlock;
   }
 
   @Override

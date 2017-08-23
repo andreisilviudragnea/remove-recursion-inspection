@@ -1,5 +1,6 @@
 package ro.pub.cs.diploma.passes;
 
+import com.intellij.openapi.util.Ref;
 import org.jetbrains.annotations.NotNull;
 import ro.pub.cs.diploma.ir.Block;
 
@@ -32,7 +33,8 @@ public class RemoveUnreachableBlocks implements Pass<List<Block>, List<Block>, L
 
     while (!queue.isEmpty()) {
       final Block current = queue.remove();
-      for (Block child : current.getChildren()) {
+      for (Ref<Block> ref : current.getOutBlocks()) {
+        final Block child = ref.get();
         if (!reachableBlocks.contains(child)) {
           reachableBlocks.add(child);
           queue.add(child);

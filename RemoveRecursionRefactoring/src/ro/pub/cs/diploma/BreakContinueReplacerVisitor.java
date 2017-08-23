@@ -30,15 +30,14 @@ public class BreakContinueReplacerVisitor extends JavaRecursiveElementVisitor {
     if (block == null) {
       return;
     }
-    block.addReference(Ref.create(block));
+    myCurrentBlock.addEdgeTo(Ref.create(block));
     block.setDoNotInline(true);
-    myCurrentBlock.addChild(block);
     statement.getParent().addBefore(myFactory.createStatementFromText("frame.block = " + block.getId() + ";", null), statement);
     statement.replace(myFactory.createStatementFromText("break;", null));
   }
 
   @Override
-  public void visitBreakStatement(PsiBreakStatement statement) {
+  public void visitBreakStatement(@NotNull final PsiBreakStatement statement) {
     final PsiStatement exitedStatement = statement.findExitedStatement();
     if (exitedStatement == null) {
       return;
@@ -47,7 +46,7 @@ public class BreakContinueReplacerVisitor extends JavaRecursiveElementVisitor {
   }
 
   @Override
-  public void visitContinueStatement(PsiContinueStatement statement) {
+  public void visitContinueStatement(@NotNull final PsiContinueStatement statement) {
     final PsiStatement continuedStatement = statement.findContinuedStatement();
     if (continuedStatement == null) {
       return;

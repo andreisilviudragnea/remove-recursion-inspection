@@ -12,8 +12,8 @@ import java.util.List;
 public class Block implements Statement {
   private final int id;
   @NotNull private final List<Statement> statements = new ArrayList<>();
-  @NotNull private final List<Ref<Block>> references = new ArrayList<>();
-  @NotNull private final List<Block> children = new ArrayList<>();
+  @NotNull private final List<Ref<Block>> inBlocks = new ArrayList<>();
+  @NotNull private final List<Ref<Block>> outBlocks = new ArrayList<>();
 
   private boolean doNotInline;
   private boolean finished;
@@ -25,15 +25,21 @@ public class Block implements Statement {
   public void addConditionalJump(@NotNull final PsiExpression condition,
                                  @NotNull final Ref<Block> thenBlockRef,
                                  @NotNull final Ref<Block> elseBlockRef) {
+    if (finished) {
+      return;
+    }
     statements.add(new ConditionalJumpStatement(condition, thenBlockRef, elseBlockRef));
-    children.add(thenBlockRef.get());
-    children.add(elseBlockRef.get());
+    addEdgeTo(thenBlockRef);
+    addEdgeTo(elseBlockRef);
     finished = true;
   }
 
   public void addUnconditionalJump(@NotNull final Ref<Block> blockRef) {
+    if (finished) {
+      return;
+    }
     statements.add(new UnconditionalJumpStatement(blockRef));
-    children.add(blockRef.get());
+    addEdgeTo(blockRef);
     finished = true;
   }
 
@@ -46,25 +52,18 @@ public class Block implements Statement {
     statements.add(new NormalStatement(statement));
   }
 
-  public void addReference(@NotNull final Ref<Block> blockRef) {
-    references.add(blockRef);
-  }
-
-  public void addChild(@NotNull final Block child) {
-    children.add(child);
-  }
-
-  public boolean isFinished() {
-    return finished;
+  public void addEdgeTo(@NotNull final Ref<Block> blockRef) {
+    outBlocks.add(blockRef);
+    blockRef.get().inBlocks.add(blockRef);
   }
 
   public boolean isInlinable() {
-    return references.size() == 1 && !doNotInline;
+    return inBlocks.size() == 1 && !doNotInline;
   }
 
   @NotNull
-  public List<Block> getChildren() {
-    return children;
+  public List<Ref<Block>> getOutBlocks() {
+    return outBlocks;
   }
 
   public int getId() {
@@ -83,8 +82,8 @@ public class Block implements Statement {
   public boolean inlineIfTrivial() {
     if (id != 0 && statements.size() == 1 && statements.get(0) instanceof UnconditionalJumpStatement) {
       final Block jumpBlock = ((UnconditionalJumpStatement)statements.get(0)).getBlock();
-      for (final Ref<Block> reference : references) {
-        reference.set(jumpBlock);
+      for (final Ref<Block> inBlock : inBlocks) {
+        inBlock.set(jumpBlock);
       }
       if (doNotInline) {
         jumpBlock.doNotInline = true;
