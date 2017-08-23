@@ -143,7 +143,7 @@ public class IterativeMethodGenerator {
   private void replaceReturnStatements(final int steps,
                                        @NotNull final List<Pair<Integer, PsiCodeBlock>> pairs,
                                        @NotNull final Ref<Boolean> atLeastOneLabeledBreak) {
-    if (steps == 12) {
+    if (steps <= 12) {
       return;
     }
     pairs.forEach(pair -> replaceReturnStatements(pair.getSecond(), myNameManager, atLeastOneLabeledBreak));

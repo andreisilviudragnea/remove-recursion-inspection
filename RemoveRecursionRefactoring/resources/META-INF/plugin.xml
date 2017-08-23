@@ -71,6 +71,31 @@
                      groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"
                      enabledByDefault="true" level="WARNING"
                      implementationClass="ro.pub.cs.diploma.inspections.ReplaceDeclarationsHavingInitializersWithAssignmentsInspection"/>
+    <localInspection groupPath="Java" language="JAVA" shortName="GenerateCFG"
+                     bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="generate.cfg"
+                     groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"
+                     enabledByDefault="true" level="WARNING"
+                     implementationClass="ro.pub.cs.diploma.inspections.GenerateCFGInspection"/>
+    <localInspection groupPath="Java" language="JAVA" shortName="RemoveUnreachableBlocks"
+                     bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="remove.unreachable.blocks"
+                     groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"
+                     enabledByDefault="true" level="WARNING"
+                     implementationClass="ro.pub.cs.diploma.inspections.RemoveUnreachableBlocksInspection"/>
+    <localInspection groupPath="Java" language="JAVA" shortName="InlineTrivialBlocks"
+                     bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="inline.trivial.blocks"
+                     groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"
+                     enabledByDefault="true" level="WARNING"
+                     implementationClass="ro.pub.cs.diploma.inspections.InlineTrivialBlocksInspection"/>
+    <localInspection groupPath="Java" language="JAVA" shortName="InlineBlocks"
+                     bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="inline.blocks"
+                     groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"
+                     enabledByDefault="true" level="WARNING"
+                     implementationClass="ro.pub.cs.diploma.inspections.InlineBlocksInspection"/>
+    <localInspection groupPath="Java" language="JAVA" shortName="ReplaceReturnStatements"
+                     bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="replace.return.statements"
+                     groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"
+                     enabledByDefault="true" level="WARNING"
+                     implementationClass="ro.pub.cs.diploma.inspections.ReplaceReturnStatementsInspection"/>
   </extensions>
 
   <actions>
