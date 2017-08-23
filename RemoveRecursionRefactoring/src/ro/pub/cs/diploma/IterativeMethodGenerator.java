@@ -104,7 +104,7 @@ public class IterativeMethodGenerator {
       }).collect(Collectors.toList());
 
     final Ref<Boolean> atLeastOneLabeledBreak = new Ref<>(false);
-    pairs.forEach(pair -> replaceReturnStatements(pair.getSecond(), myNameManager, atLeastOneLabeledBreak));
+    replaceReturnStatements(steps, pairs, atLeastOneLabeledBreak);
 
     final String casesString = pairs.stream().map(pair -> "case " + pair.getFirst() + ":" + pair.getSecond().getText())
       .collect(Collectors.joining(""));
@@ -138,6 +138,15 @@ public class IterativeMethodGenerator {
     }
 
     return nonTrivialReachableBlocks;
+  }
+
+  private void replaceReturnStatements(final int steps,
+                                       @NotNull final List<Pair<Integer, PsiCodeBlock>> pairs,
+                                       @NotNull final Ref<Boolean> atLeastOneLabeledBreak) {
+    if (steps == 12) {
+      return;
+    }
+    pairs.forEach(pair -> replaceReturnStatements(pair.getSecond(), myNameManager, atLeastOneLabeledBreak));
   }
 
   private void replaceReturnStatements(@NotNull final PsiCodeBlock block,
