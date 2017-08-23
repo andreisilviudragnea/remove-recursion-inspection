@@ -1,6 +1,5 @@
 package ro.pub.cs.diploma;
 
-import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.Ref;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -8,11 +7,8 @@ import com.siyeh.ig.psiutils.ExpressionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ro.pub.cs.diploma.ir.Block;
-import ro.pub.cs.diploma.ir.InlineVisitor;
-import ro.pub.cs.diploma.passes.RemoveUnreachableBlocks;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   @NotNull private final PsiMethod myMethod;
@@ -285,18 +281,8 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   public void visitClass(PsiClass aClass) {
   }
 
-  List<Pair<Integer, PsiCodeBlock>> getBlocks() {
-    final List<Block> reachableBlocks = RemoveUnreachableBlocks.getInstance().apply(myBlocks);
-
-    final List<Block> nonTrivialReachableBlocks = reachableBlocks
-      .stream()
-      .filter(Block::inlineIfTrivial)
-      .collect(Collectors.toList());
-
-    return nonTrivialReachableBlocks.stream().filter(block -> !block.isInlinable()).map(block -> {
-      InlineVisitor inlineVisitor = new InlineVisitor(myFactory, myNameManager);
-      block.accept(inlineVisitor);
-      return Pair.create(block.getId(), inlineVisitor.getBlock());
-    }).collect(Collectors.toList());
+  @NotNull
+  List<Block> getBlocks() {
+    return myBlocks;
   }
 }

@@ -86,7 +86,7 @@ public class InlineVisitor implements Visitor {
   }
 
   @Override
-  public void visit(@NotNull ConditionalJumpStatement conditionalJumpStatement) {
+  public void visit(@NotNull final ConditionalJumpStatement conditionalJumpStatement) {
     final Block thenBlock = conditionalJumpStatement.getThenBlock();
     final PsiCodeBlock thenPsiBlock = inline(thenBlock);
 
@@ -119,7 +119,6 @@ public class InlineVisitor implements Visitor {
   @Override
   public void visit(@NotNull final UnconditionalJumpStatement unconditionalJumpStatement) {
     final Block block = unconditionalJumpStatement.getBlock();
-
     final PsiCodeBlock psiBlock = inline(block);
 
     if (psiBlock != null) {

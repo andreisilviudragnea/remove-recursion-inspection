@@ -6,6 +6,8 @@ import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
+import ro.pub.cs.diploma.ir.Block;
+import ro.pub.cs.diploma.ir.InlineVisitor;
 import ro.pub.cs.diploma.passes.*;
 
 import java.util.List;
@@ -88,7 +90,18 @@ public class IterativeMethodGenerator {
       new BasicBlocksGenerator(myMethod, myNameManager, myFactory,
                                RecursionUtil.extractStatementsContainingRecursiveCalls(incorporatedBody, myMethod));
     incorporatedBody.accept(basicBlocksGenerator);
-    final List<Pair<Integer, PsiCodeBlock>> pairs = basicBlocksGenerator.getBlocks();
+    final List<Block> blocks = basicBlocksGenerator.getBlocks();
+
+    final List<Block> optimizedBlocks = applyBlocksOptimizations(steps, blocks);
+
+    final List<Pair<Integer, PsiCodeBlock>> pairs = optimizedBlocks
+      .stream()
+      .filter(block -> !block.isInlinable())
+      .map(block -> {
+        InlineVisitor inlineVisitor = new InlineVisitor(myFactory, myNameManager);
+        block.accept(inlineVisitor);
+        return Pair.create(block.getId(), inlineVisitor.getBlock());
+      }).collect(Collectors.toList());
 
     final Ref<Boolean> atLeastOneLabeledBreak = new Ref<>(false);
     pairs.forEach(pair -> replaceReturnStatements(pair.getSecond(), myNameManager, atLeastOneLabeledBreak));
@@ -99,6 +112,32 @@ public class IterativeMethodGenerator {
     incorporatedBody.replace(statement(
       (atLeastOneLabeledBreak.get() ? myNameManager.getSwitchLabelName() + ":" : "") +
       "switch(" + myNameManager.getFrameVarName() + "." + myNameManager.getBlockFieldName() + "){" + casesString + "}"));
+  }
+
+  private List<Block> applyBlocksOptimizations(final int steps, @NotNull final List<Block> blocks) {
+    if (steps == 9) {
+      blocks.forEach(block -> block.setDoNotInline(true));
+      return blocks;
+    }
+
+    final List<Block> reachableBlocks = RemoveUnreachableBlocks.getInstance().apply(blocks);
+
+    if (steps == 10) {
+      reachableBlocks.forEach(block -> block.setDoNotInline(true));
+      return reachableBlocks;
+    }
+
+    final List<Block> nonTrivialReachableBlocks = reachableBlocks
+      .stream()
+      .filter(Block::inlineIfTrivial)
+      .collect(Collectors.toList());
+
+    if (steps == 11) {
+      nonTrivialReachableBlocks.forEach(block -> block.setDoNotInline(true));
+      return nonTrivialReachableBlocks;
+    }
+
+    return nonTrivialReachableBlocks;
   }
 
   private void replaceReturnStatements(@NotNull final PsiCodeBlock block,

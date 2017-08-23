@@ -50,7 +50,7 @@ public class RemoveRecursionInspection extends BaseInspection {
           return;
         }
         IterativeMethodGenerator.getInstance(Util.getFactory(method), Util.getStyleManager(method), method, NameManager.getInstance(method))
-          .createIterativeBody(20);
+          .createIterativeBody(12);
       }
     };
   }
