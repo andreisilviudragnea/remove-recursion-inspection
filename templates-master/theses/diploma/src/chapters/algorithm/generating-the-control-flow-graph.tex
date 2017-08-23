@@ -13,7 +13,8 @@ The structure of the CFG (Control Flow Graph) \abbrev{CFG}{Control Flow Graph} p
 IR\footnote{\url{https://llvm.org/docs/LangRef.html}}.
 
 In this context, a \code{Block} is defined as a list of non-terminal \code{NormalStatement}s terminated by a
-\code{TerminatorStatement}.
+\code{TerminatorStatement}. This definition is inspired from the definition of a \textit{basic block} as presented in
+\textit{Chapter 8.4} of \cite{aho}.
 
 A \code{NormalStatement} is a wrapper for a \code{PsiStatement}.
 
