@@ -4,7 +4,7 @@ This code transformation is needed in order to avoid name clashes later on, when
 holds the variables potentially used after returning from a recursive call (both formal parameters and local variables)
 is generated. The fields of this class will simulate the stack frame of the method.
 
-The JVMS (Java Virtual Machine Specification)\abbrev{JVMS}{Java Virtual Machine Specification} states the
+The JVMS\cite{jvms} (Java Virtual Machine Specification)\abbrev{JVMS}{Java Virtual Machine Specification} states the
 following\footnote{\url{http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-2.html#jvms-2.6.1}}:
 
 \begin{quote}
