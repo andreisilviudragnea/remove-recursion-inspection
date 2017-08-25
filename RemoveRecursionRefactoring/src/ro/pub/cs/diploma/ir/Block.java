@@ -11,9 +11,9 @@ import java.util.List;
 
 public class Block implements Statement {
   private final int id;
-  @NotNull private final List<Statement> statements = new ArrayList<>();
-  @NotNull private final List<Ref<Block>> inBlocks = new ArrayList<>();
-  @NotNull private final List<Ref<Block>> outBlocks = new ArrayList<>();
+  @NotNull private final List<Statement> myStatements = new ArrayList<>();
+  @NotNull private final List<Ref<Block>> myInBlocks = new ArrayList<>();
+  @NotNull private final List<Ref<Block>> myOutBlocks = new ArrayList<>();
 
   private boolean doNotInline;
   private boolean finished;
@@ -28,7 +28,7 @@ public class Block implements Statement {
     if (finished) {
       return;
     }
-    statements.add(new ConditionalJumpStatement(condition, thenBlockRef, elseBlockRef));
+    myStatements.add(new ConditionalJumpStatement(condition, thenBlockRef, elseBlockRef));
     addEdgeTo(thenBlockRef);
     addEdgeTo(elseBlockRef);
     finished = true;
@@ -38,32 +38,42 @@ public class Block implements Statement {
     if (finished) {
       return;
     }
-    statements.add(new UnconditionalJumpStatement(blockRef));
+    myStatements.add(new UnconditionalJumpStatement(blockRef));
     addEdgeTo(blockRef);
     finished = true;
   }
 
   public void addReturnStatement(@NotNull final PsiReturnStatement statement) {
-    statements.add(new ReturnStatement(statement));
+    myStatements.add(new ReturnStatement(statement));
+    finished = true;
+  }
+
+  public void addSwitchStatement(@NotNull final PsiExpression expression, @NotNull final List<Statement> statements) {
+    myStatements.add(new SwitchStatement(expression, statements));
+    for (Statement statement : statements) {
+      if (statement instanceof UnconditionalJumpStatement) {
+        addEdgeTo(((UnconditionalJumpStatement)statement).getBlockRef());
+      }
+    }
     finished = true;
   }
 
   public void add(@NotNull final PsiStatement statement) {
-    statements.add(new NormalStatement(statement));
+    myStatements.add(new NormalStatement(statement));
   }
 
   public void addEdgeTo(@NotNull final Ref<Block> blockRef) {
-    outBlocks.add(blockRef);
-    blockRef.get().inBlocks.add(blockRef);
+    myOutBlocks.add(blockRef);
+    blockRef.get().myInBlocks.add(blockRef);
   }
 
   public boolean isInlinable() {
-    return inBlocks.size() == 1 && !doNotInline;
+    return myInBlocks.size() == 1 && !doNotInline;
   }
 
   @NotNull
   public List<Ref<Block>> getOutBlocks() {
-    return outBlocks;
+    return myOutBlocks;
   }
 
   public int getId() {
@@ -72,7 +82,7 @@ public class Block implements Statement {
 
   @NotNull
   List<Statement> getStatements() {
-    return statements;
+    return myStatements;
   }
 
   public void setDoNotInline(final boolean doNotInline) {
@@ -80,9 +90,9 @@ public class Block implements Statement {
   }
 
   public boolean inlineIfTrivial() {
-    if (id != 0 && statements.size() == 1 && statements.get(0) instanceof UnconditionalJumpStatement) {
-      final Block jumpBlock = ((UnconditionalJumpStatement)statements.get(0)).getBlock();
-      for (final Ref<Block> inBlock : inBlocks) {
+    if (id != 0 && myStatements.size() == 1 && myStatements.get(0) instanceof UnconditionalJumpStatement) {
+      final Block jumpBlock = ((UnconditionalJumpStatement)myStatements.get(0)).getBlock();
+      for (final Ref<Block> inBlock : myInBlocks) {
         inBlock.set(jumpBlock);
       }
       if (doNotInline) {

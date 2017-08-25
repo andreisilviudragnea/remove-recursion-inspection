@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import ro.pub.cs.diploma.NameManager;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class InlineVisitor implements Visitor {
   @NotNull private final PsiElementFactory factory;
@@ -33,9 +34,13 @@ public class InlineVisitor implements Visitor {
     currentBlock.add(statement);
   }
 
+  private void addBreak() {
+    addStatement("break;");
+  }
+
   private void addBlockSet(@NotNull final String val) {
     addStatement(blockSet + val + ";");
-    addStatement("break;");
+    addBreak();
   }
 
   public InlineVisitor(@NotNull final PsiElementFactory factory, @NotNull final NameManager nameManager) {
@@ -127,5 +132,20 @@ public class InlineVisitor implements Visitor {
     }
 
     addBlockSet(String.valueOf(block.getId()));
+  }
+
+  @Override
+  public void visit(@NotNull final SwitchStatement switchStatement) {
+    final List<Statement> statements = switchStatement.getStatements();
+    PsiCodeBlock psiBlock = newBlock();
+    final PsiCodeBlock oldCurrentBlock = currentBlock;
+    currentBlock = psiBlock;
+    for (Statement statement : statements) {
+      statement.accept(this);
+    }
+    currentBlock = oldCurrentBlock;
+
+    addStatement("switch (" + switchStatement.getExpression().getText() + ")" + psiBlock.getText());
+    addBreak();
   }
 }

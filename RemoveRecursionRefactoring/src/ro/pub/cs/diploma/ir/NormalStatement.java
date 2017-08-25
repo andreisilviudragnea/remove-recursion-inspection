@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 public class NormalStatement implements Statement, WrapperStatement {
   @NotNull private final PsiStatement statement;
 
-  NormalStatement(@NotNull final PsiStatement statement) {
+  public NormalStatement(@NotNull final PsiStatement statement) {
     this.statement = statement;
   }
 

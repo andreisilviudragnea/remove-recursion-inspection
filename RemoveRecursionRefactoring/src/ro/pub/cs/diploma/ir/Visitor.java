@@ -12,4 +12,6 @@ public interface Visitor {
   void visit(@NotNull final ReturnStatement returnStatement);
 
   void visit(@NotNull final UnconditionalJumpStatement unconditionalJumpStatement);
+
+  void visit(@NotNull final SwitchStatement switchStatement);
 }

@@ -6,13 +6,18 @@ import org.jetbrains.annotations.NotNull;
 public class UnconditionalJumpStatement implements TerminatorStatement {
   @NotNull private final Ref<Block> blockRef;
 
-  UnconditionalJumpStatement(@NotNull Ref<Block> blockRef) {
+  public UnconditionalJumpStatement(@NotNull Ref<Block> blockRef) {
     this.blockRef = blockRef;
   }
 
   @NotNull
   public Block getBlock() {
     return blockRef.get();
+  }
+
+  @NotNull
+  public Ref<Block> getBlockRef() {
+    return blockRef;
   }
 
   @Override

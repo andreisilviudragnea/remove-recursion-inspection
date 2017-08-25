@@ -7,6 +7,9 @@ import com.siyeh.ig.psiutils.ExpressionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ro.pub.cs.diploma.ir.Block;
+import ro.pub.cs.diploma.ir.NormalStatement;
+import ro.pub.cs.diploma.ir.Statement;
+import ro.pub.cs.diploma.ir.UnconditionalJumpStatement;
 
 import java.util.*;
 
@@ -58,7 +61,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     myCurrentBlock.addConditionalJump(condition, Ref.create(thenBlock), Ref.create(jumpBlock));
   }
 
-  private void addReturnStatement(PsiReturnStatement statement) {
+  private void addReturnStatement(@NotNull final PsiReturnStatement statement) {
     myCurrentBlock.addReturnStatement(statement);
   }
 
@@ -271,6 +274,43 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     }
 
     visitLoop(statement.getCondition(), statement.getUpdate(), statement, false);
+  }
+
+  @Override
+  public void visitSwitchStatement(PsiSwitchStatement statement) {
+    final Block mergeBlock = newBlock();
+    myBreakTargets.put(statement, mergeBlock);
+
+    final PsiCodeBlock body = statement.getBody();
+    if (body == null) {
+      return;
+    }
+    final List<Statement> statements = new ArrayList<>();
+    final Block oldCurrentBlock = myCurrentBlock;
+    for (PsiStatement psiStatement : body.getStatements()) {
+      if (psiStatement instanceof PsiSwitchLabelStatement) {
+        statements.add(new NormalStatement(psiStatement));
+        continue;
+      }
+      if (psiStatement instanceof PsiBlockStatement) {
+        final Block newBlock = newBlock();
+        statements.add(new UnconditionalJumpStatement(Ref.create(newBlock)));
+
+        myCurrentBlock = newBlock;
+        psiStatement.accept(this);
+      }
+    }
+
+    addUnconditionalJumpStatement(mergeBlock);
+
+    myCurrentBlock = oldCurrentBlock;
+    final PsiExpression expression = statement.getExpression();
+    if (expression == null) {
+      return;
+    }
+    myCurrentBlock.addSwitchStatement(expression, statements);
+
+    myCurrentBlock = mergeBlock;
   }
 
   @Override
