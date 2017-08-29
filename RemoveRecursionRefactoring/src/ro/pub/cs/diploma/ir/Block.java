@@ -4,10 +4,12 @@ import com.intellij.openapi.util.Ref;
 import com.intellij.psi.PsiExpression;
 import com.intellij.psi.PsiReturnStatement;
 import com.intellij.psi.PsiStatement;
+import com.intellij.psi.PsiSwitchLabelStatement;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Block implements Statement {
   private final int id;
@@ -106,5 +108,59 @@ public class Block implements Statement {
   @Override
   public void accept(@NotNull final Visitor visitor) {
     visitor.visit(this);
+  }
+
+  public List<String> toDot() {
+    List<String> strings = new ArrayList<>();
+    for (Statement statement : myStatements) {
+      if (statement instanceof ConditionalJumpStatement) {
+        strings.add(((ConditionalJumpStatement)statement).getCondition().getText()
+                      .replace("{", "\\{")
+                      .replace("}", "\\}")
+                      .replace("<", "\\<")
+                      .replace(">", "\\>")
+                      .replace("\n", "\\n"));
+        strings.add("{<true>true|<false>false}");
+      }
+      else if (statement instanceof WrapperStatement) {
+        strings.add(((WrapperStatement)statement).getStatement().getText()
+                      .replace("{", "\\{")
+                      .replace("}", "\\}")
+                      .replace("<", "\\<")
+                      .replace(">", "\\>")
+                      .replace("\n", "\\n"));
+      } else if (statement instanceof SwitchStatement) {
+        final SwitchStatement switchStatement = (SwitchStatement)statement;
+        strings.add(switchStatement.getExpression().getText()
+                      .replace("{", "\\{")
+                      .replace("}", "\\}")
+                      .replace("<", "\\<")
+                      .replace(">", "\\>")
+                      .replace("\n", "\\n"));
+        for (Statement statement1 : switchStatement.getStatements()) {
+          if (statement1 instanceof NormalStatement) {
+            final PsiStatement statement2 = ((NormalStatement)statement1).getStatement();
+            if (statement2 instanceof PsiSwitchLabelStatement) {
+            }
+          }
+        }
+      }
+    }
+
+    List<String> statements = new ArrayList<>();
+    String color = doNotInline ? "color=red" : "";
+    statements.add(String.format("%s [label=\"{id: %s|%s}\" %s];", id, id, strings.stream().collect(Collectors.joining("|")), color));
+    if (myStatements.size() > 0) {
+      final Statement lastStatement = myStatements.get(myStatements.size() - 1);
+      if (lastStatement instanceof ConditionalJumpStatement) {
+        statements.add(String.format("%s:true -> %s;", id, ((ConditionalJumpStatement)lastStatement).getThenBlock().getId()));
+        statements.add(String.format("%s:false -> %s;", id, ((ConditionalJumpStatement)lastStatement).getElseBlock().getId()));
+      }
+      else if (lastStatement instanceof UnconditionalJumpStatement) {
+        statements.add(String.format("%s -> %s;", id, ((UnconditionalJumpStatement)lastStatement).getBlock().getId()));
+      }
+    }
+
+    return statements;
   }
 }

@@ -10,6 +10,7 @@ import ro.pub.cs.diploma.ir.Block;
 import ro.pub.cs.diploma.ir.InlineVisitor;
 import ro.pub.cs.diploma.passes.*;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -91,6 +92,11 @@ public class IterativeMethodGenerator {
                                RecursionUtil.extractStatementsContainingRecursiveCalls(incorporatedBody, myMethod));
     incorporatedBody.accept(basicBlocksGenerator);
     final List<Block> blocks = basicBlocksGenerator.getBlocks();
+
+    final List<String> collect = blocks.stream().map(Block::toDot).flatMap(Collection::stream).collect(Collectors.toList());
+    collect.add(0, "node [shape=record];");
+
+    final String cfg = String.format("digraph cfg {\n\t%s\n}", collect.stream().collect(Collectors.joining("\n\t")));
 
     final List<Block> optimizedBlocks = applyBlocksOptimizations(steps, blocks);
 
