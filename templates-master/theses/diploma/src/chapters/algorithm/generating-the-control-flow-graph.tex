@@ -205,6 +205,36 @@ which are optional and the dotted lines represent arbitrary subgraphs.
     \caption{For statement CFG\label{img:for-statement}}
 \end{figure}
 
+\subsection{Visiting a \code{PsiSwitchStatement}}
+
+After the \textit{Replacing single statements with block statements} pass, the body of a \code{switch} statement
+contains only either \code{PsiSwitchLabelStatement}s or \code{PsiBlockStatement}s.
+
+First, a \code{mergeBlock} is generated, the \code{currentBlock} is saved in an \code{oldCurrentBlock} variable and
+the \code{previousCurrentBlock} is set to \code{null}. An empty list of \code{Statement}s called \code{statements}
+is also initialized. Then each statement in the body of the \code{switch} statement is processed.
+
+If the current statement is an instance of \code{PsiSwitchLabelStatement}, then a\\
+\code{NormalStatement} wrapping the \code{PsiSwitchLabelStatement} is added to the \code{statements} list.
+
+If the current statement is an instance of \code{PsiBlockStatement}, then a \code{newBlock} is created and an
+\code{UnconditionalJumpStatement} to this \code{newBlock} is added to the \code{statements} list. If the
+\code{previousCurrentBlock} is not \code{null} and it is not finished (its last statement is not a
+\code{TerminatorStatement}), then an \code{UnconditionalJumpStatement} to the \code{newBlock} is added to the
+\code{previousCurrentBlock}. This happens when the control flow falls through the \code{previousCurrentBlock} to
+the \code{newBlock}. Then the \code{currentBlock} is set to \code{newBlock} and the visitor visits the current
+\code{PsiBlockStatement}. After this, the \code{previousCurrentBlock} is set to the actual \code{currentBlock},
+which may be other than before the visitor visits the \code{PsiBlockStatement}.
+
+After processing all the statements in the \code{switch} body, if the \code{previousCurrentBlock} is not \code{null}
+and it is not finished, an \code{UnconditionalJumpStatement} to the \code{mergeBlock} is added to the
+\code{previousCurrentBlock}. This happens when control flow falls through the last block in the \code{switch} body to
+the \code{mergeBlock}.
+
+Then the \code{currentBlock} is restored from \code{oldCurrentBlock} and a \code{SwitchStatement} is added to the
+\code{currentBlock}, containing the the \code{PsiExpression} associated with the \code{PsiSwitchStatement} and the
+computed \code{statements} list. The \code{currentBlock} is then set to the \code{mergeBlock}.
+
 An example of the generated basic blocks is provided in \labelindexref{Figure}{img:blocks}. Each block is assigned to
 a case inside a \code{switch} statement which replaces the incorporated body of the method. The \code{switch} statement
 has the \code{block} field of the \code{frame} object as its expression.
