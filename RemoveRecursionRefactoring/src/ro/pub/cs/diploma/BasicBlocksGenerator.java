@@ -287,6 +287,7 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
     }
     final List<Statement> statements = new ArrayList<>();
     final Block oldCurrentBlock = myCurrentBlock;
+    Block previousCurrentBlock = null;
     for (PsiStatement psiStatement : body.getStatements()) {
       if (psiStatement instanceof PsiSwitchLabelStatement) {
         statements.add(new NormalStatement(psiStatement));
@@ -296,8 +297,13 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
         final Block newBlock = newBlock();
         statements.add(new UnconditionalJumpStatement(Ref.create(newBlock)));
 
+        if (previousCurrentBlock != null && !previousCurrentBlock.isFinished()) {
+          previousCurrentBlock.addUnconditionalJump(Ref.create(newBlock));
+        }
+
         myCurrentBlock = newBlock;
         psiStatement.accept(this);
+        previousCurrentBlock = myCurrentBlock;
       }
     }
 

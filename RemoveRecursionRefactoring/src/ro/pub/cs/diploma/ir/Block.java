@@ -73,6 +73,10 @@ public class Block implements Statement {
     return myInBlocks.size() == 1 && !doNotInline;
   }
 
+  public boolean isFinished() {
+    return finished;
+  }
+
   @NotNull
   public List<Ref<Block>> getOutBlocks() {
     return myOutBlocks;
