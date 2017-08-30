@@ -2,18 +2,19 @@
 
 This pass replaces the local variable declarations in the method body which have initializers with assignments to the
 corresponding fields of the \code{frame} object. An example of this pass is provided in
-\labelindexref{Figure}{img:replace-declaration}.
+\labelindexref{Figure}{img:replace-declaration}. The local variable \code{mid} having an initializer gets replaced
+with an assignment to the corresponding field of the \code{frame} object.
 
 \begin{figure}[htb]
     \makebox[\linewidth][c]{%
-    \begin{subfigure}[b]{.6\textwidth}
+    \begin{subfigure}[b]{.5\textwidth}
         \centering
-        \includegraphics[height=3.7in]{src/img/replace-identifier-after.png}
+        \includegraphics[width=2.6in]{src/img/replace-declaration-before-30.png}
         \caption{Before}
     \end{subfigure}%
-    \begin{subfigure}[b]{.6\textwidth}
+    \begin{subfigure}[b]{.5\textwidth}
         \centering
-        \includegraphics[height=3.7in]{src/img/replace-declaration-after.png}
+        \includegraphics[width=2.6in]{src/img/replace-declaration-after-30.png}
         \caption{After}
     \end{subfigure}%
     }\\
