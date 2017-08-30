@@ -307,7 +307,9 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
       }
     }
 
-    addUnconditionalJumpStatement(mergeBlock);
+    if (previousCurrentBlock != null && !previousCurrentBlock.isFinished()) {
+      previousCurrentBlock.addUnconditionalJump(Ref.create(mergeBlock));
+    }
 
     myCurrentBlock = oldCurrentBlock;
     final PsiExpression expression = statement.getExpression();
