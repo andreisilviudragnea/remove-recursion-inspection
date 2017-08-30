@@ -14,14 +14,14 @@ This pass generates a \code{private static} nested class named by the capitalize
 local variables) which are relevant after a recursive call (whose scope contains at least a recursive call). They are
 declared as \code{private}, because the enclosing class can still access the fields of this class. The frame class also
 contains a \code{private} constructor which initializes only the fields representing the formal parameters of the
-method, because the fields corresponding to local variables will be initialized by assignment in the method body,
-after another pass. Until they are initialized in the method body, they will have default values. By virtue of
-\textit{Definite Assignment}\footnote{\url{https://docs.oracle.com/javase/specs/jls/se8/html/jls-16.html}}, provided
-that the method compiles without errors before the refactoring, there will not be any problems involving using
+method, because the fields corresponding to local variables are initialized by assignment in the method body,
+after another pass. Until they are initialized in the method body, they have the corresponding default values.
+By virtue of \textit{Definite Assignment}\footnote{\url{https://docs.oracle.com/javase/specs/jls/se8/html/jls-16.html}},
+provided that the method compiles without errors before the refactoring, there will not be any problems involving using
 uninitialized local variables.
 
-There is an additional \code{int} field named \code{block} in the frame class, which will represent the index of the
-block of code to which the method will jump when returning from the callee to continue executing the statements in the
+There is an additional \code{int} field named \code{block} in the frame class, which represents the index of the
+block of code to which the method jumps when returning from the callee to continue executing the statements in the
 caller after the recursive call.
 
 An example of a frame class in provided in \labelindexref{Figure}{img:add-frame-class}.
