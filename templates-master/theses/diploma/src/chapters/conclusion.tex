@@ -1,10 +1,28 @@
 \chapter{Conclusion}
 
-The algorithm for transforming recursion in iteration is composed of thirteen passes which gradually transform the body
-of the method. The end result is a method which is functionally equivalent to the initial method, but the recursion does
-not take place implicitly anymore, but explicitly by simulating it in the user program with a stack of frames. This is
-how \code{StackOverflowError}s can be avoided, at the cost of obfuscating the code.
+%The algorithm for transforming recursion in iteration is composed of thirteen passes which gradually transform the body
+%of the method. The end result is a method which is functionally equivalent to the initial method, but the recursion does
+%not take place implicitly anymore, but explicitly by simulating it in the user program with a stack of frames. This is
+%how \code{StackOverflowError}s can be avoided, at the cost of obfuscating the code.
+%
+%The performance of the generated code is generally worse than the performance of the original code, but this is
+%generally acceptable, because this refactoring should only be used as a temporary solution to
+%\code{StackOverflowError}s.
 
-The performance of the generated code is generally worse than the performance of the original code, but this is
-generally acceptable, because this refactoring should only be used as a temporary solution to
-\code{StackOverflowError}s.
+The purpose of this refactoring is to offer a temporary solution for \code{StackOverflowError}s. This is achieved by
+simulating the call stack in the user program and building a reduced version of the control flow graph for the recursive
+method, which enables jumps to arbitrary places in the code. The process of embedding the control flow graph inside
+a \code{switch} and a \code{while} statement is necessary, given the limitation of the Java programming language of not
+supporting the \code{goto} statement, which would have enabled jumps to any point in the method body. The refactoring
+does not improve either the performance or the readability of the original code of the recursive method. The algorithm
+still needs to be improved if performance is critical.
+
+The most difficult part of the algorithm is preserving the semantics of the original code. Given the fact that there is
+no formal proof for the corectness of the transformations and that not all the Java language features are supported,
+there is no strong guarantee about the semantic equivalence. Writing a refactoring that is accurate in almost any
+situation is difficult, because there are many use cases which are hard to predict beforehand.
+
+The refactoring has been tested on about twenty different recursive methods in order to confirm its correctness in the
+most common use cases, by checking their behaviour before and after the refactoring. The user of the refactoring should
+have a way of testing the recursive method before and after applying the refactoring, probably by writing some unit
+tests, in order to be sure the semantics are preserved.
