@@ -12,7 +12,7 @@ methods are already part of a separate \textit{ExpressionStatement}.
 
 This code modification is necessary because the expression in which a recursive call may be embedded gets evaluated
 only after returning from the recursive call. By separating the point of return from recursion from the following
-computations, it will be possible to jump in the method body to the statements after the call. An example is provided
+computations, it becomes possible to jump in the method body to the statements after the call. An example is provided
 in \labelindexref{Figure}{img:extract-before} (before) and \labelindexref{Figure}{img:extract-after} (after).
 
 \begin{figure}[htb]
