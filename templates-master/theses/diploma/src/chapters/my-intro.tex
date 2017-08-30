@@ -2,9 +2,9 @@
 
 The purpose of this thesis is to present an algorithm for transforming a recursive method in the Java programming
 language into a method which simulates the recursion using an explicit stack in the user program. This transformation
-preserves the semantics of the original code, but since the main purpose of this refactoring is to avoid
-\code{StackOverflowError}s, the performance of the transformed method may be worse than the performance of the original
-one. This refactoring is a temporary solution for the bigger problem of improving the original algorithm.
+preserves the semantics of the original code, but since the main purpose of this refactoring\cite{refactoring}
+is to avoid \code{StackOverflowError}s, the performance of the transformed method may be worse than the performance of
+the original one. This refactoring is a temporary solution for the bigger problem of improving the original algorithm.
 
 The algorithm of the refactoring is split into multiple steps. The main idea of the algorithm is to construct a reduced
 version of the control flow graph of the method, which highlights the points of return from recursion in the method
