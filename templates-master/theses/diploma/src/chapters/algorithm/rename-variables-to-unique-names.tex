@@ -2,7 +2,7 @@
 
 This code transformation is needed in order to avoid name clashes later on, when the static nested class which
 holds the variables potentially used after returning from a recursive call (both formal parameters and local variables)
-is generated. The fields of this class will simulate the stack frame of the method.
+is generated. The fields of this class simulate the stack frame of the method.
 
 The JVMS\cite{jvms} (Java Virtual Machine Specification)\abbrev{JVMS}{Java Virtual Machine Specification} states the
 following\footnote{\url{http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-2.html#jvms-2.6.1}}:
@@ -63,11 +63,11 @@ will occur because JLS specifies that\footnote{\url{https://docs.oracle.com/java
     It is a compile-time error for the body of a class declaration to declare two fields with the same name.
 \end{quote}
 
-So all the relevant variables in the method (formal parameters and local variables) will be collected as fields of a
-static nested frame class, which will be used by the recursive method to save the state of the method call when
+So all the relevant variables in the method (formal parameters and local variables) are collected as fields of a
+static nested frame class, which is used by the recursive method to save the state of the method call when
 recursing, thus simulating the call stack. The rule is that for all the variables with the same name and type, there
-will be only one corresponding field in the frame class, but if there are variables with the same name, but different
-type, each variable in a type group will have a different name and a different corresponding frame class field.
+is only one corresponding field in the frame class, but if there are variables with the same name, but different
+type, each variable in a type group has a different name and a different corresponding frame class field.
 
 In other words, the first pass ensures that all the variables in a method which have the same name also have the same
 type.
