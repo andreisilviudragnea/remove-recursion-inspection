@@ -4,7 +4,6 @@ import com.intellij.openapi.util.Ref;
 import com.intellij.psi.PsiExpression;
 import com.intellij.psi.PsiReturnStatement;
 import com.intellij.psi.PsiStatement;
-import com.intellij.psi.PsiSwitchLabelStatement;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -116,54 +115,49 @@ public class Block implements Statement {
 
   public List<String> toDot() {
     List<String> strings = new ArrayList<>();
-    for (Statement statement : myStatements) {
-      if (statement instanceof ConditionalJumpStatement) {
-        strings.add(((ConditionalJumpStatement)statement).getCondition().getText()
-                      .replace("{", "\\{")
-                      .replace("}", "\\}")
-                      .replace("<", "\\<")
-                      .replace(">", "\\>")
-                      .replace("\n", "\\n"));
-        strings.add("{<true>true|<false>false}");
-      }
-      else if (statement instanceof WrapperStatement) {
+    if (myStatements.size() > 0) {
+      for (Statement statement : myStatements.subList(0, myStatements.size() - 1)) {
         strings.add(((WrapperStatement)statement).getStatement().getText()
                       .replace("{", "\\{")
                       .replace("}", "\\}")
                       .replace("<", "\\<")
                       .replace(">", "\\>")
                       .replace("\n", "\\n"));
-      } else if (statement instanceof SwitchStatement) {
-        final SwitchStatement switchStatement = (SwitchStatement)statement;
-        strings.add(switchStatement.getExpression().getText()
-                      .replace("{", "\\{")
-                      .replace("}", "\\}")
-                      .replace("<", "\\<")
-                      .replace(">", "\\>")
-                      .replace("\n", "\\n"));
-        for (Statement statement1 : switchStatement.getStatements()) {
-          if (statement1 instanceof NormalStatement) {
-            final PsiStatement statement2 = ((NormalStatement)statement1).getStatement();
-            if (statement2 instanceof PsiSwitchLabelStatement) {
-            }
-          }
-        }
       }
     }
 
-    List<String> statements = new ArrayList<>();
+    List<String> strings2 = new ArrayList<>();
+    strings2.add(String.format("id: %s", id));
+    strings2.add(strings.stream().collect(Collectors.joining("\\n")));
     String color = doNotInline ? "color=red" : "";
-    statements.add(String.format("%s [label=\"{id: %s|%s}\" %s];", id, id, strings.stream().collect(Collectors.joining("|")), color));
+    List<String> statements = new ArrayList<>();
     if (myStatements.size() > 0) {
       final Statement lastStatement = myStatements.get(myStatements.size() - 1);
       if (lastStatement instanceof ConditionalJumpStatement) {
+        strings2.add(((ConditionalJumpStatement)lastStatement).getCondition().getText()
+                         .replace("{", "\\{")
+                         .replace("}", "\\}")
+                         .replace("<", "\\<")
+                         .replace(">", "\\>")
+                         .replace("\n", "\\n"));
+        strings2.add("{<true>true|<false>false}");
         statements.add(String.format("%s:true -> %s;", id, ((ConditionalJumpStatement)lastStatement).getThenBlock().getId()));
         statements.add(String.format("%s:false -> %s;", id, ((ConditionalJumpStatement)lastStatement).getElseBlock().getId()));
       }
       else if (lastStatement instanceof UnconditionalJumpStatement) {
-        statements.add(String.format("%s -> %s;", id, ((UnconditionalJumpStatement)lastStatement).getBlock().getId()));
+        final int jumpId = ((UnconditionalJumpStatement)lastStatement).getBlock().getId();
+        strings2.add(String.format("jump %s;", jumpId));
+        statements.add(String.format("%s -> %s;", id, jumpId));
+      } else if (lastStatement instanceof ReturnStatement) {
+        strings2.add(((ReturnStatement)lastStatement).getStatement().getText()
+                       .replace("{", "\\{")
+                       .replace("}", "\\}")
+                       .replace("<", "\\<")
+                       .replace(">", "\\>")
+                       .replace("\n", "\\n"));
       }
     }
+    statements.add(String.format("%s [label=\"{%s}\" %s];", id, strings2.stream().collect(Collectors.joining("|")), color));
 
     return statements;
   }
