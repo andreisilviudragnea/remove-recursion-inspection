@@ -21,20 +21,20 @@ This transformation does not alter the semantics of the \code{switch} statement.
 
 This pass also transforms statements which may not contain recursive calls, because there are elements which the
 refactoring alters in order to remove recursion and they are not only method calls (for example, \code{return}
-statements). An example is provided in \labelindexref{Figure}{img:replace-single-statements-with-block-statements-before}
-(before) and \labelindexref{Figure}{img:replace-single-statements-with-block-statements-after} (after).
+statements). An example is provided in \labelindexref{Figure}{img:replace-single-statements-with-block-statements}.
 
 \begin{figure}[htb]
-    \centering
-    \begin{minipage}[b]{0.45\textwidth}
+    \makebox[\linewidth][c]{%
+    \begin{subfigure}[b]{.6\textwidth}
         \centering
-        \includegraphics[height=0.6in]{src/img/replace-single-statements-with-block-statements-before.png}
-        \caption{Replace single statements with block statements (before)\label{img:replace-single-statements-with-block-statements-before}}
-    \end{minipage}
-    \hfill
-    \begin{minipage}[b]{0.45\textwidth}
+        \includegraphics[height=0.6in]{src/img/replace-single-statements-with-block-statements-before-white.png}
+        \caption{Before}
+    \end{subfigure}%
+    \begin{subfigure}[b]{.6\textwidth}
         \centering
-        \includegraphics[height=1.44in]{src/img/replace-single-statements-with-block-statements-after.png}
-        \caption{Replace single statements with block statements (after)\label{img:replace-single-statements-with-block-statements-after}}
-    \end{minipage}
+        \includegraphics[height=1.44in]{src/img/replace-single-statements-with-block-statements-after-white.png}
+        \caption{After}
+    \end{subfigure}%
+    }\\
+    \caption{Replacing single statements with block statements \label{img:replace-single-statements-with-block-statements}}
 \end{figure}
