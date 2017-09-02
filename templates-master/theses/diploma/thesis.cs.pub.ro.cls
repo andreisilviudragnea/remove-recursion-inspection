@@ -30,6 +30,7 @@
 \setlength{\headsep}{0.50cm}
 
 \usepackage{parskip}
+\usepackage{minted}
 
 % package for variable line spacing (1, 1.5, 2)
 % usage: write \onehalfspacing before the part which should be 

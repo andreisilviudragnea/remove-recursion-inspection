@@ -13,6 +13,7 @@
 	
 	<target name="build" description="build thesis">
 		<exec executable="pdflatex">
+			<arg value="-shell-escape"/>
 			<arg value="-interaction=scrollmode"/>
 			<arg value="--src-specials"/>
 			<arg value="thesis.tex"/>
@@ -28,6 +29,7 @@
 			<arg value="thesis.nls"/>
 		</exec>
 		<exec executable="pdflatex">
+			<arg value="-shell-escape"/>
 			<arg value="-interaction=scrollmode"/>
 			<arg value="--src-specials"/>
 			<arg value="thesis"/>
@@ -36,6 +38,7 @@
 			<arg value="thesis.idx"/>
 		</exec>
 		<exec executable="pdflatex">
+			<arg value="-shell-escape"/>
 			<arg value="-interaction=scrollmode"/>
 			<arg value="--src-specials"/>
 			<arg value="thesis"/>
