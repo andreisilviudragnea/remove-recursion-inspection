@@ -9,10 +9,10 @@ public class NameClash {
     }
 
     void nameClash(int frame, int stack) {
-        Deque<NameClashFrame> stack1 = new ArrayDeque<>();
+        final Deque<NameClashFrame> stack1 = new ArrayDeque<>();
         stack1.push(new NameClashFrame(frame, stack));
         while (!stack1.isEmpty()) {
-            NameClashFrame frame1 = stack1.peek();
+            final NameClashFrame frame1 = stack1.peek();
             switch (frame1.block) {
                 case 0: {
                     if (frame1.frame == frame1.stack) {

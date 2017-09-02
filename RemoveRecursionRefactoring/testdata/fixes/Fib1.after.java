@@ -3,11 +3,11 @@ import java.util.Deque;
 
 public class Fib1 {
     static int fib1(int n) {
-        Deque<Fib1Frame> stack = new ArrayDeque<>();
+        final Deque<Fib1Frame> stack = new ArrayDeque<>();
         stack.push(new Fib1Frame(n));
         int ret = 0;
         while (!stack.isEmpty()) {
-            Fib1Frame frame = stack.peek();
+            final Fib1Frame frame = stack.peek();
             switch (frame.block) {
                 case 0: {
                     if (frame.n == 0) {

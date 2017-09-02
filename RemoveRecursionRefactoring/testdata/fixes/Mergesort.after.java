@@ -15,10 +15,10 @@ public class Mergesort {
     }
 
     private void mergesort(int low, int high) {
-        Deque<MergesortFrame> stack = new ArrayDeque<>();
+        final Deque<MergesortFrame> stack = new ArrayDeque<>();
         stack.push(new MergesortFrame(low, high));
         while (!stack.isEmpty()) {
-            MergesortFrame frame = stack.peek();
+            final MergesortFrame frame = stack.peek();
             switch (frame.block) {
                 case 0: {
                     if (frame.low < frame.high) {

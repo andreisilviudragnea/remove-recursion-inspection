@@ -5,10 +5,10 @@ import java.util.List;
 
 public class LabeledBreakStatement {
     static void labeledBreakStatement(int iter, List<Integer> list) {
-        Deque<LabeledBreakStatementFrame> stack = new ArrayDeque<>();
+        final Deque<LabeledBreakStatementFrame> stack = new ArrayDeque<>();
         stack.push(new LabeledBreakStatementFrame(iter, list));
         while (!stack.isEmpty()) {
-            LabeledBreakStatementFrame frame = stack.peek();
+            final LabeledBreakStatementFrame frame = stack.peek();
             switch (frame.block) {
                 case 0: {
                     if (frame.iter == 0) {

@@ -78,12 +78,12 @@ public class IncorporateBody implements Pass<PsiMethod, PsiMethod, PsiCodeBlock>
     final String frameClassName = myNameManager.getFrameClassName();
     final PsiWhileStatement whileStatement = (PsiWhileStatement)statement(
       "while(!" + stackVarName + ".isEmpty()){" +
-      frameClassName + " " + myNameManager.getFrameVarName() + "=" + stackVarName + ".peek();" + body.getText() + "}");
+      "final " + frameClassName + " " + myNameManager.getFrameVarName() + "=" + stackVarName + ".peek();" + body.getText() + "}");
 
     final PsiCodeBlock newBody = (PsiCodeBlock)body.replace(myFactory.createCodeBlock());
 
     newBody.add(myStyleManager.shortenClassReferences(statement(
-      "java.util.Deque<" + frameClassName + "> " + stackVarName + " = new java.util.ArrayDeque<>();")));
+      "final java.util.Deque<" + frameClassName + "> " + stackVarName + " = new java.util.ArrayDeque<>();")));
     newBody.add(Util.createPushStatement(myFactory, frameClassName, stackVarName,
                                          method.getParameterList().getParameters(), PsiNamedElement::getName));
     final PsiType returnType = method.getReturnType();

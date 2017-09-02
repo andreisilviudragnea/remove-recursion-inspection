@@ -45,10 +45,10 @@ public class P1 {
      */
 
     private static void dfsCTC(Graph g, Node node) {
-        Deque<DfsCTCFrame> stack = new ArrayDeque<>();
+        final Deque<DfsCTCFrame> stack = new ArrayDeque<>();
         stack.push(new DfsCTCFrame(g, node));
         while (!stack.isEmpty()) {
-            DfsCTCFrame frame = stack.peek();
+            final DfsCTCFrame frame = stack.peek();
             switch (frame.block) {
                 case 0: {
                     frame.node.setIndex(frame.g.time);

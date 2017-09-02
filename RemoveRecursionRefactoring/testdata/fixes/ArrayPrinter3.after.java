@@ -10,10 +10,10 @@ class ArrayPrinter3 {
     }
 
     void displayArray(int first, int last, List<Integer> result) {
-        Deque<DisplayArrayFrame> stack = new ArrayDeque<>();
+        final Deque<DisplayArrayFrame> stack = new ArrayDeque<>();
         stack.push(new DisplayArrayFrame(first, last, result));
         while (!stack.isEmpty()) {
-            DisplayArrayFrame frame = stack.peek();
+            final DisplayArrayFrame frame = stack.peek();
             switch (frame.block) {
                 case 0: {
                     frame.block = 1;

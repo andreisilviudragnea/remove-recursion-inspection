@@ -2,10 +2,10 @@ import java.util.*;
 
 public class LocalVariableSameName {
     static void recursive(int n, List<Number> result) {
-        Deque<RecursiveFrame> stack = new ArrayDeque<>();
+        final Deque<RecursiveFrame> stack = new ArrayDeque<>();
         stack.push(new RecursiveFrame(n, result));
         while (!stack.isEmpty()) {
-            RecursiveFrame frame = stack.peek();
+            final RecursiveFrame frame = stack.peek();
             switch (frame.block) {
                 case 0: {
                     if (frame.n == 0) {

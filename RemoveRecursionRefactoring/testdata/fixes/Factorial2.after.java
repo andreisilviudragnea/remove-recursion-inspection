@@ -3,11 +3,11 @@ import java.util.Deque;
 
 class Factorial2 {
     static int factorial2(int n) {
-        Deque<Factorial2Frame> stack = new ArrayDeque<>();
+        final Deque<Factorial2Frame> stack = new ArrayDeque<>();
         stack.push(new Factorial2Frame(n));
         int ret = 0;
         while (!stack.isEmpty()) {
-            Factorial2Frame frame = stack.peek();
+            final Factorial2Frame frame = stack.peek();
             switch (frame.block) {
                 case 0: {
                     if (frame.n == 0) {

@@ -5,10 +5,10 @@ import java.util.List;
 
 public class BreakStatement {
     static void breakStatement(int iter, List<Integer> list) {
-        Deque<BreakStatementFrame> stack = new ArrayDeque<>();
+        final Deque<BreakStatementFrame> stack = new ArrayDeque<>();
         stack.push(new BreakStatementFrame(iter, list));
         while (!stack.isEmpty()) {
-            BreakStatementFrame frame = stack.peek();
+            final BreakStatementFrame frame = stack.peek();
             switch (frame.block) {
                 case 0: {
                     if (frame.iter == 0) {

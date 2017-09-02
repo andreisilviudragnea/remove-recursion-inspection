@@ -7,11 +7,11 @@ class Dependency1 {
     }
 
     private int factorial(int val, int runningVal) {
-        Deque<FactorialFrame> stack = new ArrayDeque<>();
+        final Deque<FactorialFrame> stack = new ArrayDeque<>();
         stack.push(new FactorialFrame(val, runningVal));
         int ret = 0;
         while (!stack.isEmpty()) {
-            FactorialFrame frame = stack.peek();
+            final FactorialFrame frame = stack.peek();
             switch (frame.block) {
                 case 0: {
                     if (frame.val == 1) {

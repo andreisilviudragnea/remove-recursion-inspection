@@ -7,11 +7,11 @@ import java.util.Set;
 class Dependency2 {
 
     public static boolean intersect(@NotNull Set<String> ids1, @NotNull Set<String> ids2) {
-        Deque<IntersectFrame> stack = new ArrayDeque<>();
+        final Deque<IntersectFrame> stack = new ArrayDeque<>();
         stack.push(new IntersectFrame(ids1, ids2));
         boolean ret = false;
         while (!stack.isEmpty()) {
-            IntersectFrame frame = stack.peek();
+            final IntersectFrame frame = stack.peek();
             switchLabel:
             switch (frame.block) {
                 case 0: {

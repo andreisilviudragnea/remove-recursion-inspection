@@ -5,10 +5,10 @@ import java.util.List;
 
 public class ContinueStatement {
     static void cont(int iter, List<Integer> list) {
-        Deque<ContFrame> stack = new ArrayDeque<>();
+        final Deque<ContFrame> stack = new ArrayDeque<>();
         stack.push(new ContFrame(iter, list));
         while (!stack.isEmpty()) {
-            ContFrame frame = stack.peek();
+            final ContFrame frame = stack.peek();
             switch (frame.block) {
                 case 0: {
                     if (frame.iter == 0) {

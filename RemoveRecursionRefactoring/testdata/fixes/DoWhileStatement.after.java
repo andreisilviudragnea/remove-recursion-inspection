@@ -5,10 +5,10 @@ import java.util.List;
 
 public class DoWhileStatement {
     static void doWhileStatement(int iter, List<Integer> list) {
-        Deque<DoWhileStatementFrame> stack = new ArrayDeque<>();
+        final Deque<DoWhileStatementFrame> stack = new ArrayDeque<>();
         stack.push(new DoWhileStatementFrame(iter, list));
         while (!stack.isEmpty()) {
-            DoWhileStatementFrame frame = stack.peek();
+            final DoWhileStatementFrame frame = stack.peek();
             switch (frame.block) {
                 case 0: {
                     if (frame.iter == 0) {

@@ -3,11 +3,11 @@ import java.util.Deque;
 
 class Dependency4 {
     int calculate(int one, int two, int three) {
-        Deque<CalculateFrame> stack = new ArrayDeque<>();
+        final Deque<CalculateFrame> stack = new ArrayDeque<>();
         stack.push(new CalculateFrame(one, two, three));
         int ret = 0;
         while (!stack.isEmpty()) {
-            CalculateFrame frame = stack.peek();
+            final CalculateFrame frame = stack.peek();
             switch (frame.block) {
                 case 0: {
                     stack.push(new CalculateFrame(frame.one ^ 2, frame.one * frame.two, frame.one + frame.two + frame.three));
