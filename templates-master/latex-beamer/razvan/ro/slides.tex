@@ -5,6 +5,7 @@
 \usepackage[romanian]{babel}
 \usepackage{color}			% highlight
 \usepackage{alltt}			% highlight
+\usepackage{minted}
 
 % highlight; comment this out in case you don't input code source files
 \usepackage{code/highlight}		% highlight
@@ -12,6 +13,10 @@
 \usepackage{hyperref}			% folosiți \url{http://...}
 					% sau \href{http://...}{Nume Link}
 \usepackage{verbatim}
+
+\usepackage{subcaption}
+
+\def\code#1{\texttt{#1}}
 
 \mode<presentation>
 { \usetheme{Berlin} }
@@ -47,14 +52,15 @@
 \makeatother
 
 \setbeamertemplate{navigation symbols}{}%remove navigation symbols
+\setbeamertemplate{caption}[numbered]
 
-\title[Super proiectul meu de licență]{Super proiectul meu de licență}
-\subtitle{Sesiunea de licență -- iulie 2010}
+\title[Eliminarea recursivității în programele Java]{Eliminarea recursivității în programele Java}
+\subtitle{Sesiunea de licență -- septembrie 2017}
 \institute{Facultatea de Automatică și Calculatoare,\\
 	Universitatea POLITEHNICA București}
-\author[Ion Ionescu]{Ion Ionescu\\
-	Coordonator: Andrei Antonescu}
-\date{9 iulie 2010}
+\author[Andrei Silviu Dragnea]{Andrei Silviu Dragnea\\
+	Coordonator: Prof. dr. ing. Lorina Negreanu}
+\date{11 septembrie 2017}
 
 \begin{document}
 
@@ -73,10 +79,14 @@
 
 % Titlul unui frame se specifică fie în acolade, imediat după \begin{frame},
 % fie folosind \frametitle
-\begin{frame}{TODO}
-	\begin{itemize}		% Just like normal LaTeX
-		\item TODO
-	\end{itemize}
+\begin{frame}{Intellij IDEA plugin}
+    \begin{columns}[T]
+        \begin{column}{\textwidth}
+            \begin{figure}
+                \includegraphics[height=6cm]{img/highlight}
+            \end{figure}
+        \end{column}
+    \end{columns}
 \end{frame}
 
 \section{Arhitectură și design}
@@ -93,11 +103,38 @@
 
 \section{Implementare}
 
-\begin{frame}{TODO}
-	\begin{itemize}
-		\item TODO
-		\item TODO
-	\end{itemize}
+\begin{frame}{Expandarea buclelor \code{foreach}}
+    \begin{figure}[htb]
+        \makebox[\linewidth][c]{%
+        \begin{subfigure}[b]{.55\linewidth}
+            \centering
+            \includegraphics[height=0.4in]{../../../theses/diploma/src/img/foreach-to-iterator-for-before-white.png}
+            \caption{Înainte}
+        \end{subfigure}%
+        \begin{subfigure}[b]{.55\linewidth}
+            \centering
+            \includegraphics[height=0.6in]{../../../theses/diploma/src/img/foreach-to-iterator-for-after-white.png}
+            \caption{După}
+        \end{subfigure}%
+        }\\
+        \caption{Expandarea \code{foreach} bazat pe iterator}
+    \end{figure}
+
+    \begin{figure}[htb]
+        \makebox[\linewidth][c]{%
+        \begin{subfigure}[b]{.55\linewidth}
+            \centering
+            \includegraphics[height=0.4in]{../../../theses/diploma/src/img/foreach-to-indexed-for-before-white.png}
+            \caption{Înainte}
+        \end{subfigure}%
+        \begin{subfigure}[b]{.55\linewidth}
+            \centering
+            \includegraphics[height=0.5in]{../../../theses/diploma/src/img/foreach-to-indexed-for-after-white.png}
+            \caption{După}
+        \end{subfigure}%
+        }\\
+        \caption{Expandarea \code{foreach} bazat pe array}
+    \end{figure}
 \end{frame}
 
 \begin{frame}{Porțiuni de cod}
