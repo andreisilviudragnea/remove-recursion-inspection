@@ -12,7 +12,7 @@ body. These points need to be highlighted because control flow has to jump there
 and continue executing the following statements. Because the Java programming language does not support the \code{goto}
 statement, jumping into the method body is accomplished by enclosing the basic blocks of the control flow graph inside
 a \code{switch} statement, each block having its corresponding \code{case} label. The \code{switch} statement itself
-has to be placed inside a \code{while} statement, which loops until the simulated stack gets empty.
+has to be placed inside a \code{while} statement, which loops until the simulated stack becomes empty.
 
 The reduced control flow graph contains basic blocks corresponding only to statements which contain at least one
 recursive call. The statements which do not contain recursive calls do not get transformed, thus preserving the code of
@@ -41,7 +41,7 @@ from a recursive call, there is a corresponding \code{pop} call from the stack.
 Before further steps of the algorithm can take place, the body of the original method is incorporated inside the
 statements which will simulate the call stack, in order to ensure the consistent state of the code between further
 transformations. This transformation is necessary in order to be able to make use of the framework of the IDE inside
-which this refactoring is implemented, which imposes some restrictions.
+which this refactoring is implemented, which relies on the consistent state of the code to work correctly.
 
 Each reference to a local variable (including formal parameters of the method) is then replaced with an access to the
 corresponding field of the \code{frame} object at the top of the simulated stack. Local variable declarations having
@@ -51,14 +51,15 @@ initializers from the original method body are also replaced by assignments to t
 The control flow graph of the method is then generated using a visitor which performs specific tasks for each type of
 node in the abstract syntax tree representing the body of the method. The visitor takes special care of the statements
 affecting control flow, including \code{if} statements, looping constructs (\code{for}, \code{while}, \code{do-while},
-\code{switch} statements) and also \code{break}, \code{continue} and \code{return} statements. Before replacing the
-original body of the method with a list of \code{case} labels, one for each basic block in the control flow graph,
-the unreachable blocks which may have been previously generated are removed. The trivial blocks containing only jumps to
-other blocks are also replaced with jumps from the previous blocks directly to the blocks to which the trivial blocks
-jump. The blocks with only one predecessor which are not generated because of a previous recursive call (but get
-generated when visiting statements affecting control flow) can also be recursively inlined inside the predecessor
-blocks, without modifying the semantics of the code and thus reducing the number of the generated basic blocks to the
-bare mininum and improving the readability of the tranformed code.
+\code{switch} statements) and also \code{break}, \code{continue} and \code{return} statements.
+
+Before replacing the original body of the method with a list of \code{case} labels, one for each basic block in the
+control flow graph, the unreachable blocks which may have been previously generated are removed. The trivial blocks
+containing only jumps to other blocks are also replaced with jumps from the previous blocks directly to the blocks to
+which the trivial blocks jump. The blocks with only one predecessor which are not generated because of a previous
+recursive call (but are generated when visiting statements affecting control flow) can also be recursively inlined
+inside the predecessor blocks, without modifying the semantics of the code and thus reducing the number of the generated
+basic blocks to the bare mininum and improving the readability of the tranformed code.
 
 The last step of the algorithm is replacing the \code{return} statements with \code{pop} calls from the simulated stack.
 
@@ -95,5 +96,5 @@ the visitor verifies each method call expression to see if it resolves to the co
 is either absent or \code{this}. If this is the case, then the visitor registers an error on the method call expression
 and it appears highlighted in the editor as in \labelindexref{Figure}{img:recursion-highlight-warning}.
 
-\fig[width=4in]{src/img/inspection-settings.png}{img:inspection-settings}{Remove Recursion inspection}
-\fig[width=4in]{src/img/recursion-highlight-warning.png}{img:recursion-highlight-warning}{Recursion Highlighted as a Warning}
+\fig[width=3.5in]{src/img/remove.png}{img:inspection-settings}{Remove Recursion inspection}
+\fig[width=3.5in]{src/img/highlight.png}{img:recursion-highlight-warning}{Recursion Highlighted as a Warning}
