@@ -1,11 +1,11 @@
 public class Fib2 {
-    static int fib2(int n) {
-        if (n == 0) return 0;
-        else if (n == 1) return 1;
-        else return fib2(n - 1) + fib2(n - 2);
-    }
+  static int fib(int n) {
+    if (n == 0) return 0;
+    else if (n == 1) return 1;
+    else return fib(n - 1) + fib(n - 2);
+  }
 
-    public static void main(String[] args) {
-        System.out.println(Fib2.fib2(25));
-    }
+  public static void main(String[] args) {
+    System.out.println(Fib2.fib(25));
+  }
 }
