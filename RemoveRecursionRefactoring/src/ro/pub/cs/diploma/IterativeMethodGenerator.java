@@ -43,18 +43,18 @@ public class IterativeMethodGenerator {
   }
 
   public void createIterativeBody(int steps) {
-    RenameVariablesToUniqueNames.getInstance(myMethod).apply(myMethod);
+    ReplaceSingleStatementsWithBlockStatements.getInstance(myFactory).apply(myMethod);
     if (steps == 1) {
+      return;
+    }
+
+    RenameVariablesToUniqueNames.getInstance(myMethod).apply(myMethod);
+    if (steps == 2) {
       return;
     }
 
     ReplaceForEachLoopsWithIteratorForLoops.getInstance(myMethod).apply(myMethod);
     ReplaceForEachLoopsWithIndexedForLoops.getInstance(myMethod).apply(myMethod);
-    if (steps == 2) {
-      return;
-    }
-
-    ReplaceSingleStatementsWithBlockStatements.getInstance(myFactory).apply(myMethod);
     if (steps == 3) {
       return;
     }

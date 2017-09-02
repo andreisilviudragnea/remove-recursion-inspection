@@ -1,7 +1,8 @@
 public class ExtractIfCondition {
     int recursive(int n) {
-        if (n == 0)
+        if (n == 0) {
             return 0;
+        }
 
         int temp = recursive(n);
         int temp1 = recursive(n - 1);

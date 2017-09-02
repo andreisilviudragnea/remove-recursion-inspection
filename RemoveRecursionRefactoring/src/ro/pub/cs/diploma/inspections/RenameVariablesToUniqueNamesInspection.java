@@ -8,6 +8,6 @@ public class RenameVariablesToUniqueNamesInspection extends DummyInspection {
 
   @Override
   protected int getSteps() {
-    return 1;
+    return 2;
   }
 }

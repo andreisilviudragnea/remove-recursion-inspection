@@ -8,6 +8,6 @@ public class ReplaceForEachLoopsWithForLoopsInspection extends DummyInspection {
 
   @Override
   protected int getSteps() {
-    return 2;
+    return 3;
   }
 }

@@ -8,6 +8,6 @@ public class ReplaceSingleStatementsWithBlockStatementsInspection extends DummyI
 
   @Override
   protected int getSteps() {
-    return 3;
+    return 1;
   }
 }
