@@ -1,7 +1,7 @@
 digraph G {
 	node [shape=record];
 	elseBlock, currentBlockAfterVisitingElseBlock [style=filled,color=black,fillcolor=lightgrey];
-	currentBlock [label="{currentBlock|...|ifCondition|{<true>then|<false>else}}"];
+	currentBlock [label="{currentBlock|...|ifCondition|{<true>true|<false>false}}"];
 	thenBlock [label="{thenBlock|...}"];
 	elseBlock [label="{elseBlock|...}"];
 	currentBlockAfterVisitingThenBlock [label="{currentBlockAfterVisitingThenBlock|...|jump(mergeBlock);}"];

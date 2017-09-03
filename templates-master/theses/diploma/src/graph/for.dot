@@ -2,7 +2,7 @@ digraph G {
     node [shape=record];
     conditionBlock, updateBlock [style=filled, color=black, fillcolor=lightgrey];
     currentBlock [label="{currentBlock|...\ninitializationStatements|jump(conditionBlock);}"];
-    conditionBlock [label="{conditionBlock|condition|{<true>then|<false>else}}"];
+    conditionBlock [label="{conditionBlock|condition|{<true>true|<false>false}}"];
     updateBlock [label="{updateBlock|updateStatements|jump(conditionBlock);}"];
     currentBlockAfterVisitingBodyBlock [label="{currentBlockAfterVisitingBodyBlock|...|jump(updateBlock);}"];
     bodyBlock [label="{bodyBlock|...}"];
