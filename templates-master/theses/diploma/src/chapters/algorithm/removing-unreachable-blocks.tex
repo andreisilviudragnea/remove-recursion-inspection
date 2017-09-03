@@ -9,23 +9,7 @@ is acyclic; otherwise, it contains at least one cycle. A breadth-first search al
 reachable blocks from the entry block of the control flow graph. After the search is finished, the blocks which are not
 contained in the set of reachable blocks are removed from the list of all blocks representing the control flow graph.
 
-An example of this pass is provided in \labelindexref{Figure}{img:remove-unreachable}. The blocks with \code{id}s equal
-to \code{2} and \code{5} are unreachable from the entry block, so they get removed. Even though the block with \code{id}
-\code{2} is reachable from the block with \code{id} \code{5}, it is not reachable from the entry block (with \code{id}
+When this pass is applied to the CFG in \labelindexref{Figure}{img:cfg}, because the blocks with \code{id}s equal
+to \code{3} and \code{6} are unreachable from the entry block, they get removed. Even though the block with \code{id}
+\code{3} is reachable from the block with \code{id} \code{6}, it is not reachable from the entry block (with \code{id}
 \code{0}), so it still gets removed.
-
-\begin{figure}[htb]
-    \makebox[\linewidth][c]{%
-    \begin{subfigure}[b]{.6\textwidth}
-        \centering
-        \includegraphics[height=5in]{src/img/blocks-after.png}
-        \caption{Before}
-    \end{subfigure}%
-    \begin{subfigure}[b]{.6\textwidth}
-        \centering
-        \includegraphics[height=4.464in]{src/img/remove-unreachable-after.png}
-        \caption{After}
-    \end{subfigure}%
-    }\\
-    \caption{Removing unreachable blocks \label{img:remove-unreachable}}
-\end{figure}

@@ -1,7 +1,7 @@
 \section{Removing trivial blocks}
 
 A \textit{trivial block} is defined as a block which is not the first block (having \code{id} equal to \code{0}) and
-contains only an \code{UnconditionalJumpStatement}. These blocks can be removed be making the incoming blocks to jump
+contains only an \code{UnconditionalJumpStatement}. These blocks can be removed be making the incoming blocks jump
 directly to the block to which the trivial block jumps.
 
 An example of this pass is provided in \labelindexref{Figure}{img:remove-trivial}. The block with \code{id} equal to
