@@ -1,6 +1,6 @@
 digraph G {
 	node [shape=record];
-    elseBlock, currentBlockAfterVisitingElseBlock [style=filled,color=black,fillcolor=lightgrey];
+	elseBlock, currentBlockAfterVisitingElseBlock [style=filled,color=black,fillcolor=lightgrey];
 	currentBlock [label="{currentBlock|...|ifCondition|{<true>then|<false>else}}"];
 	thenBlock [label="{thenBlock|...}"];
 	elseBlock [label="{elseBlock|...}"];

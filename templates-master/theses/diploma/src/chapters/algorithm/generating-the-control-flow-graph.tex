@@ -245,21 +245,31 @@ Then the \code{myCurrentBlock} is restored from \code{oldCurrentBlock} and a \co
 computed \code{statements} list. The \code{myCurrentBlock} is then set to the \code{mergeBlock}.
 
 An example of the generated basic blocks is provided in \labelindexref{Figure}{img:blocks}. Each block is assigned to
-a case inside a \code{switch} statement which replaces the incorporated body of the method. The \code{switch} statement
-has the \code{block} field of the \code{frame} object as its expression.
+a \code{case} inside a \code{switch} statement which replaces the incorporated body of the method. The \code{switch}
+statement has the \code{block} field of the \code{frame} object as its expression. The CFG of the method body can be
+better visualized in the \labelindexref{Figure}{img:cfg}. There are two basic blocks with \code{id}s equal to \code{6}
+and \code{3}, which are unreachable from the first block of the CFG (with \code{id} equal to \code{0}). The red lined
+blocks are blocks which should explicitly not be inlined, because they are blocks which appear after a recursive call or
+because the number of incoming blocks is not equal to \code{1} (it is \code{0} in this particular case).
 
 \begin{figure}[htb]
     \makebox[\linewidth][c]{%
     \begin{subfigure}[b]{.6\textwidth}
         \centering
-        \includegraphics[height=3in]{src/img/blocks-before.png}
+        \includegraphics[height=3in]{src/img/cfg-before-white-32.png}
         \caption{Before}
     \end{subfigure}%
     \begin{subfigure}[b]{.6\textwidth}
         \centering
-        \includegraphics[height=5.25in]{src/graph/cfg.pdf}
+        \includegraphics[height=5.25in]{src/img/cfg-after-white-56.png}
         \caption{After}
     \end{subfigure}%
     }\\
     \caption{Generating the control flow graph \label{img:blocks}}
+\end{figure}
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=.5\textwidth]{src/graph/cfg.pdf}
+    \caption{The CFG\label{img:cfg}}
 \end{figure}

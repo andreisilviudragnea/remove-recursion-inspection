@@ -1,0 +1,19 @@
+digraph cfg {
+	node [shape=record];
+	0:true -> 1;
+	0:false -> 2;
+	0 [label="{id: 0||frame.n == 0|{<true>true|<false>false}}" color=red];
+	1 [label="{id: 1||return 0;}" ];
+	2:true -> 4;
+	2:false -> 5;
+	2 [label="{id: 2||frame.n == 1|{<true>true|<false>false}}" ];
+	3 [label="{id: 3|}" ];
+	4 [label="{id: 4||return 1;}" ];
+	5 -> 7;
+	5 [label="{id: 5|stack.push(new Fib2Frame(frame.n - 1));|jump 7;}" ];
+	6 -> 3;
+	6 [label="{id: 6||jump 3;}" color=red];
+	7 -> 8;
+	7 [label="{id: 7|frame.temp = ret;\nstack.push(new Fib2Frame(frame.n - 2));|jump 8;}" color=red];
+	8 [label="{id: 8|int temp1 = ret;|return frame.temp + temp1;}" color=red];
+}
