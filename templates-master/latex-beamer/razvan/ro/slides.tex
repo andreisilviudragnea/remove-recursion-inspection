@@ -89,16 +89,14 @@
     \end{columns}
 \end{frame}
 
-\section{Arhitectură și design}
-
-\begin{frame}{TODO}
-	\begin{itemize}
-		\item Formulă simplă
-			\begin{beamerboxesrounded}[lower=block body,shadow=true]{}
-				\texttt{\#define MAX(a, b)   ((a) > (b) ? (a) : (b))}
-			\end{beamerboxesrounded}
-		\item TODO
-	\end{itemize}
+\begin{frame}{Definiția unui apel recursiv în Java}
+    \begin{itemize}
+        \item Metoda apelată are aceeași semnătură cu metoda în corpul căreia se găsește
+        \item Metoda este statică sau privată sau finală
+        \item Dacă este publică, \code{protected} sau \code{package-private}, expresia apelului trebuie să fie
+        \code{this} sau absentă
+        \item Referința \code{this} este mereu constantă sau absentă (la metode statice)
+    \end{itemize}
 \end{frame}
 
 \section{Implementare}
@@ -353,32 +351,47 @@
 	
 \section{Evaluarea perfomanțelor}
 
-\begin{frame}{TODO}
+\begin{frame}{Suma primelor 10000 de numere prime}
+    \begin{figure}[htb]
+        \begin{subfigure}[b]{.45\textwidth}
+            \centering
+            \includegraphics[height=2in]{../../../theses/diploma/src/img/primes-before-33.png}
+            \caption{2ms}
+        \end{subfigure}
+        \begin{subfigure}[b]{.45\textwidth}
+            \centering
+            \includegraphics[height=2.36in]{../../../theses/diploma/src/img/primes-after-39.png}
+            \caption{6ms}
+        \end{subfigure}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Suma primelor 2000000 de numere prime}
+    \begin{itemize}
+        \item Varianta recursivă: \code{StackOverflowError}
+        \item Varianta iterativă: 2 secunde
+    \end{itemize}
+\end{frame}
+
+\section{Viitor}
+
+\begin{frame}{Dezvoltări ulterioare}
 	\begin{itemize}
-		\item TODO
-		\item TODO
+		\item Tratarea diferențiată a recursivității pe coadă
+		\item Recursivitatea pe coadă „modulo cons”
 	\end{itemize}
 \end{frame}
 
-\section{\^{I}ntrebări}
+\section{Concluzie}
 
-\begin{frame}{Întrebări}
-  \begin{columns}
-    \begin{column}[t]{0.5\textwidth}
-      \begin{itemize}
-        \item cuvânt cheie 1
-        \item cuvânt cheie 2
-        \item cuvânt cheie 3
-        \item cuvânt cheie 4
-        \item cuvânt cheie 5
-      \end{itemize}
-    \end{column}
-    \begin{column}[c]{0.5\textwidth}
-      \begin{figure}
-        \includegraphics[scale=0.3]{img/question-mark}
-      \end{figure}
-    \end{column}
-  \end{columns}
+\begin{frame}{Eliminarea recursivității}
+\begin{itemize}
+    \item Intellij IDEA plugin
+    \item Refactorizare
+    \item Recursivitate
+    \item Graful fluxului de control
+    \item Lipsa instrucțiunii \code{goto}
+\end{itemize}
 \end{frame}
 
 \end{document}
