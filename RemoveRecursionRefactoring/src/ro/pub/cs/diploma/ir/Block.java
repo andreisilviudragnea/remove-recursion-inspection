@@ -129,7 +129,7 @@ public class Block implements Statement {
     List<String> strings2 = new ArrayList<>();
     strings2.add(String.format("id: %s", id));
     strings2.add(strings.stream().collect(Collectors.joining("\\n")));
-    String color = doNotInline ? "color=red" : "";
+    String color = isInlinable() ? "" : "color=red";
     List<String> statements = new ArrayList<>();
     if (myStatements.size() > 0) {
       final Statement lastStatement = myStatements.get(myStatements.size() - 1);
