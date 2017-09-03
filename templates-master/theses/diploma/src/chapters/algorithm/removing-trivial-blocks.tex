@@ -6,28 +6,23 @@ directly to the block to which the trivial block jumps. A trivial block can appe
 in the body of a loop is an \code{if} statement. Thus the \code{mergeBlock} of the \code{if} statement contains only an
 \code{UnconditionalJumpStatement} to the \code{actualUpdateBlock}.
 
-An example of this pass is provided in \labelindexref{Figure}{img:remove-trivial}. The block with \code{id} equal to
-\code{5} is trivial and it gets removed by making the incoming blocks (with ids \code{6} and \code{7}) jump directly to
-the block to which the trivial block jumps, namely the block with \code{id} equal to \code{1}.
+An example of this pass is provided in \labelindexref{Figure}{img:remove}. The block with \code{id} equal to
+\code{6} is trivial and it gets removed by making the incoming blocks (with ids \code{7} and \code{5}) jump directly to
+the block to which the trivial block jumps, namely the block with \code{id} equal to \code{1}. The blocks with
+\code{id}s \code{1} and \code{6} cannot be inlined because they both have two incoming blocks and the block with
+\code{id} \code{7} cannot be inlined either because it is a block appearing after a recursive call.
 
 \begin{figure}[htb]
-    \makebox[\linewidth][c]{%
-    \begin{subfigure}[b]{.6\textwidth}
-        \centering
-        \includegraphics[height=5in]{src/img/remove-trivial-before.png}
-        \caption{Before}
-    \end{subfigure}%
-    \begin{subfigure}[b]{.6\textwidth}
-        \centering
-        \includegraphics[height=4.739in]{src/img/remove-trivial-after.png}
-        \caption{After}
-    \end{subfigure}%
-    }\\
-    \caption{Removing trivial blocks \label{img:remove-trivial}}
-\end{figure}
-
-\begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{src/graph/trivial-before.pdf}
+    \begin{subfigure}[b]{\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{src/graph/trivial-before.pdf}
+        \caption{Before}
+    \end{subfigure}
+    \begin{subfigure}[b]{\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{src/graph/trivial-after.pdf}
+        \caption{After}
+    \end{subfigure}
     \caption{Removing trivial blocks\label{img:remove}}
 \end{figure}
