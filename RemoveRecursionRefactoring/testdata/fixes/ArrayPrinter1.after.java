@@ -18,7 +18,7 @@ class ArrayPrinter1 {
                 case 0: {
                     if (frame.first == frame.last) {
                         frame.result.add(array[frame.first]);
-                        frame.block = 2;
+                        frame.block = 3;
                         break;
                     } else {
                         frame.mid = frame.first + (frame.last - frame.first) / 2;
@@ -27,13 +27,13 @@ class ArrayPrinter1 {
                         break;
                     }
                 }
-                case 2: {
+                case 3: {
                     stack.pop();
                     break;
                 }
                 case 4: {
                     stack.push(new DisplayArrayFrame(frame.mid + 1, frame.last, frame.result));
-                    frame.block = 2;
+                    frame.block = 3;
                     break;
                 }
             }

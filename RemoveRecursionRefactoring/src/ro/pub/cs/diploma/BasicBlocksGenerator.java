@@ -155,21 +155,15 @@ class BasicBlocksGenerator extends JavaRecursiveElementVisitor {
   @Override
   public void visitIfStatement(PsiIfStatement statement) {
     final Block thenBlock = newBlock();
-    final Block mergeBlock = newBlock();
-    Block jumpBlock = mergeBlock;
-    Block elseBlock = null;
-
     final PsiStatement elseBranch = statement.getElseBranch();
-    if (elseBranch != null) {
-      elseBlock = newBlock();
-      jumpBlock = elseBlock;
-    }
+    final Block elseBlock = elseBranch != null ? newBlock() : null;
+    final Block mergeBlock = newBlock();
 
     final PsiExpression condition = statement.getCondition();
     if (condition == null) {
       return;
     }
-    addConditionalJumpStatement(condition, thenBlock, jumpBlock);
+    addConditionalJumpStatement(condition, thenBlock, elseBranch != null ? elseBlock : mergeBlock);
 
     myCurrentBlock = thenBlock;
     final PsiStatement thenBranch = statement.getThenBranch();
