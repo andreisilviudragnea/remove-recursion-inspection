@@ -4,9 +4,9 @@ The blocks which have only one incoming block and are not blocks that appear aft
 the incoming block. This is accomplished by marking the blocks that can be inlined first and then visiting the blocks
 that cannot be inlined in order to generate the new blocks.
 
-An example of this pass is provided in \labelindexref{Figure}{img:inline-blocks}. The blocks with \code{id}s \code{1},
-\code{3}, \code{4} and \code{6} have been inlined where the jump to them takes place, thus significantly reducing the
-number of blocks.
+An example of this pass is provided in \labelindexref{Figure}{img:inline-blocks}. A second example is provided in
+\labelindexref{Figure}{img:inline1}. This is the reduced control flow graph obtained from
+\labelindexref{Figure}{img:trivial-after}.
 
 \begin{figure}[htb]
     \begin{subfigure}[b]{.5\textwidth}
@@ -20,4 +20,10 @@ number of blocks.
         \caption{After}
     \end{subfigure}
     \caption{Inlining blocks \label{img:inline-blocks}}
+\end{figure}
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=.5\textwidth]{src/graph/inline-after-1.pdf}
+    \caption{The reduced CFG\label{img:inline1}}
 \end{figure}
