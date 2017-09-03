@@ -1,14 +1,15 @@
 digraph G {
-    node [shape=box];
-    currentBlock [label=<currentBlock<BR/>...<BR/>initializationStatements<BR/>UnconditionalJumpStatement(conditionBlock)>];
-    conditionBlock [label=<conditionBlock<BR/>ConditionalJumpStatement(condition, bodyBlock, mergeBlock)>,style=filled,color=grey];
-    updateBlock [label=<updateBlock<BR/>updateStatements<BR/>UnconditionalJumpStatement(conditionBlock)>,style=filled,color=grey];
-    currentBlockAfterVisitingBodyBlock [label=<currentBlockAfterVisitingBodyBlock<BR/>...<BR/>UnconditionalJumpStatement(updateBlock)>];
-    bodyBlock [label=<bodyBlock<BR/>...>];
-    mergeBlock [label=<mergeBlock<BR/>...>];
+    node [shape=record];
+    conditionBlock, updateBlock [style=filled, color=black, fillcolor=lightgrey];
+    currentBlock [label="{currentBlock|...\ninitializationStatements|jump(conditionBlock);}"];
+    conditionBlock [label="{conditionBlock|condition|{<true>then|<false>else}}"];
+    updateBlock [label="{updateBlock|updateStatements|jump(conditionBlock);}"];
+    currentBlockAfterVisitingBodyBlock [label="{currentBlockAfterVisitingBodyBlock|...|jump(updateBlock);}"];
+    bodyBlock [label="{bodyBlock|...}"];
+    mergeBlock [label="{mergeBlock|...}"];
     currentBlock -> conditionBlock;
-    conditionBlock -> bodyBlock;
-    conditionBlock -> mergeBlock;
+    conditionBlock:true -> bodyBlock;
+    conditionBlock:false -> mergeBlock;
     bodyBlock -> currentBlockAfterVisitingBodyBlock [style=dotted];
     currentBlockAfterVisitingBodyBlock -> updateBlock;
     updateBlock -> conditionBlock;
