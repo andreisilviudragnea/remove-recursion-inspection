@@ -16,6 +16,6 @@ thesis.idx
 thesis.ilg
 thesis.ind
 
-thesis.pdf
+#thesis.pdf
 
 *.swp
