@@ -163,7 +163,7 @@ public class IterativeMethodGenerator {
   private void replaceReturnStatements(@NotNull final PsiCodeBlock block,
                                        @NotNull final NameManager nameManager,
                                        @NotNull final Ref<Boolean> atLeastOneLabeledBreak) {
-    for (final PsiReturnStatement statement : Visitors.extractReturnStatements(block)) {
+    for (final PsiReturnStatement statement : VisitorsKt.extractReturnStatements(block)) {
       final PsiExpression returnValue = statement.getReturnValue();
       final boolean hasExpression = returnValue != null;
       final PsiCodeBlock parentBlock = PsiTreeUtil.getParentOfType(statement, PsiCodeBlock.class, true);
