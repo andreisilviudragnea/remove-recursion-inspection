@@ -18,6 +18,8 @@
 
 \def\code#1{\texttt{#1}}
 
+\setlength{\leftmargini}{.5pt}
+
 \mode<presentation>
 { \usetheme{Berlin} }
 
@@ -72,30 +74,49 @@
 
 \frame{\titlepage}
 
-\frame{\tableofcontents}
+%\frame{\tableofcontents}
 
 % NB: Secțiunile nu sunt marcate vizual, ci doar apar în cuprins
 \section{Context}
 
 % Titlul unui frame se specifică fie în acolade, imediat după \begin{frame},
 % fie folosind \frametitle
-\begin{frame}{Intellij IDEA plugin}
-    \begin{columns}[T]
-        \begin{column}{\textwidth}
-            \begin{figure}
-                \includegraphics[height=6cm]{img/highlight}
-            \end{figure}
-        \end{column}
-    \end{columns}
+\begin{frame}{Recursivitatea}
+%    \begin{columns}[T]
+%        \begin{column}{\textwidth}
+%            \begin{figure}
+%                \includegraphics[height=6cm]{img/highlight}
+%            \end{figure}
+%        \end{column}
+%    \end{columns}
+    \begin{itemize}
+        \item Recursivitatea este expresivă, dar uneori ineficientă
+        \item În Java, compilatorul nu elimină niciun fel de recursivitate
+        \item Programatorul alege care funcții trebuie transformate
+        \item Funcționalitatea implementată ca un plugin pentru Intellij IDEA
+    \end{itemize}
 \end{frame}
 
-\begin{frame}{Definiția unui apel recursiv în Java}
+\begin{frame}{Particularități ale recursivității în Java}
     \begin{itemize}
-        \item Metoda apelată are aceeași semnătură cu metoda în corpul căreia se găsește
-        \item Metoda este statică sau privată sau finală
-        \item Dacă este publică, \code{protected} sau \code{package-private}, expresia apelului trebuie să fie
-        \code{this} sau absentă
-        \item Referința \code{this} este mereu constantă sau absentă (la metode statice)
+        \item Dacă metoda recursivă este statică sau privată, atunci apelul se rezolvă la compilare
+        \item În caz contrar, apelul trebuie să fie făcut direct sau prin \code{this}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Algoritmul de eliminare a recursivității}
+    \begin{itemize}
+        \item Încapsularea instrucțiunilor în blocuri
+        \item Expandarea buclelor \code{foreach}
+        \item Extragerea apelurilor recursive în instrucțiuni separate
+        \item Generarea clasei corespunzătoare unei înregistrări de activare
+        \item Includerea corpului metodei în codul auxiliar
+        \item Tratarea variabilelor locale
+        \item Generarea grafului fluxului de control
+        \item Eliminarea blocurilor inaccesibile
+        \item Eliminarea blocurilor triviale
+        \item Reducerea grafului de control
+        \item Înlocuirea instrucțiunii return
     \end{itemize}
 \end{frame}
 
@@ -115,42 +136,45 @@
             \caption{După}
         \end{subfigure}%
         }\\
-        \caption{Încapsularea instrucțiunilor în blocuri}
+%        \caption{Încapsularea instrucțiunilor în blocuri}
     \end{figure}
 \end{frame}
 
 \begin{frame}{Expandarea buclelor \code{foreach}}
-    \begin{figure}[htb]
-        \makebox[\linewidth][c]{%
-        \begin{subfigure}[b]{.55\linewidth}
-            \centering
-            \includegraphics[height=0.4in]{../../../theses/diploma/src/img/foreach-to-iterator-for-before-white.png}
-            \caption{Înainte}
-        \end{subfigure}%
-        \begin{subfigure}[b]{.55\linewidth}
-            \centering
-            \includegraphics[height=0.6in]{../../../theses/diploma/src/img/foreach-to-iterator-for-after-white.png}
-            \caption{După}
-        \end{subfigure}%
-        }\\
-        \caption{Expandarea \code{foreach} bazat pe iterator}
-    \end{figure}
+    \begin{itemize}
+        \item Expandarea \code{foreach} bazat pe iterator
+        \begin{figure}[htb]
+            \makebox[\linewidth][c]{%
+            \begin{subfigure}[b]{.55\linewidth}
+                \centering
+                \includegraphics[height=0.4in]{../../../theses/diploma/src/img/foreach-to-iterator-for-before-white.png}
+                \caption{Înainte}
+            \end{subfigure}%
+            \begin{subfigure}[b]{.55\linewidth}
+                \centering
+                \includegraphics[height=0.6in]{../../../theses/diploma/src/img/foreach-to-iterator-for-after-white.png}
+                \caption{După}
+            \end{subfigure}%
+            }\\
+        \end{figure}
 
-    \begin{figure}[htb]
-        \makebox[\linewidth][c]{%
-        \begin{subfigure}[b]{.55\linewidth}
-            \centering
-            \includegraphics[height=0.4in]{../../../theses/diploma/src/img/foreach-to-indexed-for-before-white.png}
-            \caption{Înainte}
-        \end{subfigure}%
-        \begin{subfigure}[b]{.55\linewidth}
-            \centering
-            \includegraphics[height=0.5in]{../../../theses/diploma/src/img/foreach-to-indexed-for-after-white.png}
-            \caption{După}
-        \end{subfigure}%
-        }\\
-        \caption{Expandarea \code{foreach} bazat pe array}
-    \end{figure}
+        \item Expandarea \code{foreach} bazat pe array
+        \begin{figure}[htb]
+            \makebox[\linewidth][c]{%
+            \begin{subfigure}[b]{.55\linewidth}
+                \centering
+                \includegraphics[height=0.4in]{../../../theses/diploma/src/img/foreach-to-indexed-for-before-white.png}
+                \caption{Înainte}
+            \end{subfigure}%
+            \begin{subfigure}[b]{.55\linewidth}
+                \centering
+                \includegraphics[height=0.5in]{../../../theses/diploma/src/img/foreach-to-indexed-for-after-white.png}
+                \caption{După}
+            \end{subfigure}%
+            }\\
+            % captions devin bullets
+        \end{figure}
+    \end{itemize}
 \end{frame}
 
 \begin{frame}{Extragerea apelurilor recursive în instrucțiuni separate}
@@ -167,80 +191,100 @@
             \caption{După}
         \end{subfigure}%
         }\\
-        \caption{Extragerea apelurilor recursive în instrucțiuni separate}
+%        \caption{Extragerea apelurilor recursive în instrucțiuni separate}
     \end{figure}
 \end{frame}
 
-\begin{frame}{Generarea clasei cadru de stivă}
-    \begin{figure}[htb]
-        \makebox[\linewidth][c]{%
-        \begin{subfigure}[b]{.6\textwidth}
-            \centering
-            \includegraphics[height=1.75in]{../../../theses/diploma/src/img/add-frame-class-before-white-31.png}
-            \caption{Înainte}
-        \end{subfigure}%
-        \begin{subfigure}[b]{.6\textwidth}
-            \centering
-            \includegraphics[height=2.484in]{../../../theses/diploma/src/img/add-frame-class-after-white-44.png}
-            \caption{După}
-        \end{subfigure}%
-        }\\
-        \caption{Generarea clasei cadru de stivă}
-    \end{figure}
+\begin{frame}{Generarea clasei corespunzătoare unei înregistrări de activare}
+    \begin{itemize}
+        \item Colectarea parametrilor formali ai metodei și a declarațiilor de variabile locale
+        \item Generarea unei clase statice ale cărei câmpuri corespund variabilelor locale
+        \item Generarea câmpului \code{block}, care indică blocul din graful fluxului de control care trebuie executat
+        la revenirea din apelul recursiv
+    \end{itemize}
+%    \begin{figure}[htb]
+%        \makebox[\linewidth][c]{%
+%        \begin{subfigure}[b]{.6\textwidth}
+%            \centering
+%            \includegraphics[height=1.75in]{../../../theses/diploma/src/img/add-frame-class-before-white-31.png}
+%            \caption{Înainte}
+%        \end{subfigure}%
+%        \begin{subfigure}[b]{.6\textwidth}
+%            \centering
+%            \includegraphics[height=2.484in]{../../../theses/diploma/src/img/add-frame-class-after-white-44.png}
+%            \caption{După}
+%        \end{subfigure}%
+%        }\\
+%        \caption{Generarea clasei cadru de stivă}
+%    \end{figure}
 \end{frame}
 
 \begin{frame}{Includerea codului metodei în codul auxiliar}
-    \begin{figure}[htb]
-        \makebox[\linewidth][c]{%
-        \begin{subfigure}[b]{.5\textwidth}
-            \centering
-            \includegraphics[height=1.7in]{../../../theses/diploma/src/img/incorporate-before-white-18.png}
-            \caption{Înainte}
-        \end{subfigure}%
-        \begin{subfigure}[b]{.5\textwidth}
-            \centering
-            \includegraphics[height=2.456in]{../../../theses/diploma/src/img/incorporate-after-white-26.png}
-            \caption{După}
-        \end{subfigure}%
-        }\\
-        \caption{Includerea codului metodei în codul auxiliar}
-    \end{figure}
+%    \begin{figure}[htb]
+%        \makebox[\linewidth][c]{%
+%        \begin{subfigure}[b]{.5\textwidth}
+%            \centering
+%            \includegraphics[height=1.7in]{../../../theses/diploma/src/img/incorporate-before-white-18.png}
+%            \caption{Înainte}
+%        \end{subfigure}%
+%        \begin{subfigure}[b]{.5\textwidth}
+%            \centering
+%            \includegraphics[height=2.456in]{../../../theses/diploma/src/img/incorporate-after-white-26.png}
+%            \caption{După}
+%        \end{subfigure}%
+%        }\\
+%        \caption{Includerea codului metodei în codul auxiliar}
+%    \end{figure}
+    \begin{itemize}
+        \item Declararea unei stive explicite în program
+        \item Adăugarea la stivă a unei înregistrări de activare ce reprezintă apelul metodei din exterior
+        \item Declararea unei variabile \code{ret} ce reține valoarea întoarsă de apelul recursiv
+        \item Includerea codului metodei într-o buclă \code{while} care ciclează până când se golește stiva
+        \item Declararea în interiorul buclei \code{while} a unei variabile \code{frame}, inițializată la înregistrarea
+        de activare din vârful stivei
+        \item Adăugarea unei instructiuni \code{return ret;} care întoarce valoarea apelului exterior
+    \end{itemize}
 \end{frame}
 
-\begin{frame}{Înlocuirea referințelor la variable cu accese la câmpul din cadrul de stivă}
-    \begin{figure}[htb]
-        \makebox[\linewidth][c]{%
-        \begin{subfigure}[b]{.5\textwidth}
-            \centering
-            \includegraphics[width=2.1in]{../../../theses/diploma/src/img/incorporate-after-white-26.png}
-            \caption{Înainte}
-        \end{subfigure}%
-        \begin{subfigure}[b]{.5\textwidth}
-            \centering
-            \includegraphics[width=2.1in]{../../../theses/diploma/src/img/ref-frame-after-white-26.png}
-            \caption{După}
-        \end{subfigure}%
-        }\\
-        \caption{Înlocuirea referințelor la variable cu accese la câmpul din cadrul de stivă}
-    \end{figure}
+\begin{frame}{Tratarea variabilelor locale}
+% bullet: Inlocuire referintei la variabila
+% bullet: Exemplu if factorial
+% bullet: Inlocuirea declaratiilor variabilelor
+% bullet: Exemplu: declaratie cu initializare
+    \begin{itemize}
+        \item Înlocuirea referințelor la variabile
+        \item Înlocuirea declarațiilor de variabile locale
+        \begin{figure}[htb]
+            \begin{subfigure}[b]{.48\textwidth}
+                \centering
+                \includegraphics[height=1.65in]{img/ref-var-before.png}
+                \caption{Înainte}
+            \end{subfigure}
+            \begin{subfigure}[b]{.48\textwidth}
+                \centering
+                \includegraphics[height=1.65in]{img/ref-var-after.png}
+                \caption{După}
+            \end{subfigure}
+        \end{figure}
+    \end{itemize}
 \end{frame}
 
-\begin{frame}{Înlocuirea declarațiilor având inițializare cu accese la câmpul din cadrul de stivă}
-    \begin{figure}[htb]
-        \makebox[\linewidth][c]{%
-        \begin{subfigure}[b]{.5\textwidth}
-            \centering
-            \includegraphics[width=2.1in]{../../../theses/diploma/src/img/replace-declaration-before-white-30.png}
-            \caption{Înainte}
-        \end{subfigure}%
-        \begin{subfigure}[b]{.5\textwidth}
-            \centering
-            \includegraphics[width=2.1in]{../../../theses/diploma/src/img/replace-declaration-after-white-30.png}
-            \caption{După}
-        \end{subfigure}%
-        }\\
-    \end{figure}
-\end{frame}
+%\begin{frame}{Înlocuirea declarațiilor având inițializare cu accese la câmpul din cadrul de stivă}
+%    \begin{figure}[htb]
+%        \makebox[\linewidth][c]{%
+%        \begin{subfigure}[b]{.5\textwidth}
+%            \centering
+%            \includegraphics[width=2.1in]{../../../theses/diploma/src/img/replace-declaration-before-white-30.png}
+%            \caption{Înainte}
+%        \end{subfigure}%
+%        \begin{subfigure}[b]{.5\textwidth}
+%            \centering
+%            \includegraphics[width=2.1in]{../../../theses/diploma/src/img/replace-declaration-after-white-30.png}
+%            \caption{După}
+%        \end{subfigure}%
+%        }\\
+%    \end{figure}
+%\end{frame}
 
 \begin{frame}{Generarea grafului fluxului de control (Instrucțiunea \code{if})}
     \begin{figure}[htb]
@@ -271,13 +315,25 @@
     \end{figure}
 \end{frame}
 
+\begin{frame}{Generarea grafului fluxului de control (Apelul recursiv)}
+    Tratarea apelului recursiv presupune:
+    \begin{itemize}
+        \item Înlocuirea sa cu adăugarea unei noi înregistrări de activare în vârful stivei, inițializată cu
+        expresiile folosite ca parametri actuali ai apelului
+        \item Crearea unui nou bloc de bază în graful fluxului de control
+        \item Adăugarea unui salt necondiționat din blocul curent la noul bloc creat
+        \item Setarea blocului curent la blocul nou creat
+    \end{itemize}
+\end{frame}
+
 \begin{frame}{Generarea grafului fluxului de control (Exemplu)}
     \begin{figure}[htb]
-        \begin{subfigure}[b]{.4\textwidth}
+        \begin{subfigure}{.42\textwidth}
             \centering
-            \includegraphics[width=\textwidth]{../../../theses/diploma/src/img/cfg-before-white-32.png}
+            \includegraphics[width=\textwidth]{img/ref-var-after.png}
         \end{subfigure}
-        \begin{subfigure}[b]{.4\textwidth}
+        \hfill
+        \begin{subfigure}{.42\textwidth}
             \centering
             \includegraphics[width=\textwidth]{../../../theses/diploma/src/graph/cfg.pdf}
         \end{subfigure}
@@ -285,6 +341,7 @@
 \end{frame}
 
 \begin{frame}{Eliminarea blocurilor triviale (înainte)}
+% eventual un exemplu scris de mine, care e mai simplu
     \begin{figure}[htb]
         \centering
         \includegraphics[width=\linewidth]{../../../theses/diploma/src/graph/trivial-before.pdf}
@@ -303,22 +360,24 @@
     \end{figure}
 \end{frame}
 
-\begin{frame}{Reducerea grafului de control (Exemplu 1)}
-    \begin{figure}[htb]
-        \centering
-        \includegraphics[width=.5\textwidth]{../../../theses/diploma/src/graph/inline-after-1.pdf}
-        \caption{The reduced CFG\label{img:inline1}}
-    \end{figure}
-\end{frame}
+%\begin{frame}{Reducerea grafului de control (Exemplu 1)}
+%    \begin{figure}[htb]
+%        \centering
+%        \includegraphics[width=.5\textwidth]{../../../theses/diploma/src/graph/inline-after-1.pdf}
+%        \caption{The reduced CFG\label{img:inline1}}
+%    \end{figure}
+%\end{frame}
 
-\begin{frame}{Reducerea grafului de control (Exemplu 2)}
+\begin{frame}{Reducerea grafului de control (Exemplu)}
+% las doar exemplul mai mic
     \begin{figure}[htb]
-        \begin{subfigure}[b]{.4\textwidth}
+        \begin{subfigure}[b]{.42\textwidth}
             \centering
             \includegraphics[width=\textwidth]{../../../theses/diploma/src/graph/inline-before.pdf}
             \caption{Înainte}
         \end{subfigure}
-        \begin{subfigure}[b]{.4\textwidth}
+        \hfill
+        \begin{subfigure}[b]{.42\textwidth}
             \centering
             \includegraphics[width=\textwidth]{../../../theses/diploma/src/graph/inline-after.pdf}
             \caption{După}
@@ -327,71 +386,88 @@
 \end{frame}
 
 \begin{frame}{Înlocuirea instrucțiunii \code{return}}
-    \begin{figure}[htb]
-        \begin{subfigure}[b]{.45\textwidth}
-            \centering
-            \includegraphics[height=2.3in]{../../../theses/diploma/src/img/inline-blocks-after-white-44.png}
-        \end{subfigure}
-        \begin{subfigure}[b]{.45\textwidth}
-            \centering
-            \includegraphics[height=2.617in]{../../../theses/diploma/src/img/replace-return-after-50.png}
-        \end{subfigure}
-    \end{figure}
+    \begin{itemize}
+        \item Atribuirea expresiei instrucțiunii \code{return} la variabila \code{ret}
+        \item Eliminarea de pe stivă a înregistrării de activare curente
+        \item Adăugarea unei instrucțiuni \code{break}
+\end{itemize}
+%    \begin{figure}[htb]
+%        \begin{subfigure}[b]{.45\textwidth}
+%            \centering
+%            \includegraphics[height=2.3in]{../../../theses/diploma/src/img/inline-blocks-after-white-44.png}
+%        \end{subfigure}
+%        \begin{subfigure}[b]{.45\textwidth}
+%            \centering
+%            \includegraphics[height=2.617in]{../../../theses/diploma/src/img/replace-return-after-50.png}
+%        \end{subfigure}
+%    \end{figure}
 \end{frame}
 
 \section{Testare}
 
 \begin{frame}{Testare}
     \begin{itemize}
-        \item Teste unitare pentru fiecare etapă a algoritmului pe tranformarea corectă a codului
-        \item Teste unitare pentru întreg algoritmul pe transformarea corectă a codului
-        \item Teste unitare pentru întreg algoritmul pe conservarea semanticii codului (*)
+        \item Validarea transformării corecte a codului prin teste unitare:
+        \begin{itemize}
+            \item Pentru fiecare etapă a algoritmului
+            \item Pentru întreg algoritmul
+        \end{itemize}
+        \item Validarea conservării semanticii codului
     \end{itemize}
 \end{frame}
 	
 \section{Evaluarea perfomanțelor}
 
-\begin{frame}{Suma primelor 10000 de numere prime}
-    \begin{figure}[htb]
-        \begin{subfigure}[b]{.45\textwidth}
-            \centering
-            \includegraphics[height=2in]{../../../theses/diploma/src/img/primes-before-33.png}
-            \caption{2ms}
-        \end{subfigure}
-        \begin{subfigure}[b]{.45\textwidth}
-            \centering
-            \includegraphics[height=2.36in]{../../../theses/diploma/src/img/primes-after-39.png}
-            \caption{6ms}
-        \end{subfigure}
-    \end{figure}
+\begin{frame}{Evaluarea performanțelor}
+    \begin{itemize}
+        \item Suma primelor 2000000 de numere prime
+        \begin{itemize}
+            \item Varianta recursivă: \code{StackOverflowError}
+            \item Varianta iterativă: 2 secunde
+        \end{itemize}
+        \item Suma primelor 10000 de numere prime
+        \begin{itemize}
+            \item Varianta recursivă: 2ms
+            \item Varianta iterativă: 6ms
+        \end{itemize}
+    \end{itemize}
+%    \begin{figure}[htb]
+%        \begin{subfigure}[b]{.45\textwidth}
+%            \centering
+%            \includegraphics[height=2in]{../../../theses/diploma/src/img/primes-before-33.png}
+%            \caption{2ms}
+%        \end{subfigure}
+%        \begin{subfigure}[b]{.45\textwidth}
+%            \centering
+%            \includegraphics[height=2.36in]{../../../theses/diploma/src/img/primes-after-39.png}
+%            \caption{6ms}
+%        \end{subfigure}
+%    \end{figure}
 \end{frame}
 
-\begin{frame}{Suma primelor 2000000 de numere prime}
+%\begin{frame}{Suma primelor 2000000 de numere prime}
+%    \begin{itemize}
+%        \item Varianta recursivă: \code{StackOverflowError}
+%        \item Varianta iterativă: 2 secunde
+%    \end{itemize}
+%\end{frame}
+
+\section{Concluzii}
+
+\begin{frame}{Concluzii}
     \begin{itemize}
-        \item Varianta recursivă: \code{StackOverflowError}
-        \item Varianta iterativă: 2 secunde
+        \item Rezolvă problema \code{StackoverflowError}
+        \item Instrument ușor de folosit, integrat într-un mediu de dezvoltare
+        \item Lizibilitatea codului poate fi afectată
     \end{itemize}
 \end{frame}
 
-\section{Viitor}
-
 \begin{frame}{Dezvoltări ulterioare}
 	\begin{itemize}
-		\item Tratarea diferențiată a recursivității pe coadă
-		\item Recursivitatea pe coadă „modulo cons”
+        \item Optimizarea algoritmului de eliminare a recursivității
+		\item Tratarea recursivității pe revenire
+        \item Tratarea unor cazuri particulare de recursivitate pe avans
 	\end{itemize}
-\end{frame}
-
-\section{Concluzie}
-
-\begin{frame}{Eliminarea recursivității}
-\begin{itemize}
-    \item Intellij IDEA plugin
-    \item Refactorizare
-    \item Recursivitate
-    \item Graful fluxului de control
-    \item Lipsa instrucțiunii \code{goto}
-\end{itemize}
 \end{frame}
 
 \end{document}
