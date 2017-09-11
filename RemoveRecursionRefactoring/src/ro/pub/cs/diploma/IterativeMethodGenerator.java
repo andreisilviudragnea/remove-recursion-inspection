@@ -138,6 +138,11 @@ public class IterativeMethodGenerator {
       .filter(Block::inlineIfTrivial)
       .collect(Collectors.toList());
 
+    final List<String> collect = nonTrivialReachableBlocks.stream().map(Block::toDot).flatMap(Collection::stream).collect(Collectors.toList());
+    collect.add(0, "node [shape=record];");
+
+    final String cfg = String.format("digraph cfg {\n\t%s\n}", collect.stream().collect(Collectors.joining("\n\t")));
+
     if (steps == 11) {
       nonTrivialReachableBlocks.forEach(block -> block.setDoNotInline(true));
       return nonTrivialReachableBlocks;
