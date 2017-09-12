@@ -13,22 +13,17 @@ import java.util.*
 
 internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
                                     private val myNameManager: NameManager,
-                                    private val myFactory: PsiElementFactory,
                                     private val myStatementsContainingRecursiveCalls: Set<PsiStatement>) : JavaRecursiveElementVisitor() {
-
+  private val myFactory = myMethod.getFactory()
   private val myBlocks = ArrayList<Block>()
   private val myBreakTargets = HashMap<PsiStatement, Block>()
   private val myContinueTargets = HashMap<PsiStatement, Block>()
 
-  private var myCurrentBlock: Block
   private var myCounter: Int = 0
+  private var myCurrentBlock: Block = newBlock()
 
   val blocks: List<Block>
     get() = myBlocks
-
-  init {
-    myCurrentBlock = newBlock()
-  }
 
   private fun newBlock(): Block {
     val block = Block(myCounter++)
@@ -36,8 +31,8 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
     return block
   }
 
-  private fun addStatement(statement: PsiStatement?) {
-    myCurrentBlock.add(statement!!)
+  private fun addStatement(statement: PsiStatement) {
+    myCurrentBlock.add(statement)
   }
 
   private fun addStatement(text: String) {
@@ -102,7 +97,7 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
 
     val statements = block.statements
     // This is a hack, this method gets called only for the method block, not for blocks of block statements.
-    if (PsiPrimitiveType.VOID == myMethod.returnType && statements[statements.size - 1] !is PsiReturnStatement) {
+    if (PsiPrimitiveType.VOID == myMethod.returnType && statements.last() !is PsiReturnStatement) {
       addReturnStatement(myFactory.statement("return;") as PsiReturnStatement)
     }
   }
@@ -123,7 +118,7 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
 
     val returnType = myMethod.returnType ?: return
     if (returnType != PsiPrimitiveType.VOID) {
-      val parent = PsiTreeUtil.getParentOfType(expression, PsiStatement::class.java, true)
+      val parent = PsiTreeUtil.getParentOfType(expression, PsiStatement::class.java, true) ?: return
       expression.replace(myFactory.expression(myNameManager.retVarName))
       addStatement(parent)
     }
@@ -135,8 +130,7 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
     val elseBlock = if (elseBranch != null) newBlock() else null
     val mergeBlock = newBlock()
 
-    val condition = statement.condition ?: return
-    addConditionalJumpStatement(condition, thenBlock, elseBlock ?: mergeBlock)
+    addConditionalJumpStatement(statement.condition ?: return, thenBlock, elseBlock ?: mergeBlock)
 
     myCurrentBlock = thenBlock
     val thenBranch = statement.thenBranch ?: return
@@ -153,14 +147,9 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
   }
 
   private fun addStatements(statement: PsiStatement) {
-    if (statement is PsiExpressionStatement) {
-      addStatement("${statement.expression.text};")
-      return
-    }
-    if (statement is PsiExpressionListStatement) {
-      for (expression in statement.expressionList.expressions) {
-        addStatement("${expression.text};")
-      }
+    when (statement) {
+      is PsiExpressionStatement -> addStatement("${statement.expression.text};")
+      is PsiExpressionListStatement -> statement.expressionList.expressions.forEach { addStatement("${it.text};") }
     }
   }
 
@@ -169,8 +158,7 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
                         statement: PsiLoopStatement,
                         atLeastOnce: Boolean) {
     val expression = ExpressionUtils.computeConstantExpression(condition)
-    val theCondition: PsiExpression?
-    theCondition = if (expression is Boolean && expression == java.lang.Boolean.TRUE) null else condition
+    val theCondition = if (expression is Boolean && expression == java.lang.Boolean.TRUE) null else condition
 
     val conditionBlock = if (theCondition != null) newBlock() else null
     val bodyBlock = newBlock()
@@ -185,9 +173,9 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
 
     addUnconditionalJumpStatement(if (atLeastOnce) bodyBlock else actualConditionBlock)
 
-    if (conditionBlock != null) {
+    if (theCondition != null && conditionBlock != null) {
       myCurrentBlock = conditionBlock
-      addConditionalJumpStatement(theCondition!!, bodyBlock, mergeBlock)
+      addConditionalJumpStatement(theCondition, bodyBlock, mergeBlock)
     }
 
     if (update != null && updateBlock != null) {
@@ -223,30 +211,29 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
     visitLoop(statement.condition, statement.update, statement, false)
   }
 
-  override fun visitSwitchStatement(statement: PsiSwitchStatement) {
+  override fun visitSwitchStatement(switchStatement: PsiSwitchStatement) {
     val mergeBlock = newBlock()
-    myBreakTargets.put(statement, mergeBlock)
+    myBreakTargets.put(switchStatement, mergeBlock)
 
-    val body = statement.body ?: return
+    val body = switchStatement.body ?: return
     val statements = ArrayList<Statement>()
     val oldCurrentBlock = myCurrentBlock
     var previousCurrentBlock: Block? = null
-    for (psiStatement in body.statements) {
-      if (psiStatement is PsiSwitchLabelStatement) {
-        statements.add(NormalStatement(psiStatement))
-        continue
-      }
-      if (psiStatement is PsiBlockStatement) {
-        val newBlock = newBlock()
-        statements.add(UnconditionalJumpStatement(Ref.create(newBlock)))
+    for (statement in body.statements) {
+      when (statement) {
+        is PsiSwitchLabelStatement -> statements.add(NormalStatement(statement))
+        is PsiBlockStatement -> {
+          val newBlock = newBlock()
+          statements.add(UnconditionalJumpStatement(Ref.create(newBlock)))
 
-        if (previousCurrentBlock != null && !previousCurrentBlock.isFinished) {
-          previousCurrentBlock.addUnconditionalJump(Ref.create(newBlock))
+          if (previousCurrentBlock != null && !previousCurrentBlock.isFinished) {
+            previousCurrentBlock.addUnconditionalJump(Ref.create(newBlock))
+          }
+
+          myCurrentBlock = newBlock
+          statement.accept(this)
+          previousCurrentBlock = myCurrentBlock
         }
-
-        myCurrentBlock = newBlock
-        psiStatement.accept(this)
-        previousCurrentBlock = myCurrentBlock
       }
     }
 
@@ -255,7 +242,7 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
     }
 
     myCurrentBlock = oldCurrentBlock
-    val expression = statement.expression ?: return
+    val expression = switchStatement.expression ?: return
     myCurrentBlock.addSwitchStatement(expression, statements)
 
     myCurrentBlock = mergeBlock

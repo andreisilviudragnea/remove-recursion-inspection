@@ -57,7 +57,7 @@ class IterativeMethodGenerator(private val myFactory: PsiElementFactory,
       return
     }
 
-    val basicBlocksGenerator = BasicBlocksGenerator(myMethod, myNameManager, myFactory,
+    val basicBlocksGenerator = BasicBlocksGenerator(myMethod, myNameManager,
         incorporatedBody.extractStatementsContainingRecursiveCallsTo(myMethod))
     incorporatedBody.accept(basicBlocksGenerator)
     val blocks = basicBlocksGenerator.blocks
