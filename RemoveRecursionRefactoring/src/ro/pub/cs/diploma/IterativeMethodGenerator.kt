@@ -21,7 +21,7 @@ class IterativeMethodGenerator(private val myFactory: PsiElementFactory,
       return
     }
 
-    RenameVariablesToUniqueNames(myMethod).apply(myMethod)
+    renameVariablesToUniqueNames(myMethod)
     if (steps == 2) {
       return
     }
