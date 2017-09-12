@@ -3,7 +3,6 @@ package ro.pub.cs.diploma
 import com.intellij.psi.*
 import com.intellij.psi.codeStyle.JavaCodeStyleManager
 import com.intellij.psi.util.PsiTreeUtil
-import org.jetbrains.annotations.Contract
 
 fun PsiElementFactory.statement(text: String) = this.createStatementFromText(text, null)
 fun PsiElement.getFactory(): PsiElementFactory = JavaPsiFacade.getElementFactory(this.project)
@@ -12,9 +11,6 @@ fun PsiElement.getStyleManager(): JavaCodeStyleManager = JavaCodeStyleManager.ge
 object Utilss {
   fun getContainingMethod(element: PsiElement): PsiMethod? =
       PsiTreeUtil.getParentOfType(element, PsiMethod::class.java, true, PsiClass::class.java, PsiLambdaExpression::class.java)
-
-  @Contract(pure = true)
-  fun getFrameClassName(methodName: String): String = methodName.capitalize() + Constants.FRAME
 
   fun <T : PsiElement> createPushStatement(factory: PsiElementFactory,
                                            frameClassName: String,

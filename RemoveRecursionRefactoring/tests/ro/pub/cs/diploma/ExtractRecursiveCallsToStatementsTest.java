@@ -8,7 +8,7 @@ public class ExtractRecursiveCallsToStatementsTest extends IGQuickFixesTestCase 
     super.setUp();
     myFixture.enableInspections(new ExtractRecursiveCallsToStatementsInspection());
     myRelativePath = "extract-recursive-calls-to-statements";
-    myDefaultHint = RemoveRecursionBundle.message("extract.recursive.calls.to.statements");
+    myDefaultHint = RemoveRecursionBundle.INSTANCE.message("extract.recursive.calls.to.statements");
   }
 
   public void testExtract1() {

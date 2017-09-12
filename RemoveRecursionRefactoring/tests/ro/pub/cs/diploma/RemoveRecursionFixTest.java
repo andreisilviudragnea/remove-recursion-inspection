@@ -9,7 +9,7 @@ public class RemoveRecursionFixTest extends IGQuickFixesTestCase {
     super.setUp();
     myFixture.enableInspections(new RemoveRecursionInspection());
     myRelativePath = "fixes";
-    myDefaultHint = RemoveRecursionBundle.message("remove.recursion.replace.quickfix");
+    myDefaultHint = RemoveRecursionBundle.INSTANCE.message("remove.recursion.replace.quickfix");
   }
 
   public void testCallOnOtherInstance1() {
