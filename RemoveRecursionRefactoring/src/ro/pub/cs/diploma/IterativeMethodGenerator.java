@@ -43,7 +43,7 @@ public class IterativeMethodGenerator {
   }
 
   public void createIterativeBody(int steps) {
-    ReplaceSingleStatementsWithBlockStatements.getInstance(myFactory).apply(myMethod);
+    new ReplaceSingleStatementsWithBlockStatements(myFactory).apply(myMethod);
     if (steps == 1) {
       return;
     }
@@ -69,7 +69,7 @@ public class IterativeMethodGenerator {
       return;
     }
 
-    final PsiCodeBlock incorporatedBody = IncorporateBody.Companion.getInstance(myNameManager, myFactory, myStyleManager).apply(myMethod);
+    final PsiCodeBlock incorporatedBody = new IncorporateBody(myNameManager, myFactory, myStyleManager).apply(myMethod);
     if (incorporatedBody == null) {
       return;
     }
@@ -77,7 +77,7 @@ public class IterativeMethodGenerator {
       return;
     }
 
-    ReplaceIdentifierWithFrameAccess.getInstance(myNameManager, myFactory, incorporatedBody).apply(myMethod);
+    new ReplaceIdentifierWithFrameAccess(myNameManager, myFactory, incorporatedBody).apply(myMethod);
     if (steps == 7) {
       return;
     }

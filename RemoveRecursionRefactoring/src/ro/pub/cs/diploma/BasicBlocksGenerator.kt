@@ -41,7 +41,7 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
   }
 
   private fun addStatement(text: String) {
-    myCurrentBlock.add(myFactory.createStatementFromText(text, null))
+    myCurrentBlock.add(myFactory.statement(text))
   }
 
   private fun addUnconditionalJumpStatement(block: Block) {
@@ -103,7 +103,7 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
     val statements = block.statements
     // This is a hack, this method gets called only for the method block, not for blocks of block statements.
     if (PsiPrimitiveType.VOID == myMethod.returnType && statements[statements.size - 1] !is PsiReturnStatement) {
-      addReturnStatement(myFactory.createStatementFromText("return;", null) as PsiReturnStatement)
+      addReturnStatement(myFactory.statement("return;") as PsiReturnStatement)
     }
   }
 
@@ -122,7 +122,7 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
     myCurrentBlock = block
 
     val returnType = myMethod.returnType ?: return
-    if (!Utilss.isVoid(returnType)) {
+    if (returnType != PsiPrimitiveType.VOID) {
       val parent = PsiTreeUtil.getParentOfType(expression, PsiStatement::class.java, true)
       expression.replace(myFactory.createExpressionFromText(myNameManager.retVarName, null))
       addStatement(parent)

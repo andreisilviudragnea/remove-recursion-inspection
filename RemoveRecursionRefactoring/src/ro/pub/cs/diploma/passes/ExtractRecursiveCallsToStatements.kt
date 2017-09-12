@@ -3,7 +3,8 @@ package ro.pub.cs.diploma.passes
 import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
 import ro.pub.cs.diploma.Constants
-import ro.pub.cs.diploma.Utilss
+import ro.pub.cs.diploma.getFactory
+import ro.pub.cs.diploma.getStyleManager
 import ro.pub.cs.diploma.isRecursive
 import java.util.*
 
@@ -12,7 +13,7 @@ class ExtractRecursiveCallsToStatements(private val myMethod: PsiMethod) : Pass<
   override fun collect(method: PsiMethod): List<PsiMethodCallExpression> {
     val calls = ArrayList<PsiMethodCallExpression>()
     val returnType = method.returnType ?: return calls
-    if (Utilss.isVoid(returnType)) {
+    if (returnType == PsiPrimitiveType.VOID) {
       return calls
     }
     method.accept(object : JavaRecursiveElementVisitor() {
@@ -31,8 +32,8 @@ class ExtractRecursiveCallsToStatements(private val myMethod: PsiMethod) : Pass<
   }
 
   override fun transform(expressions: List<PsiMethodCallExpression>): Any? {
-    val styleManager = Utilss.getStyleManager(myMethod)
-    val factory = Utilss.getFactory(myMethod)
+    val styleManager = myMethod.getStyleManager()
+    val factory = myMethod.getFactory()
     val returnType = myMethod.returnType ?: return null
     calls@ for (call in expressions) {
       val parentStatement = PsiTreeUtil.getParentOfType(call, PsiStatement::class.java, true)

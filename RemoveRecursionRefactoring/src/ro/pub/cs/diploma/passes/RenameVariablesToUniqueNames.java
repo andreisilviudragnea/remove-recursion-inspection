@@ -6,7 +6,7 @@ import com.intellij.psi.search.LocalSearchScope;
 import com.intellij.refactoring.util.RefactoringUtil;
 import org.jetbrains.annotations.NotNull;
 import ro.pub.cs.diploma.RecursionUtilKt;
-import ro.pub.cs.diploma.Utilss;
+import ro.pub.cs.diploma.UtilssKt;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -77,7 +77,7 @@ public class RenameVariablesToUniqueNames implements Pass<PsiMethod, Map<String,
 
   @Override
   public Object transform(Map<String, Map<PsiType, List<PsiVariable>>> names) {
-    final JavaCodeStyleManager styleManager = Utilss.INSTANCE.getStyleManager(myMethod);
+    final JavaCodeStyleManager styleManager = UtilssKt.getStyleManager(myMethod);
     for (final Map.Entry<String, Map<PsiType, List<PsiVariable>>> entry : names.entrySet()) {
       final Map<PsiType, List<PsiVariable>> typesMap = entry.getValue();
       if (typesMap.size() <= 1) {

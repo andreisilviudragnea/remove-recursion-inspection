@@ -15,8 +15,8 @@ class BreakContinueReplacerVisitor internal constructor(private val myBreakTarge
     val block = targets[targetStatement] ?: return
     myCurrentBlock.addEdgeTo(Ref.create(block))
     block.setDoNotInline(true)
-    statement.parent.addBefore(myFactory.createStatementFromText("frame.block = ${block.id};", null), statement)
-    statement.replace(myFactory.createStatementFromText("break;", null))
+    statement.parent.addBefore(myFactory.statement("frame.block = ${block.id};"), statement)
+    statement.replace(myFactory.statement("break;"))
   }
 
   override fun visitBreakStatement(statement: PsiBreakStatement) {

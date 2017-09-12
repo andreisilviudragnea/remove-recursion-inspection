@@ -1,9 +1,7 @@
 package ro.pub.cs.diploma.passes
 
 import com.intellij.psi.*
-import ro.pub.cs.diploma.NameManager
-import ro.pub.cs.diploma.Utilss
-import ro.pub.cs.diploma.hasToBeSavedOnStack
+import ro.pub.cs.diploma.*
 import java.util.*
 
 class AddFrameClass(private val myMethod: PsiMethod, private val myNameManager: NameManager) : Pass<PsiMethod, Map<String, PsiVariable>, Nothing?> {
@@ -36,7 +34,7 @@ class AddFrameClass(private val myMethod: PsiMethod, private val myNameManager: 
   }
 
   override fun transform(variables: Map<String, PsiVariable>): Nothing? {
-    val factory = Utilss.getFactory(myMethod)
+    val factory = myMethod.getFactory()
     val frameClassName = myNameManager.frameClassName
     val frameClass = factory.createClass(frameClassName)
 
@@ -46,7 +44,7 @@ class AddFrameClass(private val myMethod: PsiMethod, private val myNameManager: 
     modifierList.setModifierProperty(PsiModifier.STATIC, true)
 
     // Add fields
-    val styleManager = Utilss.getStyleManager(myMethod)
+    val styleManager = myMethod.getStyleManager()
     variables.entries
         .map {
           styleManager.shortenClassReferences(
@@ -63,7 +61,7 @@ class AddFrameClass(private val myMethod: PsiMethod, private val myNameManager: 
     for (parameter in myMethod.parameterList.parameters) {
       val name = parameter.name ?: return null
       parameterList.add(factory.createParameter(name, parameter.type))
-      body.add(factory.createStatementFromText("this.$name = $name;", null))
+      body.add(factory.statement("this.$name = $name;"))
     }
     frameClass.add(constructor)
 

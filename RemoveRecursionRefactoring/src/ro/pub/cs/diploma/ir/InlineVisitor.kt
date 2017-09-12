@@ -4,6 +4,7 @@ import com.intellij.psi.PsiCodeBlock
 import com.intellij.psi.PsiElementFactory
 import com.intellij.psi.PsiStatement
 import ro.pub.cs.diploma.NameManager
+import ro.pub.cs.diploma.statement
 
 class InlineVisitor(private val factory: PsiElementFactory, nameManager: NameManager) : Visitor {
   private val blockSet: String = "${nameManager.frameVarName}.${nameManager.blockFieldName} = "
@@ -14,7 +15,7 @@ class InlineVisitor(private val factory: PsiElementFactory, nameManager: NameMan
   private fun newBlock(): PsiCodeBlock = factory.createCodeBlock()
 
   private fun addStatement(text: String) {
-    currentBlock.add(factory.createStatementFromText(text, null))
+    currentBlock.add(factory.statement(text))
   }
 
   private fun addStatement(statement: WrapperStatement) {
