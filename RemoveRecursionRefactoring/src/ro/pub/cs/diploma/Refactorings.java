@@ -33,7 +33,7 @@ public class Refactorings {
     }
     methodCall.append(".iterator()");
     final Project project = statement.getProject();
-    final PsiElementFactory factory = UtilssKt.getFactory(method);
+    final PsiElementFactory factory = UtilsKt.getFactory(method);
     final PsiExpression iteratorCall = factory.createExpressionFromText(methodCall.toString(), iteratedValue);
     final PsiType variableType = GenericsUtil.getVariableTypeByExpressionType(iteratorCall.getType());
     if (variableType == null) {
@@ -41,7 +41,7 @@ public class Refactorings {
     }
     @NonNls final StringBuilder newStatement = new StringBuilder();
     newStatement.append("for(").append(variableType.getCanonicalText()).append(' ');
-    final JavaCodeStyleManager codeStyleManager = UtilssKt.getStyleManager(method);
+    final JavaCodeStyleManager codeStyleManager = UtilsKt.getStyleManager(method);
     final String iterator = codeStyleManager.suggestUniqueVariableName("iterator", method, true);
     newStatement.append(iterator).append("=").append(iteratorCall.getText()).append(';');
     newStatement.append(iterator).append(".hasNext();) {");

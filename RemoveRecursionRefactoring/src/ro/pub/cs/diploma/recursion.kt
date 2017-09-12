@@ -5,7 +5,6 @@ import com.intellij.openapi.util.Ref
 import com.intellij.psi.*
 import com.siyeh.ig.performance.TailRecursionInspection
 import com.siyeh.ig.psiutils.ParenthesesUtils
-import java.util.*
 
 /**
  * Checks if the `expression` is a recursive method call to `method`.
@@ -82,81 +81,8 @@ fun PsiCodeBlock.extractStatementsContainingRecursiveCallsTo(method: PsiMethod):
   return statementsContainingRecursiveCalls
 }
 
-private fun PsiParameter.getElementsInScope(): List<PsiElement> {
-  val parent = this.parent
-  val elements = ArrayList<PsiElement>()
-
-  if (parent is PsiParameterList) {
-    val body = (parent.getParent() as PsiMethod).body
-    if (body != null) {
-      elements.add(body)
-    }
-  }
-  else if (parent is PsiForeachStatement) {
-    val body = parent.body
-    if (body != null) {
-      elements.add(body)
-    }
-  }
-
-  return elements
-}
-
 fun PsiParameter.containsInScopeRecursiveCallsTo(method: PsiMethod): Boolean =
     this.getElementsInScope().any { it.containsRecursiveCallsTo(method) }
-
-private fun PsiLocalVariable.getElementsInScope(): List<PsiElement> {
-  val declarationStatement = this.parent as PsiDeclarationStatement
-  val parent = declarationStatement.parent
-
-  val elements = ArrayList<PsiElement>()
-
-  // This is because the variable is actually used only after it has been initialized.
-  //final PsiExpression initializer = variable.getInitializer();
-  //if (initializer != null) {
-  //  elements.add(initializer);
-  //}
-
-  var met = false
-  for (element in declarationStatement.declaredElements) {
-    if (element is PsiLocalVariable) {
-      if (met) {
-        elements.add(element)
-      }
-      if (element === this) {
-        met = true
-      }
-    }
-  }
-
-  if (parent is PsiForStatement) {
-    val condition = parent.condition
-    if (condition != null) {
-      elements.add(condition)
-    }
-    val update = parent.update
-    if (update != null) {
-      elements.add(update)
-    }
-    val body = parent.body
-    if (body != null) {
-      elements.add(body)
-    }
-  }
-  else if (parent is PsiCodeBlock) {
-    met = false
-    for (psiStatement in parent.statements) {
-      if (met) {
-        elements.add(psiStatement)
-      }
-      if (psiStatement === declarationStatement) {
-        met = true
-      }
-    }
-  }
-
-  return elements
-}
 
 fun PsiLocalVariable.containsInScopeRecursiveCallsTo(method: PsiMethod): Boolean =
     this.getElementsInScope().any { it.containsRecursiveCallsTo(method) }
