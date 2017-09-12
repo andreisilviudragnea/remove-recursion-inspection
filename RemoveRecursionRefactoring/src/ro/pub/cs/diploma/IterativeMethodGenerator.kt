@@ -52,7 +52,7 @@ class IterativeMethodGenerator(private val myFactory: PsiElementFactory,
       return
     }
 
-    ReplaceDeclarationsHavingInitializersWithAssignments(myMethod, myNameManager, myFactory).apply(incorporatedBody)
+    replaceDeclarationsHavingInitializersWithAssignments(myMethod, incorporatedBody, myNameManager)
     if (steps == 8) {
       return
     }
