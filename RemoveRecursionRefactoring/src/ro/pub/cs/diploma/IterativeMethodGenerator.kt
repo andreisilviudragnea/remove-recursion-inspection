@@ -47,7 +47,7 @@ class IterativeMethodGenerator(private val myFactory: PsiElementFactory,
       return
     }
 
-    ReplaceIdentifierWithFrameAccess(myNameManager, myFactory, incorporatedBody).apply(myMethod)
+    replaceReferencesWithFieldAccesses(myMethod, incorporatedBody, myNameManager)
     if (steps == 7) {
       return
     }
