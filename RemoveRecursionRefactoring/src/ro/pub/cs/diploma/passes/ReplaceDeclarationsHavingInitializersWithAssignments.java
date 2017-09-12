@@ -71,13 +71,13 @@ public class ReplaceDeclarationsHavingInitializersWithAssignments implements Pas
       final PsiElement parent = statement.getParent();
       final Stream<String> stream = getVariablesStream(statement, myNameManager.getFrameVarName());
       if (parent instanceof PsiForStatement) {
-        statement.replace(Util.statement(myFactory, stream.collect(Collectors.joining(",")) + ";"));
+        statement.replace(Util.INSTANCE.statement(myFactory, stream.collect(Collectors.joining(",")) + ";"));
         continue;
       }
       final PsiCodeBlock parentBlock = (PsiCodeBlock)parent;
       PsiElement anchor = statement;
       for (final String string : stream.collect(Collectors.toList())) {
-        anchor = parentBlock.addAfter(Util.statement(myFactory, string + ";"), anchor);
+        anchor = parentBlock.addAfter(Util.INSTANCE.statement(myFactory, string + ";"), anchor);
       }
       statement.delete();
     }

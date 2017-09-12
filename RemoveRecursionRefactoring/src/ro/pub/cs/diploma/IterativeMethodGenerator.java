@@ -59,7 +59,7 @@ public class IterativeMethodGenerator {
       return;
     }
 
-    ExtractRecursiveCallsToStatements.getInstance(myMethod).apply(myMethod);
+    new ExtractRecursiveCallsToStatements(myMethod).apply(myMethod);
     if (steps == 4) {
       return;
     }
@@ -69,7 +69,7 @@ public class IterativeMethodGenerator {
       return;
     }
 
-    final PsiCodeBlock incorporatedBody = IncorporateBody.getInstance(myNameManager, myFactory, myStyleManager).apply(myMethod);
+    final PsiCodeBlock incorporatedBody = IncorporateBody.Companion.getInstance(myNameManager, myFactory, myStyleManager).apply(myMethod);
     if (incorporatedBody == null) {
       return;
     }

@@ -65,7 +65,7 @@ public class ReplaceSingleStatementsWithBlockStatements implements Pass<PsiMetho
         if (block == null) {
           return;
         }
-        final PsiElementFactory factory = Util.getFactory(statement);
+        final PsiElementFactory factory = Util.INSTANCE.getFactory(statement);
         PsiCodeBlock currentCodeBlock = null;
         PsiSwitchLabelStatement currentLabelStatement = null;
         for (final PsiStatement psiStatement : block.getStatements()) {

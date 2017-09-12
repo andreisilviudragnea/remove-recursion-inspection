@@ -22,7 +22,7 @@ public class ReplaceForEachLoopsWithIteratorForLoops implements Pass<PsiMethod, 
 
   @Override
   public List<PsiForeachStatement> collect(PsiMethod method) {
-    return Util.getPsiForEachStatements(method);
+    return Util.INSTANCE.getPsiForEachStatements(method);
   }
 
   @Override

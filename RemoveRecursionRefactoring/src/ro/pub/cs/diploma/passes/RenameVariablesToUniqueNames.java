@@ -77,7 +77,7 @@ public class RenameVariablesToUniqueNames implements Pass<PsiMethod, Map<String,
 
   @Override
   public Object transform(Map<String, Map<PsiType, List<PsiVariable>>> names) {
-    final JavaCodeStyleManager styleManager = Util.getStyleManager(myMethod);
+    final JavaCodeStyleManager styleManager = Util.INSTANCE.getStyleManager(myMethod);
     for (final Map.Entry<String, Map<PsiType, List<PsiVariable>>> entry : names.entrySet()) {
       final Map<PsiType, List<PsiVariable>> typesMap = entry.getValue();
       if (typesMap.size() <= 1) {
