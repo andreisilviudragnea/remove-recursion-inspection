@@ -16,7 +16,7 @@ class IterativeMethodGenerator(private val myFactory: PsiElementFactory,
   private fun statement(text: String): PsiStatement = myFactory.statement(text)
 
   fun createIterativeBody(steps: Int) {
-    ReplaceSingleStatementsWithBlockStatements(myFactory).apply(myMethod)
+    replaceSingleStatementsWithBlockStatements(myMethod)
     if (steps == 1) {
       return
     }
