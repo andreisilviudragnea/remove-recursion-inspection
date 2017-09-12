@@ -5,6 +5,9 @@ import com.intellij.psi.codeStyle.JavaCodeStyleManager
 import com.intellij.psi.util.PsiTreeUtil
 
 fun PsiElementFactory.statement(text: String) = this.createStatementFromText(text, null)
+
+fun PsiElementFactory.expression(text: String) = this.createExpressionFromText(text, null)
+
 fun <T : PsiElement> PsiElementFactory.createPushStatement(frameClassName: String,
                                                            stackVarName: String,
                                                            arguments: Array<T>,

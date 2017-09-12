@@ -5,6 +5,7 @@ import com.intellij.psi.search.LocalSearchScope
 import com.intellij.psi.search.searches.ReferencesSearch
 import ro.pub.cs.diploma.NameManager
 import ro.pub.cs.diploma.containsInScopeRecursiveCallsTo
+import ro.pub.cs.diploma.expression
 
 class ReplaceIdentifierWithFrameAccess(private val myNameManager: NameManager,
                                        private val myFactory: PsiElementFactory,
@@ -40,7 +41,7 @@ class ReplaceIdentifierWithFrameAccess(private val myNameManager: NameManager,
     variables
         .flatMap { ReferencesSearch.search(it, LocalSearchScope(myBody)) }
         .filterIsInstance<PsiReferenceExpression>()
-        .forEach { it.qualifierExpression = myFactory.createExpressionFromText(myNameManager.frameVarName, null) }
+        .forEach { it.qualifierExpression = myFactory.expression(myNameManager.frameVarName) }
     return null
   }
 }

@@ -124,7 +124,7 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
     val returnType = myMethod.returnType ?: return
     if (returnType != PsiPrimitiveType.VOID) {
       val parent = PsiTreeUtil.getParentOfType(expression, PsiStatement::class.java, true)
-      expression.replace(myFactory.createExpressionFromText(myNameManager.retVarName, null))
+      expression.replace(myFactory.expression(myNameManager.retVarName))
       addStatement(parent)
     }
   }

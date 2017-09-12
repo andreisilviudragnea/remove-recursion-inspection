@@ -1,6 +1,7 @@
 package ro.pub.cs.diploma.passes
 
 import com.intellij.psi.*
+import ro.pub.cs.diploma.expression
 import ro.pub.cs.diploma.getFactory
 import ro.pub.cs.diploma.statement
 import java.util.*
@@ -84,7 +85,7 @@ class ReplaceSingleStatementsWithBlockStatements(private val myFactory: PsiEleme
   override fun transform(statements: List<PsiStatement>): Nothing? {
     statements.forEach { statement ->
       if (statement is PsiEmptyStatement) {
-        statement.replace(myFactory.createExpressionFromText("{}", null))
+        statement.replace(myFactory.expression("{}"))
       }
       else if (statement !is PsiBlockStatement) {
         statement.replace(myFactory.statement("{${statement.text}}"))

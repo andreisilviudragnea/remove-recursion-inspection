@@ -2,10 +2,7 @@ package ro.pub.cs.diploma.passes
 
 import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
-import ro.pub.cs.diploma.TEMP
-import ro.pub.cs.diploma.getFactory
-import ro.pub.cs.diploma.getStyleManager
-import ro.pub.cs.diploma.isRecursiveCallTo
+import ro.pub.cs.diploma.*
 import java.util.*
 
 class ExtractRecursiveCallsToStatements(private val myMethod: PsiMethod) : Pass<PsiMethod, List<PsiMethodCallExpression>, Nothing?> {
@@ -55,7 +52,7 @@ class ExtractRecursiveCallsToStatements(private val myMethod: PsiMethod) : Pass<
       val parentBlock = PsiTreeUtil.getParentOfType(call, PsiCodeBlock::class.java, true) ?: continue
       val temp = styleManager.suggestUniqueVariableName(TEMP, myMethod, true)
       parentBlock.addBefore(factory.createVariableDeclarationStatement(temp, returnType, call), parentStatement)
-      call.replace(factory.createExpressionFromText(temp, null))
+      call.replace(factory.expression(temp))
     }
     return null
   }
