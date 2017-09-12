@@ -15,13 +15,13 @@ class AddFrameClass(private val myMethod: PsiMethod, private val myNameManager: 
       }
 
       override fun visitParameter(parameter: PsiParameter) {
-        if (!variables.containsKey(parameter.name) && hasToBeSavedOnStack(parameter, method)) {
+        if (!variables.containsKey(parameter.name) && parameter.containsInScopeRecursiveCallsTo(method)) {
           processVariable(parameter)
         }
       }
 
       override fun visitLocalVariable(variable: PsiLocalVariable) {
-        if (!variables.containsKey(variable.name) && hasToBeSavedOnStack(variable, method)) {
+        if (!variables.containsKey(variable.name) && variable.containsInScopeRecursiveCallsTo(method)) {
           processVariable(variable)
         }
       }

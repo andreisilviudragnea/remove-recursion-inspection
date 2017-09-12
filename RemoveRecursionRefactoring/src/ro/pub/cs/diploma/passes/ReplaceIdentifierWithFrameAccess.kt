@@ -4,7 +4,7 @@ import com.intellij.psi.*
 import com.intellij.psi.search.LocalSearchScope
 import com.intellij.psi.search.searches.ReferencesSearch
 import ro.pub.cs.diploma.NameManager
-import ro.pub.cs.diploma.hasToBeSavedOnStack
+import ro.pub.cs.diploma.containsInScopeRecursiveCallsTo
 
 class ReplaceIdentifierWithFrameAccess(private val myNameManager: NameManager,
                                        private val myFactory: PsiElementFactory,
@@ -14,7 +14,7 @@ class ReplaceIdentifierWithFrameAccess(private val myNameManager: NameManager,
     val variables = ArrayList<PsiVariable>()
     method.accept(object : JavaRecursiveElementVisitor() {
       override fun visitParameter(parameter: PsiParameter) {
-        if (hasToBeSavedOnStack(parameter, method)) {
+        if (parameter.containsInScopeRecursiveCallsTo(method)) {
           variables.add(parameter)
         }
       }
@@ -24,7 +24,7 @@ class ReplaceIdentifierWithFrameAccess(private val myNameManager: NameManager,
         if (myNameManager.frameVarName == name || myNameManager.stackVarName == name) {
           return
         }
-        if (hasToBeSavedOnStack(variable, method)) {
+        if (variable.containsInScopeRecursiveCallsTo(method)) {
           variables.add(variable)
         }
       }

@@ -24,7 +24,7 @@ fun PsiMethod.getPsiForEachStatements(): List<PsiForeachStatement> {
   this.accept(object : JavaRecursiveElementVisitor() {
     override fun visitForeachStatement(statement: PsiForeachStatement) {
       super.visitForeachStatement(statement)
-      if (containsRecursiveCalls(statement, method)) {
+      if (statement.containsRecursiveCallsTo(method)) {
         statements.add(statement)
       }
     }

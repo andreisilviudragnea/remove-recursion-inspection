@@ -52,14 +52,14 @@ public class RenameVariablesToUniqueNames implements Pass<PsiMethod, Map<String,
 
       @Override
       public void visitParameter(PsiParameter parameter) {
-        if (RecursionKt.hasToBeSavedOnStack(parameter, method)) {
+        if (RecursionKt.containsInScopeRecursiveCallsTo(parameter, method)) {
           processVariable(parameter);
         }
       }
 
       @Override
       public void visitLocalVariable(PsiLocalVariable variable) {
-        if (RecursionKt.hasToBeSavedOnStack(variable, method)) {
+        if (RecursionKt.containsInScopeRecursiveCallsTo(variable, method)) {
           processVariable(variable);
         }
       }

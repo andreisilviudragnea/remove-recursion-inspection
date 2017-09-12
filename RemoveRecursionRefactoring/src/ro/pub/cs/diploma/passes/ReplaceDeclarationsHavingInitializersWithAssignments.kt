@@ -3,7 +3,7 @@ package ro.pub.cs.diploma.passes
 import com.intellij.psi.*
 import com.intellij.refactoring.util.RefactoringUtil
 import ro.pub.cs.diploma.NameManager
-import ro.pub.cs.diploma.hasToBeSavedOnStack
+import ro.pub.cs.diploma.containsInScopeRecursiveCallsTo
 import ro.pub.cs.diploma.statement
 import java.util.*
 import java.util.stream.Collectors
@@ -17,7 +17,7 @@ class ReplaceDeclarationsHavingInitializersWithAssignments(private val myMethod:
     val declarations = ArrayList<PsiDeclarationStatement>()
     block.accept(object : JavaRecursiveElementWalkingVisitor() {
       override fun visitDeclarationStatement(statement: PsiDeclarationStatement) {
-        if (hasToBeSavedOnStack(statement, myMethod)) {
+        if (statement.containsInScopeRecursiveCallsTo(myMethod)) {
           declarations.add(statement)
         }
       }

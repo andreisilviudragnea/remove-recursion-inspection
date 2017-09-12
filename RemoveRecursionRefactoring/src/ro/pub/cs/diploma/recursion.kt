@@ -35,9 +35,9 @@ fun PsiMethodCallExpression.isRecursiveCallTo(method: PsiMethod): Boolean {
 /**
  * Returns true if the specified `element` contains at least on recursive call to the specified `method`.
  */
-fun containsRecursiveCalls(element: PsiElement, method: PsiMethod): Boolean {
+fun PsiElement.containsRecursiveCallsTo(method: PsiMethod): Boolean {
   val contains = Ref(false)
-  element.accept(object : JavaRecursiveElementWalkingVisitor() {
+  this.accept(object : JavaRecursiveElementWalkingVisitor() {
     override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
       super.visitMethodCallExpression(expression)
       if (expression.isRecursiveCallTo(method)) {
@@ -53,10 +53,9 @@ fun containsRecursiveCalls(element: PsiElement, method: PsiMethod): Boolean {
   return contains.get()
 }
 
-fun extractStatementsContainingRecursiveCalls(incorporatedBody: PsiCodeBlock,
-                                              method: PsiMethod): Set<PsiStatement> {
+fun PsiCodeBlock.extractStatementsContainingRecursiveCallsTo(method: PsiMethod): Set<PsiStatement> {
   val recursiveCalls = ArrayList<PsiMethodCallExpression>()
-  incorporatedBody.accept(object : JavaRecursiveElementVisitor() {
+  this.accept(object : JavaRecursiveElementVisitor() {
     override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
       super.visitMethodCallExpression(expression)
       if (expression.isRecursiveCallTo(method)) {
@@ -72,7 +71,7 @@ fun extractStatementsContainingRecursiveCalls(incorporatedBody: PsiCodeBlock,
   val statementsContainingRecursiveCalls = HashSet<PsiStatement>()
   for (call in recursiveCalls) {
     var parent = call.parent
-    while (parent !== incorporatedBody) {
+    while (parent !== this) {
       if (parent is PsiStatement) {
         statementsContainingRecursiveCalls.add(parent)
       }
@@ -83,8 +82,8 @@ fun extractStatementsContainingRecursiveCalls(incorporatedBody: PsiCodeBlock,
   return statementsContainingRecursiveCalls
 }
 
-private fun getElementsInScope(parameter: PsiParameter): List<PsiElement> {
-  val parent = parameter.parent
+private fun PsiParameter.getElementsInScope(): List<PsiElement> {
+  val parent = this.parent
   val elements = ArrayList<PsiElement>()
 
   if (parent is PsiParameterList) {
@@ -103,11 +102,11 @@ private fun getElementsInScope(parameter: PsiParameter): List<PsiElement> {
   return elements
 }
 
-fun hasToBeSavedOnStack(parameter: PsiParameter, method: PsiMethod): Boolean =
-    getElementsInScope(parameter).any { containsRecursiveCalls(it, method) }
+fun PsiParameter.containsInScopeRecursiveCallsTo(method: PsiMethod): Boolean =
+    this.getElementsInScope().any { it.containsRecursiveCallsTo(method) }
 
-private fun getElementsInScope(variable: PsiLocalVariable): List<PsiElement> {
-  val declarationStatement = variable.parent as PsiDeclarationStatement
+private fun PsiLocalVariable.getElementsInScope(): List<PsiElement> {
+  val declarationStatement = this.parent as PsiDeclarationStatement
   val parent = declarationStatement.parent
 
   val elements = ArrayList<PsiElement>()
@@ -124,7 +123,7 @@ private fun getElementsInScope(variable: PsiLocalVariable): List<PsiElement> {
       if (met) {
         elements.add(element)
       }
-      if (element === variable) {
+      if (element === this) {
         met = true
       }
     }
@@ -145,7 +144,6 @@ private fun getElementsInScope(variable: PsiLocalVariable): List<PsiElement> {
     }
   }
   else if (parent is PsiCodeBlock) {
-
     met = false
     for (psiStatement in parent.statements) {
       if (met) {
@@ -160,8 +158,8 @@ private fun getElementsInScope(variable: PsiLocalVariable): List<PsiElement> {
   return elements
 }
 
-fun hasToBeSavedOnStack(variable: PsiLocalVariable, method: PsiMethod): Boolean =
-    getElementsInScope(variable).any { containsRecursiveCalls(it, method) }
+fun PsiLocalVariable.containsInScopeRecursiveCallsTo(method: PsiMethod): Boolean =
+    this.getElementsInScope().any { it.containsRecursiveCallsTo(method) }
 
-fun hasToBeSavedOnStack(statement: PsiDeclarationStatement, method: PsiMethod): Boolean =
-    statement.declaredElements.any { it is PsiLocalVariable && hasToBeSavedOnStack(it, method) }
+fun PsiDeclarationStatement.containsInScopeRecursiveCallsTo(method: PsiMethod): Boolean =
+    this.declaredElements.any { it is PsiLocalVariable && it.containsInScopeRecursiveCallsTo(method) }

@@ -89,7 +89,7 @@ public class IterativeMethodGenerator {
 
     final BasicBlocksGenerator basicBlocksGenerator =
       new BasicBlocksGenerator(myMethod, myNameManager, myFactory,
-                               RecursionKt.extractStatementsContainingRecursiveCalls(incorporatedBody, myMethod));
+                               RecursionKt.extractStatementsContainingRecursiveCallsTo(incorporatedBody, myMethod));
     incorporatedBody.accept(basicBlocksGenerator);
     final List<Block> blocks = basicBlocksGenerator.getBlocks();
 
