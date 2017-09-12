@@ -46,31 +46,15 @@ class IncorporateBody(private val myNameManager: NameManager,
     return lastBodyStatement.codeBlock
   }
 
-  private fun getInitialValue(type: PsiType): String {
-    if (PsiPrimitiveType.BYTE == type) {
-      return "(byte) 0"
-    }
-    if (PsiPrimitiveType.SHORT == type) {
-      return "(short) 0"
-    }
-    if (PsiPrimitiveType.INT == type) {
-      return "0"
-    }
-    if (PsiPrimitiveType.LONG == type) {
-      return "0L"
-    }
-    if (PsiPrimitiveType.FLOAT == type) {
-      return "0.0f"
-    }
-    if (PsiPrimitiveType.DOUBLE == type) {
-      return "0.0d"
-    }
-    if (PsiPrimitiveType.CHAR == type) {
-      return "'\u0000'"
-    }
-    return if (PsiPrimitiveType.BOOLEAN == type) {
-      "false"
-    }
-    else "null"
+  private fun getInitialValue(type: PsiType): String = when (type) {
+    PsiPrimitiveType.BYTE -> "(byte) 0"
+    PsiPrimitiveType.SHORT -> "(short) 0"
+    PsiPrimitiveType.INT -> "0"
+    PsiPrimitiveType.LONG -> "0L"
+    PsiPrimitiveType.FLOAT -> "0.0f"
+    PsiPrimitiveType.DOUBLE -> "0.0d"
+    PsiPrimitiveType.CHAR -> "'\u0000'"
+    PsiPrimitiveType.BOOLEAN -> "false"
+    else -> "null"
   }
 }
