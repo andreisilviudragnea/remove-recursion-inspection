@@ -8,7 +8,7 @@ import ro.pub.cs.diploma.statement
 
 class IncorporateBody(private val myNameManager: NameManager,
                       private val myFactory: PsiElementFactory,
-                      private val myStyleManager: JavaCodeStyleManager) : Pass<PsiMethod, PsiMethod, PsiCodeBlock> {
+                      private val myStyleManager: JavaCodeStyleManager) : Pass<PsiMethod, PsiMethod, PsiCodeBlock?> {
 
   override fun collect(method: PsiMethod): PsiMethod = method
 

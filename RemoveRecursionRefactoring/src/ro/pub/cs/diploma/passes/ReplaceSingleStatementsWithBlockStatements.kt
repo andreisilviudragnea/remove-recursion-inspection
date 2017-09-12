@@ -5,7 +5,7 @@ import ro.pub.cs.diploma.getFactory
 import ro.pub.cs.diploma.statement
 import java.util.*
 
-class ReplaceSingleStatementsWithBlockStatements(private val myFactory: PsiElementFactory) : Pass<PsiMethod, List<PsiStatement>, Any> {
+class ReplaceSingleStatementsWithBlockStatements(private val myFactory: PsiElementFactory) : Pass<PsiMethod, List<PsiStatement>, Nothing?> {
 
   override fun collect(method: PsiMethod): List<PsiStatement> {
     val statements = ArrayList<PsiStatement>()
@@ -81,7 +81,7 @@ class ReplaceSingleStatementsWithBlockStatements(private val myFactory: PsiEleme
     return statements
   }
 
-  override fun transform(statements: List<PsiStatement>): Any? {
+  override fun transform(statements: List<PsiStatement>): Nothing? {
     statements.forEach { statement ->
       if (statement is PsiEmptyStatement) {
         statement.replace(myFactory.createExpressionFromText("{}", null))

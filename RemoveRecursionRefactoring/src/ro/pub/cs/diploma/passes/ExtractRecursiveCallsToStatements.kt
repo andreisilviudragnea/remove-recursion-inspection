@@ -8,7 +8,7 @@ import ro.pub.cs.diploma.getStyleManager
 import ro.pub.cs.diploma.isRecursiveCallTo
 import java.util.*
 
-class ExtractRecursiveCallsToStatements(private val myMethod: PsiMethod) : Pass<PsiMethod, List<PsiMethodCallExpression>, Any> {
+class ExtractRecursiveCallsToStatements(private val myMethod: PsiMethod) : Pass<PsiMethod, List<PsiMethodCallExpression>, Nothing?> {
 
   override fun collect(method: PsiMethod): List<PsiMethodCallExpression> {
     val calls = ArrayList<PsiMethodCallExpression>()
@@ -31,7 +31,7 @@ class ExtractRecursiveCallsToStatements(private val myMethod: PsiMethod) : Pass<
     return calls
   }
 
-  override fun transform(expressions: List<PsiMethodCallExpression>): Any? {
+  override fun transform(expressions: List<PsiMethodCallExpression>): Nothing? {
     val styleManager = myMethod.getStyleManager()
     val factory = myMethod.getFactory()
     val returnType = myMethod.returnType ?: return null

@@ -11,7 +11,7 @@ import java.util.stream.Stream
 
 class ReplaceDeclarationsHavingInitializersWithAssignments(private val myMethod: PsiMethod,
                                                            private val myNameManager: NameManager,
-                                                           private val myFactory: PsiElementFactory) : Pass<PsiCodeBlock, List<PsiDeclarationStatement>, Any> {
+                                                           private val myFactory: PsiElementFactory) : Pass<PsiCodeBlock, List<PsiDeclarationStatement>, Nothing?> {
 
   override fun collect(block: PsiCodeBlock): List<PsiDeclarationStatement> {
     val declarations = ArrayList<PsiDeclarationStatement>()
@@ -29,7 +29,7 @@ class ReplaceDeclarationsHavingInitializersWithAssignments(private val myMethod:
     return declarations
   }
 
-  override fun transform(declarations: List<PsiDeclarationStatement>): Any? {
+  override fun transform(declarations: List<PsiDeclarationStatement>): Nothing? {
     for (statement in declarations) {
       val parent = statement.parent
       val stream = getVariablesStream(statement, myNameManager.frameVarName)

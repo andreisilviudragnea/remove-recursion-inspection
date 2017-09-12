@@ -8,7 +8,7 @@ import ro.pub.cs.diploma.containsInScopeRecursiveCallsTo
 
 class ReplaceIdentifierWithFrameAccess(private val myNameManager: NameManager,
                                        private val myFactory: PsiElementFactory,
-                                       private val myBody: PsiCodeBlock) : Pass<PsiMethod, List<PsiVariable>, Any> {
+                                       private val myBody: PsiCodeBlock) : Pass<PsiMethod, List<PsiVariable>, Nothing?> {
 
   override fun collect(method: PsiMethod): List<PsiVariable> {
     val variables = ArrayList<PsiVariable>()
@@ -36,7 +36,7 @@ class ReplaceIdentifierWithFrameAccess(private val myNameManager: NameManager,
     return variables
   }
 
-  override fun transform(variables: List<PsiVariable>): Any? {
+  override fun transform(variables: List<PsiVariable>): Nothing? {
     variables
         .flatMap { ReferencesSearch.search(it, LocalSearchScope(myBody)) }
         .filterIsInstance<PsiReferenceExpression>()
