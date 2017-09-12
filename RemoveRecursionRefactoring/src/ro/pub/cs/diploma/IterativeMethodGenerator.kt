@@ -37,7 +37,7 @@ class IterativeMethodGenerator(private val myFactory: PsiElementFactory,
       return
     }
 
-    AddFrameClass(myMethod, myNameManager).apply(myMethod)
+    addFrameClass(myMethod, myNameManager)
     if (steps == 5) {
       return
     }
