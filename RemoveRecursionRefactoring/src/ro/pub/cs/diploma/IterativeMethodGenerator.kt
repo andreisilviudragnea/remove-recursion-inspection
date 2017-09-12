@@ -32,7 +32,7 @@ class IterativeMethodGenerator(private val myFactory: PsiElementFactory,
       return
     }
 
-    ExtractRecursiveCallsToStatements(myMethod).apply(myMethod)
+    extractRecursiveCallsToStatements(myMethod)
     if (steps == 4) {
       return
     }
