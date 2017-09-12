@@ -1,13 +1,12 @@
 package ro.pub.cs.diploma.passes
 
 import com.intellij.psi.*
-import ro.pub.cs.diploma.Constants
 import ro.pub.cs.diploma.NameManager
 import ro.pub.cs.diploma.RecursionUtil
 import ro.pub.cs.diploma.Util
 import java.util.*
 
-class AddFrameClass(private val myMethod: PsiMethod, private val myNameManager: NameManager) : Pass<PsiMethod, Map<String, PsiVariable>, Any> {
+class AddFrameClass(private val myMethod: PsiMethod, private val myNameManager: NameManager) : Pass<PsiMethod, Map<String, PsiVariable>, Nothing?> {
 
   override fun collect(method: PsiMethod): Map<String, PsiVariable> {
     val variables = LinkedHashMap<String, PsiVariable>()
@@ -36,7 +35,7 @@ class AddFrameClass(private val myMethod: PsiMethod, private val myNameManager: 
     return variables
   }
 
-  override fun transform(variables: Map<String, PsiVariable>): Any? {
+  override fun transform(variables: Map<String, PsiVariable>): Nothing? {
     val factory = Util.getFactory(myMethod)
     val frameClassName = myNameManager.frameClassName
     val frameClass = factory.createClass(frameClassName)
@@ -49,9 +48,9 @@ class AddFrameClass(private val myMethod: PsiMethod, private val myNameManager: 
     // Add fields
     val styleManager = Util.getStyleManager(myMethod)
     variables.entries
-        .map { entry ->
+        .map {
           styleManager.shortenClassReferences(
-              factory.createFieldFromText("private " + entry.value.type.canonicalText + " " + entry.key + ";", null))
+              factory.createFieldFromText("private ${it.value.type.canonicalText} ${it.key};", null))
         }
         .forEach { frameClass.add(it) }
     frameClass.add(factory.createField(myNameManager.blockFieldName, PsiPrimitiveType.INT))
@@ -64,7 +63,7 @@ class AddFrameClass(private val myMethod: PsiMethod, private val myNameManager: 
     for (parameter in myMethod.parameterList.parameters) {
       val name = parameter.name ?: return null
       parameterList.add(factory.createParameter(name, parameter.type))
-      body.add(factory.createStatementFromText(Constants.THIS + "." + name + "=" + name + ";", null))
+      body.add(factory.createStatementFromText("this.$name = $name;", null))
     }
     frameClass.add(constructor)
 
