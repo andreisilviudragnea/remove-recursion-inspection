@@ -53,7 +53,7 @@ public class IterativeMethodGenerator {
       return;
     }
 
-    ReplaceForEachLoopsWithIteratorForLoops.getInstance(myMethod).apply(myMethod);
+    new ReplaceForEachLoopsWithIteratorForLoops(myMethod).apply(myMethod);
     new ReplaceForEachLoopsWithIndexedForLoops(myMethod).apply(myMethod);
     if (steps == 3) {
       return;
