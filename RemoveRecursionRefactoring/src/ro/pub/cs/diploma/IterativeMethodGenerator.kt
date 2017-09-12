@@ -3,15 +3,14 @@ package ro.pub.cs.diploma
 import com.intellij.openapi.util.Pair
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.*
-import com.intellij.psi.codeStyle.JavaCodeStyleManager
 import com.intellij.psi.util.PsiTreeUtil
 import ro.pub.cs.diploma.ir.Block
 import ro.pub.cs.diploma.ir.InlineVisitor
 import ro.pub.cs.diploma.passes.*
 
 class IterativeMethodGenerator(private val myFactory: PsiElementFactory,
-                               private val myStyleManager: JavaCodeStyleManager,
-                               private val myMethod: PsiMethod, private val myNameManager: NameManager) {
+                               private val myMethod: PsiMethod,
+                               private val myNameManager: NameManager) {
 
   private fun statement(text: String): PsiStatement = myFactory.statement(text)
 

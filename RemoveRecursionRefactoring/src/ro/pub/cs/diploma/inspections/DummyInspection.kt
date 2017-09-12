@@ -31,7 +31,7 @@ abstract class DummyInspection : BaseInspection() {
     return object : InspectionGadgetsFix() {
       override fun doFix(project: Project, descriptor: ProblemDescriptor) {
         val method = descriptor.psiElement.getContainingMethod() ?: return
-        IterativeMethodGenerator(method.getFactory(), method.getStyleManager(), method, NameManager(method)).createIterativeBody(steps)
+        IterativeMethodGenerator(method.getFactory(), method, NameManager(method)).createIterativeBody(steps)
       }
 
       @Nls
