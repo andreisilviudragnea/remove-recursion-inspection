@@ -13,8 +13,8 @@ fun <T : PsiElement> PsiElementFactory.createPushStatement(frameClassName: Strin
   return this.statement("$stackVarName.push(new $frameClassName($argumentsString));")
 }
 
-fun PsiElement.getFactory() = JavaPsiFacade.getElementFactory(this.project)
-fun PsiElement.getStyleManager() = JavaCodeStyleManager.getInstance(this.project)
+fun PsiElement.getFactory(): PsiElementFactory = JavaPsiFacade.getElementFactory(this.project)
+fun PsiElement.getStyleManager(): JavaCodeStyleManager = JavaCodeStyleManager.getInstance(this.project)
 fun PsiElement.getContainingMethod() = PsiTreeUtil.getParentOfType(this, PsiMethod::class.java, true, PsiClass::class.java,
     PsiLambdaExpression::class.java)
 
