@@ -26,8 +26,8 @@ class IterativeMethodGenerator(private val myFactory: PsiElementFactory,
       return
     }
 
-    ReplaceForEachLoopsWithIteratorForLoops(myMethod).apply(myMethod)
-    ReplaceForEachLoopsWithIndexedForLoops(myMethod).apply(myMethod)
+    replaceForEachLoopsWithIteratorForLoops(myMethod)
+    replaceForEachLoopsWithIndexedForLoops(myMethod)
     if (steps == 3) {
       return
     }
@@ -42,7 +42,7 @@ class IterativeMethodGenerator(private val myFactory: PsiElementFactory,
       return
     }
 
-    val incorporatedBody = IncorporateBody(myNameManager, myFactory, myStyleManager).apply(myMethod) ?: return
+    val incorporatedBody = incorporateBody(myMethod, myNameManager) ?: return
     if (steps == 6) {
       return
     }
