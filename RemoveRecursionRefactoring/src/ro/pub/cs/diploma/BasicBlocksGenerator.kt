@@ -112,8 +112,8 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
   }
 
   override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
-    addStatement(Utilss.createPushStatement(myFactory, myNameManager.frameClassName, myNameManager.stackVarName,
-        expression.argumentList.expressions) { obj: PsiElement -> obj.text })
+    addStatement(myFactory.createPushStatement(myNameManager.frameClassName, myNameManager.stackVarName,
+        expression.argumentList.expressions) { it.text })
 
     val block = newBlock()
     block.setDoNotInline(true)

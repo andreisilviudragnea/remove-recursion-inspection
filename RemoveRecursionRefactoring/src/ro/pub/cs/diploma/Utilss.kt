@@ -5,32 +5,29 @@ import com.intellij.psi.codeStyle.JavaCodeStyleManager
 import com.intellij.psi.util.PsiTreeUtil
 
 fun PsiElementFactory.statement(text: String) = this.createStatementFromText(text, null)
-fun PsiElement.getFactory(): PsiElementFactory = JavaPsiFacade.getElementFactory(this.project)
-fun PsiElement.getStyleManager(): JavaCodeStyleManager = JavaCodeStyleManager.getInstance(this.project)
+fun <T : PsiElement> PsiElementFactory.createPushStatement(frameClassName: String,
+                                                           stackVarName: String,
+                                                           arguments: Array<T>,
+                                                           function: (T) -> String): PsiStatement {
+  val argumentsString = arguments.joinToString(",", transform = function)
+  return this.statement("$stackVarName.push(new $frameClassName($argumentsString));")
+}
 
-object Utilss {
-  fun getContainingMethod(element: PsiElement): PsiMethod? =
-      PsiTreeUtil.getParentOfType(element, PsiMethod::class.java, true, PsiClass::class.java, PsiLambdaExpression::class.java)
+fun PsiElement.getFactory() = JavaPsiFacade.getElementFactory(this.project)
+fun PsiElement.getStyleManager() = JavaCodeStyleManager.getInstance(this.project)
+fun PsiElement.getContainingMethod() = PsiTreeUtil.getParentOfType(this, PsiMethod::class.java, true, PsiClass::class.java,
+    PsiLambdaExpression::class.java)
 
-  fun <T : PsiElement> createPushStatement(factory: PsiElementFactory,
-                                           frameClassName: String,
-                                           stackVarName: String,
-                                           arguments: Array<T>,
-                                           function: (T) -> String): PsiStatement {
-    val argumentsString = arguments.joinToString(",", transform = function)
-    return factory.statement("$stackVarName.push(new $frameClassName($argumentsString));")
-  }
-
-  fun getPsiForEachStatements(method: PsiMethod): List<PsiForeachStatement> {
-    val statements = ArrayList<PsiForeachStatement>()
-    method.accept(object : JavaRecursiveElementVisitor() {
-      override fun visitForeachStatement(statement: PsiForeachStatement) {
-        super.visitForeachStatement(statement)
-        if (containsRecursiveCalls(statement, method)) {
-          statements.add(statement)
-        }
+fun PsiMethod.getPsiForEachStatements(): List<PsiForeachStatement> {
+  val statements = ArrayList<PsiForeachStatement>()
+  val method = this
+  this.accept(object : JavaRecursiveElementVisitor() {
+    override fun visitForeachStatement(statement: PsiForeachStatement) {
+      super.visitForeachStatement(statement)
+      if (containsRecursiveCalls(statement, method)) {
+        statements.add(statement)
       }
-    })
-    return statements
-  }
+    }
+  })
+  return statements
 }

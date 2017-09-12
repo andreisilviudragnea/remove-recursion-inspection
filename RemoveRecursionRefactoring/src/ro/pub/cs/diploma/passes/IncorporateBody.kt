@@ -3,7 +3,7 @@ package ro.pub.cs.diploma.passes
 import com.intellij.psi.*
 import com.intellij.psi.codeStyle.JavaCodeStyleManager
 import ro.pub.cs.diploma.NameManager
-import ro.pub.cs.diploma.Utilss
+import ro.pub.cs.diploma.createPushStatement
 import ro.pub.cs.diploma.statement
 
 class IncorporateBody(private val myNameManager: NameManager,
@@ -27,8 +27,7 @@ class IncorporateBody(private val myNameManager: NameManager,
 
     newBody.add(myStyleManager.shortenClassReferences(statement(
         "final java.util.Deque<$frameClassName> $stackVarName = new java.util.ArrayDeque<>();")))
-    newBody.add(Utilss.createPushStatement(myFactory, frameClassName, stackVarName,
-        method.parameterList.parameters, { it.name ?: "" }))
+    newBody.add(myFactory.createPushStatement(frameClassName, stackVarName, method.parameterList.parameters) { it.name ?: "" })
     val returnType = method.returnType ?: return null
     val retVarName = myNameManager.retVarName
     if (returnType != PsiPrimitiveType.VOID) {

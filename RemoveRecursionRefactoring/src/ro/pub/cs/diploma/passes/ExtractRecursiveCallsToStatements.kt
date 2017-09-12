@@ -5,7 +5,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import ro.pub.cs.diploma.TEMP
 import ro.pub.cs.diploma.getFactory
 import ro.pub.cs.diploma.getStyleManager
-import ro.pub.cs.diploma.isRecursive
+import ro.pub.cs.diploma.isRecursiveCallTo
 import java.util.*
 
 class ExtractRecursiveCallsToStatements(private val myMethod: PsiMethod) : Pass<PsiMethod, List<PsiMethodCallExpression>, Any> {
@@ -19,7 +19,7 @@ class ExtractRecursiveCallsToStatements(private val myMethod: PsiMethod) : Pass<
     method.accept(object : JavaRecursiveElementVisitor() {
       override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
         super.visitMethodCallExpression(expression)
-        if (isRecursive(expression, method)) {
+        if (expression.isRecursiveCallTo(method)) {
           calls.add(expression)
         }
       }

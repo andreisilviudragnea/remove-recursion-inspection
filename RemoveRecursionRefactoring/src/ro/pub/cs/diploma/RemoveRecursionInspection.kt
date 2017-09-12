@@ -27,7 +27,7 @@ class RemoveRecursionInspection : BaseInspection() {
       override fun getFamilyName(): String = RemoveRecursionBundle.message("remove.recursion.replace.quickfix")
 
       public override fun doFix(project: Project, descriptor: ProblemDescriptor) {
-        val method = Utilss.getContainingMethod(descriptor.psiElement) ?: return
+        val method = descriptor.psiElement.getContainingMethod() ?: return
         IterativeMethodGenerator.getInstance(method.getFactory(), method.getStyleManager(), method, NameManager(method))
             .createIterativeBody(13)
       }
@@ -46,8 +46,8 @@ class RemoveRecursionInspection : BaseInspection() {
     return object : BaseInspectionVisitor() {
       override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
         super.visitMethodCallExpression(expression)
-        val method = Utilss.getContainingMethod(expression) ?: return
-        if (isRecursive(expression, method)) {
+        val method = expression.getContainingMethod() ?: return
+        if (expression.isRecursiveCallTo(method)) {
           registerMethodCallError(expression, method)
         }
       }

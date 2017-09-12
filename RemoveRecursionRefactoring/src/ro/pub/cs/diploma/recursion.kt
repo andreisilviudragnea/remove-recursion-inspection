@@ -13,15 +13,14 @@ import java.util.*
  * @see RecursiveCallLineMarkerProvider.isRecursiveMethodCall
  * @see TailRecursionInspection.TailRecursionVisitor.visitReturnStatement
  * @see com.siyeh.ig.psiutils.RecursionUtils
- *
  * @see com.siyeh.ig.psiutils.RecursionVisitor
  */
-fun isRecursive(expression: PsiMethodCallExpression, method: PsiMethod): Boolean {
-  val methodExpression = expression.methodExpression
+fun PsiMethodCallExpression.isRecursiveCallTo(method: PsiMethod): Boolean {
+  val methodExpression = this.methodExpression
   if (method.name != methodExpression.referenceName) {
     return false
   }
-  val calledMethod = expression.resolveMethod()
+  val calledMethod = this.resolveMethod()
   if (method != calledMethod) {
     return false
   }
@@ -41,11 +40,10 @@ fun containsRecursiveCalls(element: PsiElement, method: PsiMethod): Boolean {
   element.accept(object : JavaRecursiveElementWalkingVisitor() {
     override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
       super.visitMethodCallExpression(expression)
-      if (!isRecursive(expression, method)) {
-        return
+      if (expression.isRecursiveCallTo(method)) {
+        contains.set(true)
+        stopWalking()
       }
-      contains.set(true)
-      stopWalking()
     }
 
     override fun visitClass(aClass: PsiClass) {}
@@ -61,7 +59,7 @@ fun extractStatementsContainingRecursiveCalls(incorporatedBody: PsiCodeBlock,
   incorporatedBody.accept(object : JavaRecursiveElementVisitor() {
     override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
       super.visitMethodCallExpression(expression)
-      if (isRecursive(expression, method)) {
+      if (expression.isRecursiveCallTo(method)) {
         recursiveCalls.add(expression)
       }
     }

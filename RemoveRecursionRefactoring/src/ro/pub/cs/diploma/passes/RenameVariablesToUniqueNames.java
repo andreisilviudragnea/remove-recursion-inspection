@@ -5,7 +5,7 @@ import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.psi.search.LocalSearchScope;
 import com.intellij.refactoring.util.RefactoringUtil;
 import org.jetbrains.annotations.NotNull;
-import ro.pub.cs.diploma.RecursionUtilKt;
+import ro.pub.cs.diploma.RecursionKt;
 import ro.pub.cs.diploma.UtilssKt;
 
 import java.util.ArrayList;
@@ -52,14 +52,14 @@ public class RenameVariablesToUniqueNames implements Pass<PsiMethod, Map<String,
 
       @Override
       public void visitParameter(PsiParameter parameter) {
-        if (RecursionUtilKt.hasToBeSavedOnStack(parameter, method)) {
+        if (RecursionKt.hasToBeSavedOnStack(parameter, method)) {
           processVariable(parameter);
         }
       }
 
       @Override
       public void visitLocalVariable(PsiLocalVariable variable) {
-        if (RecursionUtilKt.hasToBeSavedOnStack(variable, method)) {
+        if (RecursionKt.hasToBeSavedOnStack(variable, method)) {
           processVariable(variable);
         }
       }
