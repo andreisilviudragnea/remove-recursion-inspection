@@ -102,10 +102,9 @@ class Block(val id: Int) : Statement {
     val strings2 = ArrayList<String>()
     strings2.add("id: $id")
     strings2.add(strings.joinToString("\\n"))
-    val color = if (isInlinable) "" else "color=red"
     val statements = ArrayList<String>()
     if (myStatements.size > 0) {
-      val lastStatement = myStatements[myStatements.size - 1]
+      val lastStatement = myStatements.last()
       when (lastStatement) {
         is ConditionalJumpStatement -> {
           strings2.add(lastStatement.condition.text
@@ -131,7 +130,7 @@ class Block(val id: Int) : Statement {
             .replace("\n", "\\n"))
       }
     }
-    statements.add("$id [label=\"{${strings2.joinToString("|")}}\" $color];")
+    statements.add("$id [label=\"{${strings2.joinToString("|")}}\" ${if (isInlinable) "" else "color=red"}];")
 
     return statements
   }

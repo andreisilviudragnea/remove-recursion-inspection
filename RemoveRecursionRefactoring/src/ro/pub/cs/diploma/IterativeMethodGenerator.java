@@ -64,7 +64,7 @@ public class IterativeMethodGenerator {
       return;
     }
 
-    AddFrameClass.getInstance(myMethod, myNameManager).apply(myMethod);
+    new AddFrameClass(myMethod, myNameManager).apply(myMethod);
     if (steps == 5) {
       return;
     }
