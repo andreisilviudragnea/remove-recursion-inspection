@@ -4,7 +4,7 @@ import com.intellij.psi.PsiForeachStatement;
 import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
 import ro.pub.cs.diploma.Refactorings;
-import ro.pub.cs.diploma.Util;
+import ro.pub.cs.diploma.Utilss;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ public class ReplaceForEachLoopsWithIteratorForLoops implements Pass<PsiMethod, 
 
   @Override
   public List<PsiForeachStatement> collect(PsiMethod method) {
-    return Util.INSTANCE.getPsiForEachStatements(method);
+    return Utilss.INSTANCE.getPsiForEachStatements(method);
   }
 
   @Override

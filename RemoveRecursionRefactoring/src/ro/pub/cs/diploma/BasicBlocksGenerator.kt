@@ -112,7 +112,7 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
   }
 
   override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
-    addStatement(Util.createPushStatement(myFactory, myNameManager.frameClassName, myNameManager.stackVarName,
+    addStatement(Utilss.createPushStatement(myFactory, myNameManager.frameClassName, myNameManager.stackVarName,
         expression.argumentList.expressions) { obj: PsiElement -> obj.text })
 
     val block = newBlock()
@@ -122,7 +122,7 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
     myCurrentBlock = block
 
     val returnType = myMethod.returnType ?: return
-    if (!Util.isVoid(returnType)) {
+    if (!Utilss.isVoid(returnType)) {
       val parent = PsiTreeUtil.getParentOfType(expression, PsiStatement::class.java, true)
       expression.replace(myFactory.createExpressionFromText(myNameManager.retVarName, null))
       addStatement(parent)

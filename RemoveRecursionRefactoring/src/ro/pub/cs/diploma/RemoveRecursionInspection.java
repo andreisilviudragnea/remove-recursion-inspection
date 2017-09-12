@@ -45,11 +45,11 @@ public class RemoveRecursionInspection extends BaseInspection {
 
       @Override
       public void doFix(Project project, ProblemDescriptor descriptor) {
-        final PsiMethod method = Util.INSTANCE.getContainingMethod(descriptor.getPsiElement());
+        final PsiMethod method = Utilss.INSTANCE.getContainingMethod(descriptor.getPsiElement());
         if (method == null) {
           return;
         }
-        IterativeMethodGenerator.getInstance(Util.INSTANCE.getFactory(method), Util.INSTANCE.getStyleManager(method), method, NameManager.getInstance(method))
+        IterativeMethodGenerator.getInstance(Utilss.INSTANCE.getFactory(method), Utilss.INSTANCE.getStyleManager(method), method, NameManager.getInstance(method))
           .createIterativeBody(13);
       }
     };
@@ -74,11 +74,11 @@ public class RemoveRecursionInspection extends BaseInspection {
       @Override
       public void visitMethodCallExpression(PsiMethodCallExpression expression) {
         super.visitMethodCallExpression(expression);
-        final PsiMethod method = Util.INSTANCE.getContainingMethod(expression);
+        final PsiMethod method = Utilss.INSTANCE.getContainingMethod(expression);
         if (method == null) {
           return;
         }
-        if (RecursionUtil.isRecursive(expression, method)) {
+        if (RecursionUtilKt.isRecursive(expression, method)) {
           registerMethodCallError(expression, method);
         }
       }

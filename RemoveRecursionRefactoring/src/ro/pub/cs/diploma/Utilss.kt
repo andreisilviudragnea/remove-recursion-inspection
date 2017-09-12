@@ -6,9 +6,9 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.annotations.Contract
 import java.util.*
 
-object Util {
+fun PsiElementFactory.statement(text: String) = this.createStatementFromText(text, null)
 
-  fun statement(factory: PsiElementFactory, text: String): PsiStatement = factory.createStatementFromText(text, null)
+object Utilss {
 
   fun getFactory(element: PsiElement): PsiElementFactory = JavaPsiFacade.getElementFactory(element.project)
 
@@ -36,7 +36,7 @@ object Util {
     method.accept(object : JavaRecursiveElementVisitor() {
       override fun visitForeachStatement(statement: PsiForeachStatement) {
         super.visitForeachStatement(statement)
-        if (RecursionUtil.containsRecursiveCalls(statement, method)) {
+        if (containsRecursiveCalls(statement, method)) {
           statements.add(statement)
         }
       }

@@ -3,7 +3,7 @@ package ro.pub.cs.diploma.passes;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ro.pub.cs.diploma.Util;
+import ro.pub.cs.diploma.Utilss;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +65,7 @@ public class ReplaceSingleStatementsWithBlockStatements implements Pass<PsiMetho
         if (block == null) {
           return;
         }
-        final PsiElementFactory factory = Util.INSTANCE.getFactory(statement);
+        final PsiElementFactory factory = Utilss.INSTANCE.getFactory(statement);
         PsiCodeBlock currentCodeBlock = null;
         PsiSwitchLabelStatement currentLabelStatement = null;
         for (final PsiStatement psiStatement : block.getStatements()) {

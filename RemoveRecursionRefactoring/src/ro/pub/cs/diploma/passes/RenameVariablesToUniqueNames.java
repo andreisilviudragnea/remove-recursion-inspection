@@ -5,8 +5,8 @@ import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.psi.search.LocalSearchScope;
 import com.intellij.refactoring.util.RefactoringUtil;
 import org.jetbrains.annotations.NotNull;
-import ro.pub.cs.diploma.RecursionUtil;
-import ro.pub.cs.diploma.Util;
+import ro.pub.cs.diploma.RecursionUtilKt;
+import ro.pub.cs.diploma.Utilss;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -52,14 +52,14 @@ public class RenameVariablesToUniqueNames implements Pass<PsiMethod, Map<String,
 
       @Override
       public void visitParameter(PsiParameter parameter) {
-        if (RecursionUtil.hasToBeSavedOnStack(parameter, method)) {
+        if (RecursionUtilKt.hasToBeSavedOnStack(parameter, method)) {
           processVariable(parameter);
         }
       }
 
       @Override
       public void visitLocalVariable(PsiLocalVariable variable) {
-        if (RecursionUtil.hasToBeSavedOnStack(variable, method)) {
+        if (RecursionUtilKt.hasToBeSavedOnStack(variable, method)) {
           processVariable(variable);
         }
       }
@@ -77,7 +77,7 @@ public class RenameVariablesToUniqueNames implements Pass<PsiMethod, Map<String,
 
   @Override
   public Object transform(Map<String, Map<PsiType, List<PsiVariable>>> names) {
-    final JavaCodeStyleManager styleManager = Util.INSTANCE.getStyleManager(myMethod);
+    final JavaCodeStyleManager styleManager = Utilss.INSTANCE.getStyleManager(myMethod);
     for (final Map.Entry<String, Map<PsiType, List<PsiVariable>>> entry : names.entrySet()) {
       final Map<PsiType, List<PsiVariable>> typesMap = entry.getValue();
       if (typesMap.size() <= 1) {

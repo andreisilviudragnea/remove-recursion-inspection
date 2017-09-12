@@ -2,8 +2,8 @@ package ro.pub.cs.diploma.passes
 
 import com.intellij.psi.*
 import ro.pub.cs.diploma.NameManager
-import ro.pub.cs.diploma.RecursionUtil
-import ro.pub.cs.diploma.Util
+import ro.pub.cs.diploma.Utilss
+import ro.pub.cs.diploma.hasToBeSavedOnStack
 import java.util.*
 
 class AddFrameClass(private val myMethod: PsiMethod, private val myNameManager: NameManager) : Pass<PsiMethod, Map<String, PsiVariable>, Nothing?> {
@@ -17,13 +17,13 @@ class AddFrameClass(private val myMethod: PsiMethod, private val myNameManager: 
       }
 
       override fun visitParameter(parameter: PsiParameter) {
-        if (!variables.containsKey(parameter.name) && RecursionUtil.hasToBeSavedOnStack(parameter, method)) {
+        if (!variables.containsKey(parameter.name) && hasToBeSavedOnStack(parameter, method)) {
           processVariable(parameter)
         }
       }
 
       override fun visitLocalVariable(variable: PsiLocalVariable) {
-        if (!variables.containsKey(variable.name) && RecursionUtil.hasToBeSavedOnStack(variable, method)) {
+        if (!variables.containsKey(variable.name) && hasToBeSavedOnStack(variable, method)) {
           processVariable(variable)
         }
       }
@@ -36,7 +36,7 @@ class AddFrameClass(private val myMethod: PsiMethod, private val myNameManager: 
   }
 
   override fun transform(variables: Map<String, PsiVariable>): Nothing? {
-    val factory = Util.getFactory(myMethod)
+    val factory = Utilss.getFactory(myMethod)
     val frameClassName = myNameManager.frameClassName
     val frameClass = factory.createClass(frameClassName)
 
@@ -46,7 +46,7 @@ class AddFrameClass(private val myMethod: PsiMethod, private val myNameManager: 
     modifierList.setModifierProperty(PsiModifier.STATIC, true)
 
     // Add fields
-    val styleManager = Util.getStyleManager(myMethod)
+    val styleManager = Utilss.getStyleManager(myMethod)
     variables.entries
         .map {
           styleManager.shortenClassReferences(

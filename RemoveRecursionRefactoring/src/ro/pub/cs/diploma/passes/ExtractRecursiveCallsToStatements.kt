@@ -3,8 +3,8 @@ package ro.pub.cs.diploma.passes
 import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
 import ro.pub.cs.diploma.Constants
-import ro.pub.cs.diploma.RecursionUtil
-import ro.pub.cs.diploma.Util
+import ro.pub.cs.diploma.Utilss
+import ro.pub.cs.diploma.isRecursive
 import java.util.*
 
 class ExtractRecursiveCallsToStatements(private val myMethod: PsiMethod) : Pass<PsiMethod, List<PsiMethodCallExpression>, Any> {
@@ -12,13 +12,13 @@ class ExtractRecursiveCallsToStatements(private val myMethod: PsiMethod) : Pass<
   override fun collect(method: PsiMethod): List<PsiMethodCallExpression> {
     val calls = ArrayList<PsiMethodCallExpression>()
     val returnType = method.returnType ?: return calls
-    if (Util.isVoid(returnType)) {
+    if (Utilss.isVoid(returnType)) {
       return calls
     }
     method.accept(object : JavaRecursiveElementVisitor() {
       override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
         super.visitMethodCallExpression(expression)
-        if (RecursionUtil.isRecursive(expression, method)) {
+        if (isRecursive(expression, method)) {
           calls.add(expression)
         }
       }
@@ -31,8 +31,8 @@ class ExtractRecursiveCallsToStatements(private val myMethod: PsiMethod) : Pass<
   }
 
   override fun transform(expressions: List<PsiMethodCallExpression>): Any? {
-    val styleManager = Util.getStyleManager(myMethod)
-    val factory = Util.getFactory(myMethod)
+    val styleManager = Utilss.getStyleManager(myMethod)
+    val factory = Utilss.getFactory(myMethod)
     val returnType = myMethod.returnType ?: return null
     calls@ for (call in expressions) {
       val parentStatement = PsiTreeUtil.getParentOfType(call, PsiStatement::class.java, true)

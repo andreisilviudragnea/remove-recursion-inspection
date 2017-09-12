@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nls
 import ro.pub.cs.diploma.IterativeMethodGenerator
 import ro.pub.cs.diploma.NameManager
 import ro.pub.cs.diploma.RemoveRecursionBundle
-import ro.pub.cs.diploma.Util
+import ro.pub.cs.diploma.Utilss
 
 abstract class DummyInspection : BaseInspection() {
   protected abstract val key: String
@@ -33,8 +33,8 @@ abstract class DummyInspection : BaseInspection() {
   override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {
     return object : InspectionGadgetsFix() {
       override fun doFix(project: Project, descriptor: ProblemDescriptor) {
-        val method = Util.getContainingMethod(descriptor.psiElement) ?: return
-        IterativeMethodGenerator.getInstance(Util.getFactory(method), Util.getStyleManager(method), method, NameManager.getInstance(method))
+        val method = Utilss.getContainingMethod(descriptor.psiElement) ?: return
+        IterativeMethodGenerator.getInstance(Utilss.getFactory(method), Utilss.getStyleManager(method), method, NameManager.getInstance(method))
             .createIterativeBody(steps)
       }
 

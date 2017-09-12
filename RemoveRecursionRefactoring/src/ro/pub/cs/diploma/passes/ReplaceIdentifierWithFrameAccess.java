@@ -5,7 +5,7 @@ import com.intellij.psi.search.LocalSearchScope;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import org.jetbrains.annotations.NotNull;
 import ro.pub.cs.diploma.NameManager;
-import ro.pub.cs.diploma.RecursionUtil;
+import ro.pub.cs.diploma.RecursionUtilKt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,7 @@ public class ReplaceIdentifierWithFrameAccess implements Pass<PsiMethod, List<Ps
     method.accept(new JavaRecursiveElementVisitor() {
       @Override
       public void visitParameter(PsiParameter parameter) {
-        if (RecursionUtil.hasToBeSavedOnStack(parameter, method)) {
+        if (RecursionUtilKt.hasToBeSavedOnStack(parameter, method)) {
           variables.add(parameter);
         }
       }
@@ -47,7 +47,7 @@ public class ReplaceIdentifierWithFrameAccess implements Pass<PsiMethod, List<Ps
         if (myNameManager.getFrameVarName().equals(name) || myNameManager.getStackVarName().equals(name)) {
           return;
         }
-        if (RecursionUtil.hasToBeSavedOnStack(variable, method)) {
+        if (RecursionUtilKt.hasToBeSavedOnStack(variable, method)) {
           variables.add(variable);
         }
       }

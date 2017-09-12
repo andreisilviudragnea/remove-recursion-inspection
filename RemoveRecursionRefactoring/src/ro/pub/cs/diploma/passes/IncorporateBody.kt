@@ -3,7 +3,7 @@ package ro.pub.cs.diploma.passes
 import com.intellij.psi.*
 import com.intellij.psi.codeStyle.JavaCodeStyleManager
 import ro.pub.cs.diploma.NameManager
-import ro.pub.cs.diploma.Util
+import ro.pub.cs.diploma.Utilss
 
 class IncorporateBody private constructor(private val myNameManager: NameManager,
                                           private val myFactory: PsiElementFactory,
@@ -29,18 +29,18 @@ class IncorporateBody private constructor(private val myNameManager: NameManager
 
     newBody.add(myStyleManager.shortenClassReferences(statement(
         "final java.util.Deque<$frameClassName> $stackVarName = new java.util.ArrayDeque<>();")))
-    newBody.add(Util.createPushStatement(myFactory, frameClassName, stackVarName,
+    newBody.add(Utilss.createPushStatement(myFactory, frameClassName, stackVarName,
         method.parameterList.parameters, { it.name ?: "" }))
     val returnType = method.returnType ?: return null
     val retVarName = myNameManager.retVarName
-    if (!Util.isVoid(returnType)) {
+    if (!Utilss.isVoid(returnType)) {
       newBody.add(myStyleManager.shortenClassReferences(statement(
           returnType.canonicalText + " " + retVarName + "=" + getInitialValue(returnType) + ";")))
     }
 
     val incorporatedWhileStatement = newBody.add(whileStatement) as PsiWhileStatement
 
-    if (!Util.isVoid(returnType)) {
+    if (!Utilss.isVoid(returnType)) {
       newBody.addAfter(statement("return $retVarName;"), incorporatedWhileStatement)
     }
 

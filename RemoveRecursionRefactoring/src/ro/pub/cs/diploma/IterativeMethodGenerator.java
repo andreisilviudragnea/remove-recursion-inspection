@@ -54,7 +54,7 @@ public class IterativeMethodGenerator {
     }
 
     ReplaceForEachLoopsWithIteratorForLoops.getInstance(myMethod).apply(myMethod);
-    ReplaceForEachLoopsWithIndexedForLoops.getInstance(myMethod).apply(myMethod);
+    new ReplaceForEachLoopsWithIndexedForLoops(myMethod).apply(myMethod);
     if (steps == 3) {
       return;
     }
@@ -82,14 +82,14 @@ public class IterativeMethodGenerator {
       return;
     }
 
-    ReplaceDeclarationsHavingInitializersWithAssignments.getInstance(myMethod, myNameManager, myFactory).apply(incorporatedBody);
+    new ReplaceDeclarationsHavingInitializersWithAssignments(myMethod, myNameManager, myFactory).apply(incorporatedBody);
     if (steps == 8) {
       return;
     }
 
     final BasicBlocksGenerator basicBlocksGenerator =
       new BasicBlocksGenerator(myMethod, myNameManager, myFactory,
-                               RecursionUtil.extractStatementsContainingRecursiveCalls(incorporatedBody, myMethod));
+                               RecursionUtilKt.extractStatementsContainingRecursiveCalls(incorporatedBody, myMethod));
     incorporatedBody.accept(basicBlocksGenerator);
     final List<Block> blocks = basicBlocksGenerator.getBlocks();
 

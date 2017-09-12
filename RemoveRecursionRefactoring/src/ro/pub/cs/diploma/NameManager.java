@@ -23,8 +23,8 @@ public class NameManager {
 
   private NameManager(@NotNull PsiMethod method) {
     this.method = method;
-    styleManager = Util.INSTANCE.getStyleManager(method);
-    frameClassName = Util.INSTANCE.getFrameClassName(method.getName());
+    styleManager = Utilss.INSTANCE.getStyleManager(method);
+    frameClassName = Utilss.INSTANCE.getFrameClassName(method.getName());
   }
 
   @NotNull
