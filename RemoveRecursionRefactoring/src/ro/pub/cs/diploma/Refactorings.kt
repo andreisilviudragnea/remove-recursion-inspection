@@ -178,17 +178,15 @@ private fun getReferenceToIterate(expression: PsiExpression, context: PsiElement
 
 private fun createVariable(variableNameRoot: String?, iteratedValue: PsiExpression, context: PsiElement): String? {
     val variableName = createVariableName(variableNameRoot ?: return null, iteratedValue)
-    val project = context.project
     val iteratedValueType = iteratedValue.type ?: return null
-    val elementFactory = JavaPsiFacade.getElementFactory(project)
-    val declarationStatement = elementFactory.createVariableDeclarationStatement(variableName, iteratedValueType, iteratedValue)
+    val declarationStatement = context.getFactory().createVariableDeclarationStatement(variableName, iteratedValueType, iteratedValue)
     val newElement = context.parent.addBefore(declarationStatement, context)
-    JavaCodeStyleManager.getInstance(project).shortenClassReferences(newElement)
+    context.getStyleManager().shortenClassReferences(newElement)
     return variableName
 }
 
 private fun createVariableName(baseName: String, assignedExpression: PsiExpression): String {
-    val codeStyleManager = JavaCodeStyleManager.getInstance(assignedExpression.project)
+    val codeStyleManager = assignedExpression.getStyleManager()
     val names = codeStyleManager.suggestVariableName(VariableKind.LOCAL_VARIABLE, baseName, assignedExpression, null)
     return if (names.names.isEmpty()) {
         codeStyleManager.suggestUniqueVariableName(baseName, assignedExpression, true)
@@ -196,7 +194,7 @@ private fun createVariableName(baseName: String, assignedExpression: PsiExpressi
 }
 
 private fun createVariableName(baseName: String, type: PsiType, context: PsiElement): String {
-    val codeStyleManager = JavaCodeStyleManager.getInstance(context.project)
+    val codeStyleManager = context.getStyleManager()
     val names = codeStyleManager.suggestVariableName(VariableKind.LOCAL_VARIABLE, baseName, null, type)
     return if (names.names.isEmpty()) {
         codeStyleManager.suggestUniqueVariableName(baseName, context, true)
