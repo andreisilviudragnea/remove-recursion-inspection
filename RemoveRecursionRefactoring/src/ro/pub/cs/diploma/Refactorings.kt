@@ -28,7 +28,7 @@ fun replaceForEachLoopWithIteratorForLoop(statement: PsiForeachStatement, method
     newStatement.append(iterator).append("=").append(iteratorCall.text).append(';')
     newStatement.append(iterator).append(".hasNext();) {")
     val codeStyleSettings = CodeStyleSettingsManager.getSettings(statement.project)
-    if (codeStyleSettings.GENERATE_FINAL_LOCALS) {
+    if (codeStyleSettings.getCustomSettings(JavaCodeStyleSettings::class.java).GENERATE_FINAL_LOCALS) {
         newStatement.append("final ")
     }
     val iterationParameter = statement.iterationParameter
