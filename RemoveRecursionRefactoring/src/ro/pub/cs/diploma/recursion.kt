@@ -7,7 +7,7 @@ import com.siyeh.ig.performance.TailRecursionInspection
 import com.siyeh.ig.psiutils.ParenthesesUtils
 
 /**
- * Checks if the `expression` is a recursive method call to `method`.
+ * Checks if the expression is a recursive method call to [method].
  *
  * @see RecursiveCallLineMarkerProvider.isRecursiveMethodCall
  * @see TailRecursionInspection.TailRecursionVisitor.visitReturnStatement
@@ -32,7 +32,7 @@ fun PsiMethodCallExpression.isRecursiveCallTo(method: PsiMethod): Boolean {
 
 
 /**
- * Returns true if the specified `element` contains at least on recursive call to the specified `method`.
+ * Returns true if the element contains at least on recursive call to [method].
  */
 fun PsiElement.containsRecursiveCallsTo(method: PsiMethod): Boolean {
   val contains = Ref(false)
