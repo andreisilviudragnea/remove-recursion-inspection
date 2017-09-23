@@ -28,7 +28,7 @@ class RemoveRecursionInspection : BaseInspection() {
 
       public override fun doFix(project: Project, descriptor: ProblemDescriptor) {
         val method = descriptor.psiElement.getContainingMethod() ?: return
-        IterativeMethodGenerator(method.getFactory(), method, NameManager(method)).createIterativeBody(13)
+        createIterativeBody(13, method, NameManager(method))
       }
     }
   }
