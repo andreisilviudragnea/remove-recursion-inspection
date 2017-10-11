@@ -2,7 +2,6 @@ package ro.pub.cs.diploma
 
 import com.intellij.openapi.util.Pair
 import com.intellij.openapi.util.Ref
-import com.intellij.psi.PsiCodeBlock
 import com.intellij.psi.PsiMethod
 import ro.pub.cs.diploma.ir.Block
 import ro.pub.cs.diploma.ir.InlineVisitor
@@ -72,7 +71,9 @@ fun createIterativeBody(steps: Int, method: PsiMethod, nameManager: NameManager)
       }.toList()
 
   val atLeastOneLabeledBreak = Ref(false)
-  replaceReturnStatements(steps, pairs, nameManager, atLeastOneLabeledBreak)
+  if (steps == 13) {
+    pairs.forEach { pair -> replaceReturnStatements(pair.getSecond(), nameManager, atLeastOneLabeledBreak) }
+  }
 
   val casesString = pairs.joinToString("") { pair -> "case ${pair.getFirst()}: ${pair.getSecond().text}" }
 
@@ -110,14 +111,4 @@ private fun applyBlocksOptimizations(steps: Int, blocks: List<Block>): List<Bloc
   }
 
   return nonTrivialReachableBlocks
-}
-
-private fun replaceReturnStatements(steps: Int,
-                                    pairs: List<Pair<Int, PsiCodeBlock>>,
-                                    nameManager: NameManager,
-                                    atLeastOneLabeledBreak: Ref<Boolean>) {
-  if (steps <= 12) {
-    return
-  }
-  pairs.forEach { pair -> replaceReturnStatements(pair.getSecond(), nameManager, atLeastOneLabeledBreak) }
 }
