@@ -6,48 +6,33 @@ import com.intellij.psi.PsiMethod
 import ro.pub.cs.diploma.ir.Block
 import ro.pub.cs.diploma.ir.InlineVisitor
 import ro.pub.cs.diploma.passes.*
+import kotlin.coroutines.experimental.buildSequence
 
-fun createIterativeBody(steps: Int, method: PsiMethod, nameManager: NameManager) {
+fun createIterativeBody(steps: Int, method: PsiMethod, nameManager: NameManager) = buildSequence {
   replaceSingleStatementsWithBlockStatements(method)
-  if (steps == 1) {
-    return
-  }
+  yield(Unit)
 
   renameVariablesToUniqueNames(method)
-  if (steps == 2) {
-    return
-  }
+  yield(Unit)
 
   replaceForEachLoopsWithIteratorForLoops(method)
   replaceForEachLoopsWithIndexedForLoops(method)
-  if (steps == 3) {
-    return
-  }
+  yield(Unit)
 
   extractRecursiveCallsToStatements(method)
-  if (steps == 4) {
-    return
-  }
+  yield(Unit)
 
   addFrameClass(method, nameManager)
-  if (steps == 5) {
-    return
-  }
+  yield(Unit)
 
-  val incorporatedBody = incorporateBody(method, nameManager) ?: return
-  if (steps == 6) {
-    return
-  }
+  val incorporatedBody = incorporateBody(method, nameManager) ?: return@buildSequence
+  yield(Unit)
 
   replaceReferencesWithFieldAccesses(method, incorporatedBody, nameManager)
-  if (steps == 7) {
-    return
-  }
+  yield(Unit)
 
   replaceDeclarationsHavingInitializersWithAssignments(method, incorporatedBody, nameManager)
-  if (steps == 8) {
-    return
-  }
+  yield(Unit)
 
   val basicBlocksGenerator = BasicBlocksGenerator(method, nameManager, incorporatedBody.extractStatementsContainingRecursiveCallsTo(method))
   incorporatedBody.accept(basicBlocksGenerator)
