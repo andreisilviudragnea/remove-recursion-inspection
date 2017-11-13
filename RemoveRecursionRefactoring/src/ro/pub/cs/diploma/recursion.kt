@@ -82,10 +82,10 @@ fun PsiCodeBlock.extractStatementsContainingRecursiveCallsTo(method: PsiMethod):
 }
 
 fun PsiParameter.containsInScopeRecursiveCallsTo(method: PsiMethod): Boolean =
-    this.getElementsInScope().any { it.containsRecursiveCallsTo(method) }
+    getElementsInScope().any { it.containsRecursiveCallsTo(method) }
 
 fun PsiLocalVariable.containsInScopeRecursiveCallsTo(method: PsiMethod): Boolean =
-    this.getElementsInScope().any { it.containsRecursiveCallsTo(method) }
+    getElementsInScope().any { it.containsRecursiveCallsTo(method) }
 
 fun PsiDeclarationStatement.containsInScopeRecursiveCallsTo(method: PsiMethod): Boolean =
-    this.declaredElements.any { it is PsiLocalVariable && it.containsInScopeRecursiveCallsTo(method) }
+    declaredElements.any { it is PsiLocalVariable && it.containsInScopeRecursiveCallsTo(method) }

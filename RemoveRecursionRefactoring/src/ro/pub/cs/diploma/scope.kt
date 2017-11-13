@@ -3,22 +3,11 @@ package ro.pub.cs.diploma
 import com.intellij.psi.*
 
 fun PsiParameter.getElementsInScope(): List<PsiElement> {
-  val parent = this.parent
   val elements = ArrayList<PsiElement>()
-
-  if (parent is PsiParameterList) {
-    val body = (parent.getParent() as PsiMethod).body
-    if (body != null) {
-      elements.add(body)
-    }
+  when (parent) {
+    is PsiParameterList -> (parent.parent as PsiMethod).body?.let { elements.add(it) }
+    is PsiForeachStatement -> (parent as PsiForeachStatement).body?.let { elements.add(it) }
   }
-  else if (parent is PsiForeachStatement) {
-    val body = parent.body
-    if (body != null) {
-      elements.add(body)
-    }
-  }
-
   return elements
 }
 
@@ -46,20 +35,11 @@ fun PsiLocalVariable.getElementsInScope(): List<PsiElement> {
     }
   }
 
-  when(parent) {
+  when (parent) {
     is PsiForStatement -> {
-      val condition = parent.condition
-      if (condition != null) {
-        elements.add(condition)
-      }
-      val update = parent.update
-      if (update != null) {
-        elements.add(update)
-      }
-      val body = parent.body
-      if (body != null) {
-        elements.add(body)
-      }
+      parent.condition?.let { elements.add(it) }
+      parent.update?.let { elements.add(it) }
+      parent.body?.let { elements.add(it) }
     }
     is PsiCodeBlock -> {
       met = false

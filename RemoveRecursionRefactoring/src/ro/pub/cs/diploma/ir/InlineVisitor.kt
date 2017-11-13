@@ -14,10 +14,6 @@ class InlineVisitor(private val factory: PsiElementFactory, nameManager: NameMan
     currentBlock.add(factory.statement(text))
   }
 
-  private fun addStatement(statement: WrapperStatement) {
-    currentBlock.add(statement.statement)
-  }
-
   private fun addBreak() {
     addStatement("break;")
   }
@@ -75,6 +71,10 @@ class InlineVisitor(private val factory: PsiElementFactory, nameManager: NameMan
     val concreteElsePsiBlock = getConcreteBlock(elseBlock, elsePsiBlock)
 
     addStatement("if ($conditionText) ${concreteThenPsiBlock.text} else ${concreteElsePsiBlock.text}")
+  }
+
+  private fun addStatement(statement: WrapperStatement) {
+    currentBlock.add(statement.statement)
   }
 
   override fun visit(normalStatement: NormalStatement) {
