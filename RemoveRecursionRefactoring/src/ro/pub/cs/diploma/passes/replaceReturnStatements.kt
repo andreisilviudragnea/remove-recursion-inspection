@@ -1,15 +1,26 @@
 package ro.pub.cs.diploma.passes
 
 import com.intellij.openapi.util.Ref
-import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiCodeBlock
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiLoopStatement
+import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
 import ro.pub.cs.diploma.NameManager
-import ro.pub.cs.diploma.extractReturnStatements
 import ro.pub.cs.diploma.getFactory
 import ro.pub.cs.diploma.statement
+
+private fun PsiCodeBlock.extractReturnStatements(): List<PsiReturnStatement> {
+  val returnStatements = ArrayList<PsiReturnStatement>()
+  accept(object : JavaRecursiveElementWalkingVisitor() {
+    override fun visitReturnStatement(statement: PsiReturnStatement) {
+      super.visitReturnStatement(statement)
+      returnStatements.add(statement)
+    }
+
+    override fun visitClass(aClass: PsiClass) {}
+
+    override fun visitLambdaExpression(expression: PsiLambdaExpression) {}
+  })
+  return returnStatements
+}
 
 fun replaceReturnStatements(block: PsiCodeBlock, nameManager: NameManager, atLeastOneLabeledBreak: Ref<Boolean>) {
   val factory = block.getFactory()

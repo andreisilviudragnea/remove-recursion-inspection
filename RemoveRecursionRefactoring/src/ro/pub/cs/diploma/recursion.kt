@@ -36,7 +36,7 @@ fun PsiMethodCallExpression.isRecursiveCallTo(method: PsiMethod): Boolean {
  */
 fun PsiElement.containsRecursiveCallsTo(method: PsiMethod): Boolean {
   val contains = Ref(false)
-  this.accept(object : JavaRecursiveElementWalkingVisitor() {
+  accept(object : JavaRecursiveElementWalkingVisitor() {
     override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
       super.visitMethodCallExpression(expression)
       if (expression.isRecursiveCallTo(method)) {
@@ -54,7 +54,7 @@ fun PsiElement.containsRecursiveCallsTo(method: PsiMethod): Boolean {
 
 fun PsiCodeBlock.extractStatementsContainingRecursiveCallsTo(method: PsiMethod): Set<PsiStatement> {
   val recursiveCalls = ArrayList<PsiMethodCallExpression>()
-  this.accept(object : JavaRecursiveElementVisitor() {
+  accept(object : JavaRecursiveElementVisitor() {
     override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
       super.visitMethodCallExpression(expression)
       if (expression.isRecursiveCallTo(method)) {
