@@ -14,7 +14,7 @@ class Block(val id: Int) : Statement {
   var isFinished: Boolean = false
     private set
 
-  val isInlinable: Boolean
+  val canBeInlined: Boolean
     get() = myInBlocks.size == 1 && !doNotInline
 
   val outBlocks: List<Ref<Block>>
@@ -131,7 +131,7 @@ class Block(val id: Int) : Statement {
             .replace("\n", "\\n"))
       }
     }
-    statements.add("$id [label=\"{${strings2.joinToString("|")}}\" ${if (isInlinable) "" else "color=red"}];")
+    statements.add("$id [label=\"{${strings2.joinToString("|")}}\" ${if (canBeInlined) "" else "color=red"}];")
 
     return statements
   }

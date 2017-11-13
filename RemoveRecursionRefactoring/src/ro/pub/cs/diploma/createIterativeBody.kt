@@ -48,7 +48,7 @@ fun createIterativeBody(steps: Int, method: PsiMethod, nameManager: NameManager)
   val factory = method.getFactory()
 
   val pairs = optimizedBlocks
-      .filter { block -> !block.isInlinable }
+      .filter { block -> !block.canBeInlined }
       .map { block ->
         val inlineVisitor = InlineVisitor(factory, nameManager)
         block.accept(inlineVisitor)

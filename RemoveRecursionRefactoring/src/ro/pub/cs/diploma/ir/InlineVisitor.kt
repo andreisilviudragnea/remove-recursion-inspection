@@ -33,7 +33,7 @@ class InlineVisitor(private val factory: PsiElementFactory, nameManager: NameMan
 
   private fun inline(block: Block): PsiCodeBlock? {
     var psiBlock: PsiCodeBlock? = null
-    if (block.isInlinable) {
+    if (block.canBeInlined) {
       psiBlock = factory.createCodeBlock()
       val oldCurrentBlock = currentBlock
       currentBlock = psiBlock
