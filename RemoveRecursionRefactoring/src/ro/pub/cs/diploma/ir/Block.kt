@@ -35,10 +35,11 @@ class Block(val id: Int) : Statement {
     isFinished = true
   }
 
-  fun addUnconditionalJump(blockRef: Ref<Block>) {
+  fun addUnconditionalJump(block: Block) {
     if (isFinished) {
       return
     }
+    val blockRef = Ref.create(block)
     myStatements.add(UnconditionalJumpStatement(blockRef))
     addEdgeTo(blockRef)
     isFinished = true

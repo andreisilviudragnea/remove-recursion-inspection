@@ -29,16 +29,8 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
     return block
   }
 
-  private fun addStatement(statement: PsiStatement) {
-    myCurrentBlock.add(statement)
-  }
-
   private fun addStatement(text: String) {
     myCurrentBlock.add(myFactory.statement(text))
-  }
-
-  private fun addUnconditionalJumpStatement(block: Block) {
-    myCurrentBlock.addUnconditionalJump(Ref.create(block))
   }
 
   private fun addConditionalJumpStatement(condition: PsiExpression,
@@ -62,7 +54,7 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
 
     val breakContinueReplacerVisitor = BreakContinueReplacerVisitor(myBreakTargets, myContinueTargets, myFactory, myCurrentBlock)
     statement.accept(breakContinueReplacerVisitor)
-    addStatement(statement)
+    myCurrentBlock.add(statement)
   }
 
   override fun visitReturnStatement(statement: PsiReturnStatement) {
@@ -74,10 +66,10 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
                                targets: Map<PsiStatement, Block>) {
     val block = targets[targetStatement]
     if (block == null) {
-      addStatement(statement)
+      myCurrentBlock.add(statement)
       return
     }
-    addUnconditionalJumpStatement(block)
+    myCurrentBlock.addUnconditionalJump(block)
   }
 
   override fun visitBreakStatement(statement: PsiBreakStatement) {
@@ -105,12 +97,12 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
   }
 
   override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
-    addStatement(myFactory.createPushStatement(myNameManager.frameClassName, myNameManager.stackVarName,
+    myCurrentBlock.add(myFactory.createPushStatement(myNameManager.frameClassName, myNameManager.stackVarName,
         expression.argumentList.expressions) { it.text })
 
     val block = newBlock()
     block.setDoNotInline(true)
-    addUnconditionalJumpStatement(block)
+    myCurrentBlock.addUnconditionalJump(block)
 
     myCurrentBlock = block
 
@@ -118,7 +110,7 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
     if (returnType != PsiPrimitiveType.VOID) {
       val parent = PsiTreeUtil.getParentOfType(expression, PsiStatement::class.java, true) ?: return
       expression.replace(myFactory.expression(myNameManager.retVarName))
-      addStatement(parent)
+      myCurrentBlock.add(parent)
     }
   }
 
@@ -133,12 +125,12 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
     myCurrentBlock = thenBlock
     val thenBranch = statement.thenBranch ?: return
     thenBranch.accept(this)
-    addUnconditionalJumpStatement(mergeBlock)
+    myCurrentBlock.addUnconditionalJump(mergeBlock)
 
     if (elseBranch != null && elseBlock != null) {
       myCurrentBlock = elseBlock
       elseBranch.accept(this)
-      addUnconditionalJumpStatement(mergeBlock)
+      myCurrentBlock.addUnconditionalJump(mergeBlock)
     }
 
     myCurrentBlock = mergeBlock
@@ -169,7 +161,7 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
     myBreakTargets.put(statement, mergeBlock)
     myContinueTargets.put(statement, actualUpdateBlock)
 
-    addUnconditionalJumpStatement(if (atLeastOnce) bodyBlock else actualConditionBlock)
+    myCurrentBlock.addUnconditionalJump(if (atLeastOnce) bodyBlock else actualConditionBlock)
 
     if (theCondition != null && conditionBlock != null) {
       myCurrentBlock = conditionBlock
@@ -179,13 +171,13 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
     if (update != null && updateBlock != null) {
       myCurrentBlock = updateBlock
       addStatements(update)
-      addUnconditionalJumpStatement(actualConditionBlock)
+      myCurrentBlock.addUnconditionalJump(actualConditionBlock)
     }
 
     myCurrentBlock = bodyBlock
     val body = statement.body ?: return
     body.accept(this)
-    addUnconditionalJumpStatement(actualUpdateBlock)
+    myCurrentBlock.addUnconditionalJump(actualUpdateBlock)
 
     myCurrentBlock = mergeBlock
   }
@@ -225,7 +217,7 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
           statements.add(UnconditionalJumpStatement(Ref.create(newBlock)))
 
           if (previousCurrentBlock != null && !previousCurrentBlock.isFinished) {
-            previousCurrentBlock.addUnconditionalJump(Ref.create(newBlock))
+            previousCurrentBlock.addUnconditionalJump(newBlock)
           }
 
           myCurrentBlock = newBlock
@@ -236,7 +228,7 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
     }
 
     if (previousCurrentBlock != null && !previousCurrentBlock.isFinished) {
-      previousCurrentBlock.addUnconditionalJump(Ref.create(mergeBlock))
+      previousCurrentBlock.addUnconditionalJump(mergeBlock)
     }
 
     myCurrentBlock = oldCurrentBlock
