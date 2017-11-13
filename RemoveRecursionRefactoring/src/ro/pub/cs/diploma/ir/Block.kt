@@ -29,11 +29,9 @@ class Block(val id: Int) : Statement {
     if (isFinished) {
       return
     }
-    val thenBlockRef = Ref.create(thenBlock)
-    val elseBlockRef = Ref.create(elseBlock)
-    myStatements.add(ConditionalJumpStatement(condition, thenBlockRef, elseBlockRef))
-    addEdgeTo(thenBlockRef)
-    addEdgeTo(elseBlockRef)
+    myStatements.add(ConditionalJumpStatement(condition, thenBlock, elseBlock))
+    addEdgeTo(Ref.create(thenBlock))
+    addEdgeTo(Ref.create(elseBlock))
     isFinished = true
   }
 
