@@ -2,17 +2,13 @@ package ro.pub.cs.diploma.ir
 
 import com.intellij.psi.PsiCodeBlock
 import com.intellij.psi.PsiElementFactory
-import com.intellij.psi.PsiStatement
 import ro.pub.cs.diploma.NameManager
 import ro.pub.cs.diploma.statement
 
 class InlineVisitor(private val factory: PsiElementFactory, nameManager: NameManager) : Visitor {
   private val blockSet: String = "${nameManager.frameVarName}.${nameManager.blockFieldName} = "
-  val block: PsiCodeBlock
-
-  private var currentBlock: PsiCodeBlock
-
-  private fun newBlock(): PsiCodeBlock = factory.createCodeBlock()
+  val block: PsiCodeBlock = factory.createCodeBlock()
+  private var currentBlock: PsiCodeBlock = block
 
   private fun addStatement(text: String) {
     currentBlock.add(factory.statement(text))
@@ -22,23 +18,13 @@ class InlineVisitor(private val factory: PsiElementFactory, nameManager: NameMan
     currentBlock.add(statement.statement)
   }
 
-  private fun addStatement(statement: PsiStatement) {
-    currentBlock.add(statement)
-  }
-
   private fun addBreak() {
     addStatement("break;")
   }
 
-  private fun addBlockSet(`val`: String) {
-    addStatement("$blockSet$`val`;")
+  private fun addBlockSet(value: String) {
+    addStatement("$blockSet$value;")
     addBreak()
-  }
-
-  init {
-    block = newBlock()
-
-    currentBlock = block
   }
 
   override fun visit(block: Block) {
@@ -48,7 +34,7 @@ class InlineVisitor(private val factory: PsiElementFactory, nameManager: NameMan
   private fun inline(block: Block): PsiCodeBlock? {
     var psiBlock: PsiCodeBlock? = null
     if (block.isInlinable) {
-      psiBlock = newBlock()
+      psiBlock = factory.createCodeBlock()
       val oldCurrentBlock = currentBlock
       currentBlock = psiBlock
       block.accept(this)
@@ -61,9 +47,8 @@ class InlineVisitor(private val factory: PsiElementFactory, nameManager: NameMan
     val concretePsiBlock: PsiCodeBlock
     if (psiBlock != null) {
       concretePsiBlock = psiBlock
-    }
-    else {
-      concretePsiBlock = newBlock()
+    } else {
+      concretePsiBlock = factory.createCodeBlock()
       val oldCurrentBlock = currentBlock
       currentBlock = concretePsiBlock
       addBlockSet(block.id.toString())
@@ -105,7 +90,7 @@ class InlineVisitor(private val factory: PsiElementFactory, nameManager: NameMan
     val psiBlock = inline(block)
 
     if (psiBlock != null) {
-      psiBlock.statements.forEach { this.addStatement(it) }
+      psiBlock.statements.forEach { currentBlock.add(it) }
       return
     }
 
@@ -114,7 +99,7 @@ class InlineVisitor(private val factory: PsiElementFactory, nameManager: NameMan
 
   override fun visit(switchStatement: SwitchStatement) {
     val statements = switchStatement.statements
-    val psiBlock = newBlock()
+    val psiBlock = factory.createCodeBlock()
     val oldCurrentBlock = currentBlock
     currentBlock = psiBlock
     for (statement in statements) {
