@@ -2,9 +2,9 @@ package ro.pub.cs.diploma
 
 import com.intellij.psi.*
 
-fun extractReturnStatements(block: PsiCodeBlock): List<PsiReturnStatement> {
+fun PsiCodeBlock.extractReturnStatements(): List<PsiReturnStatement> {
   val returnStatements = ArrayList<PsiReturnStatement>()
-  block.accept(object : JavaRecursiveElementWalkingVisitor() {
+  accept(object : JavaRecursiveElementWalkingVisitor() {
     override fun visitReturnStatement(statement: PsiReturnStatement) {
       super.visitReturnStatement(statement)
       returnStatements.add(statement)

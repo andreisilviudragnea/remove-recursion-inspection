@@ -13,7 +13,7 @@ import ro.pub.cs.diploma.statement
 
 fun replaceReturnStatements(block: PsiCodeBlock, nameManager: NameManager, atLeastOneLabeledBreak: Ref<Boolean>) {
   val factory = block.getFactory()
-  for (statement in extractReturnStatements(block)) {
+  for (statement in block.extractReturnStatements()) {
     val returnValue = statement.returnValue
     val parentBlock = PsiTreeUtil.getParentOfType(statement, PsiCodeBlock::class.java, true) ?: continue
     var anchor: PsiElement = statement
