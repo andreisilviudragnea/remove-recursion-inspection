@@ -33,16 +33,6 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
     myCurrentBlock.add(myFactory.statement(text))
   }
 
-  private fun addConditionalJumpStatement(condition: PsiExpression,
-                                          thenBlock: Block,
-                                          jumpBlock: Block) {
-    myCurrentBlock.addConditionalJump(condition, Ref.create(thenBlock), Ref.create(jumpBlock))
-  }
-
-  private fun addReturnStatement(statement: PsiReturnStatement) {
-    myCurrentBlock.addReturnStatement(statement)
-  }
-
   private fun processStatement(statement: PsiStatement) {
     if (myStatementsContainingRecursiveCalls.contains(statement) ||
         statement is PsiReturnStatement ||
@@ -58,7 +48,7 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
   }
 
   override fun visitReturnStatement(statement: PsiReturnStatement) {
-    addReturnStatement(statement)
+    myCurrentBlock.addReturnStatement(statement)
   }
 
   private fun processStatement(statement: PsiStatement,
@@ -88,7 +78,7 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
     val statements = block.statements
     // This is a hack, this method gets called only for the method block, not for blocks of block statements.
     if (PsiPrimitiveType.VOID == myMethod.returnType && statements.last() !is PsiReturnStatement) {
-      addReturnStatement(myFactory.statement("return;") as PsiReturnStatement)
+      myCurrentBlock.addReturnStatement(myFactory.statement("return;") as PsiReturnStatement)
     }
   }
 
@@ -120,7 +110,7 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
     val elseBlock = if (elseBranch != null) newBlock() else null
     val mergeBlock = newBlock()
 
-    addConditionalJumpStatement(statement.condition ?: return, thenBlock, elseBlock ?: mergeBlock)
+    myCurrentBlock.addConditionalJump(statement.condition ?: return, thenBlock, elseBlock ?: mergeBlock)
 
     myCurrentBlock = thenBlock
     val thenBranch = statement.thenBranch ?: return
@@ -165,7 +155,7 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
 
     if (theCondition != null && conditionBlock != null) {
       myCurrentBlock = conditionBlock
-      addConditionalJumpStatement(theCondition, bodyBlock, mergeBlock)
+      myCurrentBlock.addConditionalJump(theCondition, bodyBlock, mergeBlock)
     }
 
     if (update != null && updateBlock != null) {

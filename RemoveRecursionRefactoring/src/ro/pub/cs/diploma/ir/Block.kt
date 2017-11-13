@@ -24,11 +24,13 @@ class Block(val id: Int) : Statement {
     get() = myStatements
 
   fun addConditionalJump(condition: PsiExpression,
-                         thenBlockRef: Ref<Block>,
-                         elseBlockRef: Ref<Block>) {
+                         thenBlock: Block,
+                         elseBlock: Block) {
     if (isFinished) {
       return
     }
+    val thenBlockRef = Ref.create(thenBlock)
+    val elseBlockRef = Ref.create(elseBlock)
     myStatements.add(ConditionalJumpStatement(condition, thenBlockRef, elseBlockRef))
     addEdgeTo(thenBlockRef)
     addEdgeTo(elseBlockRef)
