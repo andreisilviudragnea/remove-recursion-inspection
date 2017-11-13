@@ -9,8 +9,6 @@ import ro.pub.cs.diploma.ir.NormalStatement
 import ro.pub.cs.diploma.ir.Statement
 import ro.pub.cs.diploma.ir.UnconditionalJumpStatement
 
-import java.util.*
-
 internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
                                     private val myNameManager: NameManager,
                                     private val myStatementsContainingRecursiveCalls: Set<PsiStatement>) : JavaRecursiveElementVisitor() {
