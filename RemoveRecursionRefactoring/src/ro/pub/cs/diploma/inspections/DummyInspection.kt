@@ -7,7 +7,10 @@ import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
 import com.siyeh.ig.InspectionGadgetsFix
 import org.jetbrains.annotations.Nls
-import ro.pub.cs.diploma.*
+import ro.pub.cs.diploma.NameManager
+import ro.pub.cs.diploma.RemoveRecursionBundle
+import ro.pub.cs.diploma.createIterativeBody
+import ro.pub.cs.diploma.getContainingMethod
 
 abstract class DummyInspection : BaseInspection() {
   protected abstract val key: String
@@ -31,7 +34,7 @@ abstract class DummyInspection : BaseInspection() {
     return object : InspectionGadgetsFix() {
       override fun doFix(project: Project, descriptor: ProblemDescriptor) {
         val method = descriptor.psiElement.getContainingMethod() ?: return
-        createIterativeBody(steps, method, NameManager(method))
+        createIterativeBody(13 - steps, method, NameManager(method)).take(steps).forEach {  }
       }
 
       @Nls

@@ -56,7 +56,7 @@ fun createIterativeBody(steps: Int, method: PsiMethod, nameManager: NameManager)
       }.toList()
 
   val atLeastOneLabeledBreak = Ref(false)
-  if (steps == 13) {
+  if (steps == 4) {
     pairs.forEach { pair -> replaceReturnStatements(pair.getSecond(), nameManager, atLeastOneLabeledBreak) }
   }
 
@@ -69,14 +69,14 @@ fun createIterativeBody(steps: Int, method: PsiMethod, nameManager: NameManager)
 }
 
 private fun applyBlocksOptimizations(steps: Int, blocks: List<Block>): List<Block> {
-  if (steps == 9) {
+  if (steps == 0) {
     blocks.forEach { block -> block.setDoNotInline(true) }
     return blocks
   }
 
   val reachableBlocks = removeUnreachableBlocks(blocks)
 
-  if (steps == 10) {
+  if (steps == 1) {
     reachableBlocks.forEach { block -> block.setDoNotInline(true) }
     return reachableBlocks
   }
@@ -90,7 +90,7 @@ private fun applyBlocksOptimizations(steps: Int, blocks: List<Block>): List<Bloc
 
   val cfg = "digraph cfg {\n\t${collect.joinToString("\n\t")}\n}"
 
-  if (steps == 11) {
+  if (steps == 2) {
     nonTrivialReachableBlocks.forEach { block -> block.setDoNotInline(true) }
     return nonTrivialReachableBlocks
   }
