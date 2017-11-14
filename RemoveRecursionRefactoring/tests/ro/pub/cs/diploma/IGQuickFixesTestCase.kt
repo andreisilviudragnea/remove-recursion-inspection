@@ -19,9 +19,7 @@ abstract class IGQuickFixesTestCase : LightCodeInsightFixtureTestCase() {
         LanguageLevelProjectExtension.getInstance(project).languageLevel = LanguageLevel.JDK_1_8
     }
 
-    override fun getTestDataPath(): String {
-        return "testdata"
-    }
+    override fun getTestDataPath(): String = "testdata"
 
     internal fun doTest() {
         doTest(getTestName(false))
@@ -35,7 +33,5 @@ abstract class IGQuickFixesTestCase : LightCodeInsightFixtureTestCase() {
         myFixture.checkResultByFile("$myRelativePath/$testName.after.java")
     }
 
-    override fun getProjectDescriptor(): LightProjectDescriptor {
-        return DefaultLightProjectDescriptor()
-    }
+    override fun getProjectDescriptor(): LightProjectDescriptor = DefaultLightProjectDescriptor()
 }

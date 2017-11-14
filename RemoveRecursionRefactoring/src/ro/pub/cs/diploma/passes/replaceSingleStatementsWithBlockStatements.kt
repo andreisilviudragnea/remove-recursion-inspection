@@ -4,7 +4,6 @@ import com.intellij.psi.*
 import ro.pub.cs.diploma.expression
 import ro.pub.cs.diploma.getFactory
 import ro.pub.cs.diploma.statement
-import java.util.*
 
 fun replaceSingleStatementsWithBlockStatements(method: PsiMethod) {
   val factory = method.getFactory()
