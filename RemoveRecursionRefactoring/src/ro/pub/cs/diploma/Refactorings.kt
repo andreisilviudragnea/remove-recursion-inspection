@@ -27,8 +27,7 @@ fun replaceForEachLoopWithIteratorForLoop(statement: PsiForeachStatement, method
     val iterator = method.getStyleManager().suggestUniqueVariableName("iterator", method, true)
     newStatement.append(iterator).append("=").append(iteratorCall.text).append(';')
     newStatement.append(iterator).append(".hasNext();) {")
-    val codeStyleSettings = CodeStyleSettingsManager.getSettings(statement.project)
-    if (codeStyleSettings.getCustomSettings(JavaCodeStyleSettings::class.java).GENERATE_FINAL_LOCALS) {
+    if (JavaCodeStyleSettings.getInstance(statement.project).GENERATE_FINAL_LOCALS) {
         newStatement.append("final ")
     }
     val iterationParameter = statement.iterationParameter
@@ -62,8 +61,7 @@ fun replaceForEachLoopWithIndexedForLoop(statement: PsiForeachStatement) {
     @NonNls val newStatement = StringBuilder()
     val indexText = createVariableName("i", PsiType.INT, statement)
     createForLoopDeclaration(iteratedValue, isArray, iteratedValueText, newStatement, indexText)
-    val codeStyleSettings = CodeStyleSettingsManager.getSettings(statement.project)
-    if (codeStyleSettings.GENERATE_FINAL_LOCALS) {
+    if (JavaCodeStyleSettings.getInstance(statement.project).GENERATE_FINAL_LOCALS) {
         newStatement.append("final ")
     }
     newStatement.append(statement.iterationParameter.type.canonicalText)
