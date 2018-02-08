@@ -4,13 +4,6 @@
 		Ant file for building the thesis
 	</description>
 	
-	<!--
-		pdflatex -interaction=scrollmode \-\-src-specials thesis.tex
-		bibtex thesis
-		pdflatex -interaction=scrollmode \-\-src-specials thesis.tex
-		pdflatex -interaction=scrollmode \-\-src-specials thesis.tex
-	-->
-	
 	<target name="build" description="build thesis">
 		<exec executable="pdflatex">
 			<arg value="-shell-escape"/>
@@ -48,12 +41,6 @@
 
 	<target name="linux-preview" depends="build" description="preview thesis">
 		<exec executable="evince">
-			<arg value="thesis.pdf"/>
-		</exec>
-	</target>
-
-	<target name="mac-preview" description="preview thesis">
-		<exec executable="/Applications/Preview.app/Contents/MacOS/Preview">
 			<arg value="thesis.pdf"/>
 		</exec>
 	</target>
