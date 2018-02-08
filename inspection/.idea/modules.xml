@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/RemoveRecursionRefactoring.iml" filepath="$PROJECT_DIR$/RemoveRecursionRefactoring.iml" />
+      <module fileurl="file://$PROJECT_DIR$/remove-recursion-inspection.iml" filepath="$PROJECT_DIR$/remove-recursion-inspection.iml" />
     </modules>
   </component>
 </project>
