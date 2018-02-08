@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/eliminare-recursivitate.iml" filepath="$PROJECT_DIR$/eliminare-recursivitate.iml" />
+      <module fileurl="file://$PROJECT_DIR$/test-recursion.iml" filepath="$PROJECT_DIR$/test-recursion.iml" />
     </modules>
   </component>
 </project>
