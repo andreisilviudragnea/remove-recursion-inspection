@@ -1,0 +1,16 @@
+digraph G {
+    node [shape=record];
+    conditionBlock, updateBlock [style=filled, color=black, fillcolor=lightgrey];
+    currentBlock [label="{currentBlock|...\ninitializationStatements|jump(conditionBlock);}"];
+    conditionBlock [label="{conditionBlock|condition|{<true>true|<false>false}}"];
+    updateBlock [label="{updateBlock|updateStatements|jump(conditionBlock);}"];
+    currentBlockAfterVisitingBodyBlock [label="{currentBlockAfterVisitingBodyBlock|...|jump(updateBlock);}"];
+    bodyBlock [label="{bodyBlock|...}"];
+    mergeBlock [label="{mergeBlock|...}"];
+    currentBlock -> conditionBlock;
+    conditionBlock:true -> bodyBlock;
+    conditionBlock:false -> mergeBlock;
+    bodyBlock -> currentBlockAfterVisitingBodyBlock [style=dotted];
+    currentBlockAfterVisitingBodyBlock -> updateBlock;
+    updateBlock -> conditionBlock;
+}

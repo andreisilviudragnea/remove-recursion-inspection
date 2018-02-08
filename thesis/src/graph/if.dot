@@ -1,0 +1,16 @@
+digraph G {
+	node [shape=record];
+	elseBlock, currentBlockAfterVisitingElseBlock [style=filled,color=black,fillcolor=lightgrey];
+	currentBlock [label="{currentBlock|...|ifCondition|{<true>true|<false>false}}"];
+	thenBlock [label="{thenBlock|...}"];
+	elseBlock [label="{elseBlock|...}"];
+	currentBlockAfterVisitingThenBlock [label="{currentBlockAfterVisitingThenBlock|...|jump(mergeBlock);}"];
+	currentBlockAfterVisitingElseBlock [label="{currentBlockAfterVisitingElseBlock|...|jump(mergeBlock);}"];
+	mergeBlock [label="{mergeBlock|...}"];
+	currentBlock:true -> thenBlock;
+	currentBlock:false -> elseBlock;
+	thenBlock -> currentBlockAfterVisitingThenBlock [style=dotted];
+	elseBlock -> currentBlockAfterVisitingElseBlock [style=dotted];
+	currentBlockAfterVisitingThenBlock -> mergeBlock;
+	currentBlockAfterVisitingElseBlock -> mergeBlock;
+}

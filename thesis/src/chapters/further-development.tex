@@ -1,0 +1,26 @@
+\chapter{Further development}
+
+%The refactoring does not support \code{try} statements in the method body, given the complex control flow involving
+%these statements. They can however be supported by the refactoring with some more effort, but they are not usually used
+%in the context of recursive methods. Recursive calls inside \code{switch} statements are not supported either, because
+%they are rather uncommon. The \code{switch} statement could be however supported by first transforming it into a chain
+%of equivalent \code{if} statements before applying the refactoring.
+
+The refactoring does not support recursive calls inside \code{try} statements. This is a rather obscure use case,
+because the exception the \code{try} statement would catch should be generated somewhere else inside the same method.
+No real usable code would be written that way.
+
+There is basic and unstable support for recursive calls inside \code{switch} statements. They are supported by
+replacing each block in the body of the original \code{switch} statement with jumps to the basic blocks corresponding
+to these blocks. The original \code{switch} statement thus becomes a new terminator statement for the basic block inside
+which the statement appears.
+
+A special case to be considered is \texit{tail recursion}. In the case of tail recursive methods, which are methods
+whose last statement is a recursive call, the recursion can be removed by placing the body of the method inside a
+\code{while} loop and then replacing the \code{return} statements with assignments to the formal parameters of the
+method, ensuring that the order of assignments respects the order of evaluation of the arguments to the recursive call.
+Auxiliary variables can be used here, if necessary.
+
+In the case of tail recursive methods with \code{void} return type, the transformation is more complicated because it
+is difficult to determine the last statement executed on each code path in the method body, as opposed to methods with
+no \code{void} return type, where the last statements executed on each code path are explicit \code{return} statements.

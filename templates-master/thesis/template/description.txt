@@ -1,9 +1,0 @@
-Lucrarea prezintă un algoritm de eliminare a recursivității dintr-o metodă scrisă în limbajul de
-programare Java prin simularea acesteia folosind o stivă explicită în corpul metodei. Scopul acestei
-transformări care păstrează semantica codului este de a evita epuizarea stivei de apel în cazul unui
-număr mare de apeluri recursive.
-
-The thesis presents an algorithm for removing the recursion from a method written in the Java programming
-language by simulating it using a stack in the user program. The purpose of this code tranformation
-which preserves the semantics of the original code is to avoid exhausting the call stack space in the
-case of deep recursion.

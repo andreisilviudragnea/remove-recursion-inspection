@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<project name="thesis" default="build">
+	<description>
+		Ant file for building the thesis
+	</description>
+	
+	<target name="build" description="build thesis">
+		<exec executable="pdflatex">
+			<arg value="-shell-escape"/>
+			<arg value="-interaction=scrollmode"/>
+			<arg value="--src-specials"/>
+			<arg value="thesis.tex"/>
+		</exec>
+		<exec executable="bibtex">
+			<arg value="thesis"/>
+		</exec>
+		<exec executable="makeindex">
+			<arg value="thesis.nlo"/>
+			<arg value="-s"/>
+			<arg value="nomencl.ist"/>
+			<arg value="-o"/>
+			<arg value="thesis.nls"/>
+		</exec>
+		<exec executable="pdflatex">
+			<arg value="-shell-escape"/>
+			<arg value="-interaction=scrollmode"/>
+			<arg value="--src-specials"/>
+			<arg value="thesis"/>
+		</exec>
+		<exec executable="makeindex">
+			<arg value="thesis.idx"/>
+		</exec>
+		<exec executable="pdflatex">
+			<arg value="-shell-escape"/>
+			<arg value="-interaction=scrollmode"/>
+			<arg value="--src-specials"/>
+			<arg value="thesis"/>
+		</exec>
+		<antcall target="build-clean" />
+	</target>
+
+	<target name="linux-preview" depends="build" description="preview thesis">
+		<exec executable="evince">
+			<arg value="thesis.pdf"/>
+		</exec>
+	</target>
+
+	<target name="build-clean">
+		<delete dir="." includes="**/*.log,**/*.lot,**/*.lof,**/*.blg,**/*.bbl,**/*.out,**/*.toc,**/*.aux" />
+		<delete dir="." includes="thesis.idx,thesis.ilg,thesis.ind" />
+		<delete dir="." includes="thesis.nlo,thesis.nls" />
+	</target>
+	
+	<target name="clean" depends="build-clean">
+		<delete dir="." includes="thesis.pdf" />
+	</target>
+	
+</project>

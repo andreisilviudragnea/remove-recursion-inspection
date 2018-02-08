@@ -1,0 +1,75 @@
+\section{Renaming local variables to unique names}
+
+This code transformation is needed in order to avoid name clashes later on, when the static nested class which
+holds the variables potentially used after returning from a recursive call (both formal parameters and local variables)
+is generated. The fields of this class simulate the stack frame of the method.
+
+The JVMS\cite{jvms} (Java Virtual Machine Specification)\abbrev{JVMS}{Java Virtual Machine Specification} states the
+following\footnote{\url{http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-2.html#jvms-2.6.1}}:
+
+\begin{quote}
+    The Java Virtual Machine uses local variables to pass parameters on method invocation. On class method invocation,
+    any parameters are passed in consecutive local variables starting from local variable 0. On instance method invocation,
+    local variable 0 is always used to pass a reference to the object on which the instance method is being invoked
+    (\code{this} in the Java programming language). Any parameters are subsequently passed in consecutive local
+    variables starting from local variable 1.
+\end{quote}
+
+In the context of this refactoring, the recursive call is defined only as a method call expression whose qualifier is
+either absent or \code{this}, so the target reference of the instance method invocation never changes. This is why it is
+not a field of the frame class. In the case of class method invocations, there is no target reference (\code{this}).
+
+JLS specifies that\footnote{\url{https://docs.oracle.com/javase/specs/jls/se8/html/jls-6.html#jls-6.4}}:
+\begin{quote}
+    It is a compile-time error if the name of a formal parameter is used to declare a new variable within the body of
+    the method, constructor, or lambda expression, unless the new variable is declared within a class declaration
+    contained by the method, constructor, or lambda expression.
+
+    It is a compile-time error if the name of a local variable v is used to declare a new variable within the scope of
+    v, unless the new variable is declared within a class whose declaration is within the scope of v.
+\end{quote}
+
+This means that all the names of formal parameters and local variables whose scopes overlap are unique in the method
+body. In other words, a compile-time error occurs for the program in
+\labelindexref{Figure}{img:attempted-shadowing-of-a-local-variable}, but not for the program in
+\labelindexref{Figure}{img:no-shadow}.
+
+%\fig[width=4in]{src/img/attempted-shadowing-of-a-local-variable.png}{img:attempted-shadowing-of-a-local-variable}{Attempted shadowing of a local variable}
+%\fig[width=4in]{src/img/no-shadow.png}{img:no-shadow}{Two non-overlapping scopes}
+\begin{figure}[htb]
+    \centering
+    \begin{minipage}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{src/img/attempted-shadowing-of-a-local-variable-white.png}
+        \caption{Attempted shadowing of a local variable \label{img:attempted-shadowing-of-a-local-variable}}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{src/img/no-shadow-white.png}
+        \caption{Two non-overlapping scopes \label{img:no-shadow}}
+    \end{minipage}
+\end{figure}
+
+In the second example, it also means that the storage for the first \code{i} variable can be reused as the storage for
+the second \code{i} variable, thus reducing the number of fields in the generated frame class, as at any moment during
+the execution of the method, only one variable (formal parameter or local variable) of a certain name is in scope,
+meaning that its value can be used in the code.
+
+There are still problems if there is another variable in the method which shares the same name with other variable, but
+whose type is different. If this other variable is not renamed, when generating the frame class, a compile-time error
+will occur because JLS specifies that\footnote{\url{https://docs.oracle.com/javase/specs/jls/se8/html/jls-8.html#jls-FieldDeclaration}}:
+\begin{quote}
+    It is a compile-time error for the body of a class declaration to declare two fields with the same name.
+\end{quote}
+
+So all the relevant variables in the method (formal parameters and local variables) are collected as fields of a
+static nested frame class, which is used by the recursive method to save the state of the method call when
+recursing, thus simulating the call stack. The rule is that for all the variables with the same name and type, there
+is only one corresponding field in the frame class, but if there are variables with the same name, but different
+type, each variable in a type group has a different name and a different corresponding frame class field.
+
+In other words, the first pass ensures that all the variables in a method which have the same name also have the same
+type.
+
+%TODO: Add example of renaming.

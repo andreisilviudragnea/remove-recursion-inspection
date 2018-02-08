@@ -1,0 +1,14 @@
+digraph G {
+    node [shape=record];
+    conditionBlock [style=filled, color=black, fillcolor=lightgrey];
+    currentBlock [label="{currentBlock|...|jump(conditionBlock);}"];
+    conditionBlock [label="{conditionBlock|condition|{<true>true|<false>false}}"];
+    currentBlockAfterVisitingBodyBlock [label="{currentBlockAfterVisitingBodyBlock|...|jump(conditionBlock);}"];
+    bodyBlock [label="{bodyBlock|...}"];
+    mergeBlock [label="{mergeBlock|...}"];
+    currentBlock -> conditionBlock;
+    conditionBlock:true -> bodyBlock;
+    conditionBlock:false -> mergeBlock;
+    bodyBlock -> currentBlockAfterVisitingBodyBlock [style=dotted];
+    currentBlockAfterVisitingBodyBlock -> conditionBlock;
+}

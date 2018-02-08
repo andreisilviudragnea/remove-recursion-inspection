@@ -1,0 +1,15 @@
+\section{Removing unreachable blocks}
+
+There could be blocks generated in the previous pass which are \textit{unreachable}, meaning that there is no path from
+the \textit{entry block} (whose \code{id} is equal to \code{0}) of the control flow graph to these blocks. The entry
+block is reachable by default.
+
+This pass visits the control flow graph, which is a directed graph. If the method body does not contain loops, the graph
+is acyclic; otherwise, it contains at least one cycle. A breadth-first search algorithm is used to compute the set of
+reachable blocks from the entry block of the control flow graph. After the search is finished, the blocks which are not
+contained in the set of reachable blocks are removed from the list of all blocks representing the control flow graph.
+
+When this pass is applied to the CFG in \labelindexref{Figure}{img:cfg}, because the blocks with \code{id}s equal
+to \code{3} and \code{6} are unreachable from the entry block, they get removed. Even though the block with \code{id}
+\code{3} is reachable from the block with \code{id} \code{6}, it is not reachable from the entry block (with \code{id}
+\code{0}), so it still gets removed.
