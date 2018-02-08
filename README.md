@@ -11,3 +11,5 @@ control flow in the recursive method is complex.
 ## Repository structure
 - The [inspection](inspection) directory contains the source code of the inspection.
 - A detailed description of the algorithm is included in [thesis/thesis.pdf](thesis/thesis.pdf).
+- The [test-recursion](test-recursion) project contains examples of recursive methods and tests
+ to verify that the semantics of the code is preserved.
