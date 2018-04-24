@@ -15,11 +15,11 @@ import com.siyeh.ig.psiutils.ParenthesesUtils
  * @see com.siyeh.ig.psiutils.RecursionVisitor
  */
 fun PsiMethodCallExpression.isRecursiveCallTo(method: PsiMethod): Boolean {
-  val methodExpression = this.methodExpression
+  val methodExpression = methodExpression
   if (method.name != methodExpression.referenceName) {
     return false
   }
-  val calledMethod = this.resolveMethod()
+  val calledMethod = resolveMethod()
   if (method != calledMethod) {
     return false
   }
