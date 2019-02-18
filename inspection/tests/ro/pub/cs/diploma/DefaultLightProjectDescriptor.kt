@@ -17,7 +17,7 @@ import com.intellij.testFramework.LightProjectDescriptor
 class DefaultLightProjectDescriptor : LightProjectDescriptor() {
   override fun getModuleType(): ModuleType<*> = StdModuleTypes.JAVA
 
-  override fun getSdk(): Sdk? = JavaSdk.getInstance().createJdk("java 1.8", "/usr/lib/jvm/java-1.8.0-openjdk-amd64", false)
+  override fun getSdk(): Sdk? = JavaSdk.getInstance().createJdk("java 1.8", "/Library/Java/JavaVirtualMachines/jdk1.8.0_192.jdk/Contents/Home", false)
 
   public override fun configureModule(module: Module, model: ModifiableRootModel, contentEntry: ContentEntry) {
     val extension = model.getModuleExtension(LanguageLevelModuleExtension::class.java)
