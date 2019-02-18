@@ -10,7 +10,7 @@ import ro.pub.cs.diploma.statement
 private fun PsiDeclarationStatement.getAssignments(frameVarName: String): List<String> {
   return declaredElements
       .filterIsInstance(PsiLocalVariable::class.java)
-      .filter({ it.hasInitializer() })
+      .filter { it.hasInitializer() }
       .map { "$frameVarName.${it.name} = ${RefactoringUtil.convertInitializerToNormalExpression(it.initializer, it.type).text}" }
 }
 

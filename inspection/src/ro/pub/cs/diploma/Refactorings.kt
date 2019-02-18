@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NonNls
  */
 fun replaceForEachLoopWithIteratorForLoop(statement: PsiForeachStatement, method: PsiMethod) {
     val iteratedValue = statement.iteratedValue ?: return
-    iteratedValue.type as? PsiClassType ?: return
+    if (iteratedValue.type !is PsiClassType) return
     @NonNls val methodCall = StringBuilder()
     if (ParenthesesUtils.getPrecedence(iteratedValue) > ParenthesesUtils.METHOD_CALL_PRECEDENCE) {
         methodCall.append('(').append(iteratedValue.text).append(')')

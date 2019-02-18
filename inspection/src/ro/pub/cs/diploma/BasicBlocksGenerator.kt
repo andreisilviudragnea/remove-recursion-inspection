@@ -148,8 +148,8 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
     val actualConditionBlock = conditionBlock ?: bodyBlock
     val actualUpdateBlock = updateBlock ?: actualConditionBlock
 
-    myBreakTargets.put(statement, mergeBlock)
-    myContinueTargets.put(statement, actualUpdateBlock)
+    myBreakTargets[statement] = mergeBlock
+    myContinueTargets[statement] = actualUpdateBlock
 
     myCurrentBlock.addUnconditionalJump(if (atLeastOnce) bodyBlock else actualConditionBlock)
 
@@ -193,7 +193,7 @@ internal class BasicBlocksGenerator(private val myMethod: PsiMethod,
 
   override fun visitSwitchStatement(switchStatement: PsiSwitchStatement) {
     val mergeBlock = newBlock()
-    myBreakTargets.put(switchStatement, mergeBlock)
+    myBreakTargets[switchStatement] = mergeBlock
 
     val body = switchStatement.body ?: return
     val statements = ArrayList<Statement>()

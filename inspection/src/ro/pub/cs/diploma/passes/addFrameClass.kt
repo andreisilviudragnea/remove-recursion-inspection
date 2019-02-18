@@ -7,7 +7,7 @@ fun addFrameClass(method: PsiMethod, nameManager: NameManager) {
   val variables = LinkedHashMap<String, PsiVariable>()
   method.accept(object : JavaRecursiveElementVisitor() {
     private fun processVariable(variable: PsiVariable) {
-      variables.put(variable.name ?: return, variable)
+      variables[variable.name ?: return] = variable
     }
 
     override fun visitParameter(parameter: PsiParameter) {
