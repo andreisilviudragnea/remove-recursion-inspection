@@ -6,9 +6,8 @@ import com.intellij.psi.PsiMethod
 import ro.pub.cs.diploma.ir.Block
 import ro.pub.cs.diploma.ir.InlineVisitor
 import ro.pub.cs.diploma.passes.*
-import kotlin.coroutines.experimental.buildSequence
 
-fun createIterativeBody(steps: Int, method: PsiMethod, nameManager: NameManager) = buildSequence {
+fun createIterativeBody(steps: Int, method: PsiMethod, nameManager: NameManager) = sequence {
   replaceSingleStatementsWithBlockStatements(method)
   yield(Unit)
 
@@ -25,7 +24,7 @@ fun createIterativeBody(steps: Int, method: PsiMethod, nameManager: NameManager)
   addFrameClass(method, nameManager)
   yield(Unit)
 
-  val incorporatedBody = incorporateBody(method, nameManager) ?: return@buildSequence
+  val incorporatedBody = incorporateBody(method, nameManager) ?: return@sequence
   yield(Unit)
 
   replaceReferencesWithFieldAccesses(method, incorporatedBody, nameManager)
