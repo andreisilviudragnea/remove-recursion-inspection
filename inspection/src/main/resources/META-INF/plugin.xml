@@ -1,0 +1,101 @@
+<idea-plugin>
+    <id>com.remove.recursion.inspection</id>
+    <name>Remove Recursion Inspection</name>
+    <version>0.2</version>
+    <vendor email="andreisilviudragnea@gmail.com"
+            url="https://github.com/andreisilviudragnea/remove-recursion-inspection">
+        Andrei Silviu Dragnea
+    </vendor>
+
+    <description><![CDATA[
+      This plugin adds a complex inspection which detects and reports recursive calls which may exhaust stack space.
+      Methods which make recursive calls can be replaced with methods that don't make recursive calls, by simulating
+      the call stack in the user program code. The initial method code is replaced with a while statement
+      containing a switch statement that jumps between basic blocks of code in the original method.
+    ]]></description>
+
+    <change-notes><![CDATA[
+      Initial release.
+    ]]>
+    </change-notes>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="181"/>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <depends>com.intellij.modules.java</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <localInspection groupPath="Java" language="JAVA" shortName="RemoveRecursion"
+                         bundle="RemoveRecursionBundle" key="remove.recursion.display.name"
+                         groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"
+                         enabledByDefault="true" level="WARNING"
+                         implementationClass="ro.pub.cs.diploma.RemoveRecursionInspection"/>
+        <!--<localInspection groupPath="Java" language="JAVA" shortName="ReplaceSingleStatementsWithBlockStatements"-->
+        <!--bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="replace.single.statements.with.block.statements"-->
+        <!--groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"-->
+        <!--enabledByDefault="true" level="WARNING"-->
+        <!--implementationClass="ro.pub.cs.diploma.inspections.ReplaceSingleStatementsWithBlockStatementsInspection"/>-->
+        <!--<localInspection groupPath="Java" language="JAVA" shortName="RenameVariablesToUniqueNames"-->
+        <!--bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="rename.variables.to.unique.names"-->
+        <!--groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"-->
+        <!--enabledByDefault="true" level="WARNING"-->
+        <!--implementationClass="ro.pub.cs.diploma.inspections.RenameVariablesToUniqueNamesInspection"/>-->
+        <!--<localInspection groupPath="Java" language="JAVA" shortName="ReplaceForEachLoopsWithForLoops"-->
+        <!--bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="replace.foreach.loops.with.for.loops"-->
+        <!--groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"-->
+        <!--enabledByDefault="true" level="WARNING"-->
+        <!--implementationClass="ro.pub.cs.diploma.inspections.ReplaceForEachLoopsWithForLoopsInspection"/>-->
+        <!--<localInspection groupPath="Java" language="JAVA" shortName="ExtractRecursiveCallsToStatements"-->
+        <!--bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="extract.recursive.calls.to.statements"-->
+        <!--groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"-->
+        <!--enabledByDefault="true" level="WARNING"-->
+        <!--implementationClass="ro.pub.cs.diploma.inspections.ExtractRecursiveCallsToStatementsInspection"/>-->
+        <!--<localInspection groupPath="Java" language="JAVA" shortName="AddFrameClass"-->
+        <!--bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="add.frame.class"-->
+        <!--groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"-->
+        <!--enabledByDefault="true" level="WARNING"-->
+        <!--implementationClass="ro.pub.cs.diploma.inspections.AddFrameClassInspection"/>-->
+        <!--<localInspection groupPath="Java" language="JAVA" shortName="IncorporateBody"-->
+        <!--bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="incorporate.body"-->
+        <!--groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"-->
+        <!--enabledByDefault="true" level="WARNING"-->
+        <!--implementationClass="ro.pub.cs.diploma.inspections.IncorporateBodyInspection"/>-->
+        <!--<localInspection groupPath="Java" language="JAVA" shortName="ReplaceIdentifierWithFrameAccess"-->
+        <!--bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="replace.identifier.with.frame.access"-->
+        <!--groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"-->
+        <!--enabledByDefault="true" level="WARNING"-->
+        <!--implementationClass="ro.pub.cs.diploma.inspections.ReplaceIdentifierWithFrameAccessInspection"/>-->
+        <!--<localInspection groupPath="Java" language="JAVA" shortName="ReplaceDeclarationsHavingInitializersWithAssignments"-->
+        <!--bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="replace.declarations.having.initializers.with.assignments"-->
+        <!--groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"-->
+        <!--enabledByDefault="true" level="WARNING"-->
+        <!--implementationClass="ro.pub.cs.diploma.inspections.ReplaceDeclarationsHavingInitializersWithAssignmentsInspection"/>-->
+        <!--<localInspection groupPath="Java" language="JAVA" shortName="GenerateCFG"-->
+        <!--bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="generate.cfg"-->
+        <!--groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"-->
+        <!--enabledByDefault="true" level="WARNING"-->
+        <!--implementationClass="ro.pub.cs.diploma.inspections.GenerateCFGInspection"/>-->
+        <!--<localInspection groupPath="Java" language="JAVA" shortName="RemoveUnreachableBlocks"-->
+        <!--bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="remove.unreachable.blocks"-->
+        <!--groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"-->
+        <!--enabledByDefault="true" level="WARNING"-->
+        <!--implementationClass="ro.pub.cs.diploma.inspections.RemoveUnreachableBlocksInspection"/>-->
+        <!--<localInspection groupPath="Java" language="JAVA" shortName="InlineTrivialBlocks"-->
+        <!--bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="inline.trivial.blocks"-->
+        <!--groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"-->
+        <!--enabledByDefault="true" level="WARNING"-->
+        <!--implementationClass="ro.pub.cs.diploma.inspections.InlineTrivialBlocksInspection"/>-->
+        <!--<localInspection groupPath="Java" language="JAVA" shortName="InlineBlocks"-->
+        <!--bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="inline.blocks"-->
+        <!--groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"-->
+        <!--enabledByDefault="true" level="WARNING"-->
+        <!--implementationClass="ro.pub.cs.diploma.inspections.InlineBlocksInspection"/>-->
+        <!--<localInspection groupPath="Java" language="JAVA" shortName="ReplaceReturnStatements"-->
+        <!--bundle="ro.pub.cs.diploma.RemoveRecursionBundle" key="replace.return.statements"-->
+        <!--groupBundle="messages.InspectionsBundle" groupKey="group.names.performance.issues"-->
+        <!--enabledByDefault="true" level="WARNING"-->
+        <!--implementationClass="ro.pub.cs.diploma.inspections.ReplaceReturnStatementsInspection"/>-->
+    </extensions>
+</idea-plugin>
