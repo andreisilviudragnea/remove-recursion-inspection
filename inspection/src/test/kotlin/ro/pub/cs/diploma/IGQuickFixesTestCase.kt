@@ -3,13 +3,13 @@ package ro.pub.cs.diploma
 import com.intellij.openapi.roots.LanguageLevelProjectExtension
 import com.intellij.pom.java.LanguageLevel
 import com.intellij.testFramework.LightProjectDescriptor
-import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
+import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase
 import junit.framework.TestCase
 
 /*
  * @see com.siyeh.ig.IGQuickFixesTestCase
  */
-abstract class IGQuickFixesTestCase : LightCodeInsightFixtureTestCase() {
+abstract class IGQuickFixesTestCase : LightJavaCodeInsightFixtureTestCase() {
     internal var myDefaultHint: String? = null
     internal var myRelativePath: String? = null
 

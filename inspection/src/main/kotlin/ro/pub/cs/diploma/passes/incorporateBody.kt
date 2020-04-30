@@ -31,7 +31,7 @@ fun incorporateBody(method: PsiMethod, nameManager: NameManager): PsiCodeBlock? 
   val styleManager = method.getStyleManager()
   newBody.add(styleManager.shortenClassReferences(factory.statement(
       "final java.util.Deque<$frameClassName> $stackVarName = new java.util.ArrayDeque<>();")))
-  newBody.add(factory.createPushStatement(frameClassName, stackVarName, method.parameterList.parameters) { it.name ?: "" })
+  newBody.add(factory.createPushStatement(frameClassName, stackVarName, method.parameterList.parameters) { it.name })
 
   val returnType = method.returnType ?: return null
   val retVarName = nameManager.retVarName

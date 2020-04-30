@@ -52,7 +52,7 @@ fun addFrameClass(method: PsiMethod, nameManager: NameManager) {
   val body = constructor.body ?: return
   val parameterList = constructor.parameterList
   for (parameter in method.parameterList.parameters) {
-    val name = parameter.name ?: return
+    val name = parameter.name
     parameterList.add(factory.createParameter(name, parameter.type))
     body.add(factory.statement("this.$name = $name;"))
   }
