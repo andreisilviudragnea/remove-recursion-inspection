@@ -2,13 +2,21 @@ package ro.pub.cs.diploma
 
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.codeStyle.JavaCodeStyleManager
+import java.util.Locale
 
 class NameManager(private val method: PsiMethod) {
     private val styleManager: JavaCodeStyleManager = method.getStyleManager()
 
-    private fun getName(baseName: String): String = styleManager.suggestUniqueVariableName(baseName, method, true)
+    private fun getName(baseName: String): String =
+        styleManager.suggestUniqueVariableName(baseName, method, true)
 
-    val frameClassName: String = "${method.name.capitalize()}$FRAME"
+    val frameClassName: String = "${
+    method.name.replaceFirstChar {
+        if (it.isLowerCase()) it.titlecase(
+            Locale.getDefault()
+        ) else it.toString()
+    }
+    }$FRAME"
 
     val switchLabelName: String = SWITCH_LABEL
 

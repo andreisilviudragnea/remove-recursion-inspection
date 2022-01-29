@@ -16,8 +16,8 @@ import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiStatement
 import com.intellij.psi.PsiThisExpression
+import com.intellij.psi.util.PsiUtil
 import com.siyeh.ig.performance.TailRecursionInspection
-import com.siyeh.ig.psiutils.ParenthesesUtils
 
 /**
  * Checks if the expression is a recursive method call to [method].
@@ -39,7 +39,7 @@ fun PsiMethodCallExpression.isRecursiveCallTo(method: PsiMethod): Boolean {
     if (method.hasModifierProperty(PsiModifier.STATIC) || method.hasModifierProperty(PsiModifier.PRIVATE)) {
         return true
     }
-    val qualifier = ParenthesesUtils.stripParentheses(methodExpression.qualifierExpression)
+    val qualifier = PsiUtil.skipParenthesizedExprDown(methodExpression.qualifierExpression)
     return qualifier == null || qualifier is PsiThisExpression
 }
 

@@ -20,13 +20,13 @@ tasks {
     compileKotlin {
         kotlinOptions {
             jvmTarget = "11"
-//      allWarningsAsErrors = true
+            allWarningsAsErrors = true
         }
     }
     compileTestKotlin {
         kotlinOptions {
             jvmTarget = "11"
-//      allWarningsAsErrors = true
+            allWarningsAsErrors = true
         }
     }
     runIde {

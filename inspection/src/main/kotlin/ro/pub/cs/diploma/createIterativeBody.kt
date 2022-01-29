@@ -50,7 +50,7 @@ fun createIterativeBody(steps: Int, method: PsiMethod, nameManager: NameManager)
     val collect = blocks.map { it.toDot() }.flatten().toMutableList()
     collect.add(0, "node [shape=record];")
 
-    val cfg = "digraph cfg {\n\t${collect.joinToString("\n\t")}\n}"
+    "digraph cfg {\n\t${collect.joinToString("\n\t")}\n}"
 
     val optimizedBlocks = applyBlocksOptimizations(steps, blocks)
 
@@ -100,7 +100,7 @@ private fun applyBlocksOptimizations(steps: Int, blocks: List<Block>): List<Bloc
     val collect = nonTrivialReachableBlocks.map { it.toDot() }.flatten().toMutableList()
     collect.add(0, "node [shape=record];")
 
-    val cfg = "digraph cfg {\n\t${collect.joinToString("\n\t")}\n}"
+    "digraph cfg {\n\t${collect.joinToString("\n\t")}\n}"
 
     if (steps == 2) {
         nonTrivialReachableBlocks.forEach { block -> block.setDoNotInline(true) }
