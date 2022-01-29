@@ -1,8 +1,25 @@
 package ro.pub.cs.diploma
 
 import com.intellij.openapi.util.text.StringUtil
-import com.intellij.psi.*
-import com.intellij.psi.codeStyle.*
+import com.intellij.psi.GenericsUtil
+import com.intellij.psi.PsiArrayAccessExpression
+import com.intellij.psi.PsiArrayType
+import com.intellij.psi.PsiBlockStatement
+import com.intellij.psi.PsiClassType
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiExpression
+import com.intellij.psi.PsiForeachStatement
+import com.intellij.psi.PsiJavaCodeReferenceElement
+import com.intellij.psi.PsiLabeledStatement
+import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiMethodCallExpression
+import com.intellij.psi.PsiNewExpression
+import com.intellij.psi.PsiParenthesizedExpression
+import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypeCastExpression
+import com.intellij.psi.PsiVariable
+import com.intellij.psi.codeStyle.JavaCodeStyleSettings
+import com.intellij.psi.codeStyle.VariableKind
 import com.siyeh.ig.PsiReplacementUtil
 import com.siyeh.ig.psiutils.ParenthesesUtils
 import org.jetbrains.annotations.NonNls
@@ -38,7 +55,7 @@ fun replaceForEachLoopWithIteratorForLoop(statement: PsiForeachStatement, method
         val block = body.codeBlock
         val children = block.children
         for (i in 1 until children.size - 1) {
-            //skip the braces
+            // skip the braces
             newStatement.append(children[i].text)
         }
     } else {
@@ -83,7 +100,7 @@ fun replaceForEachLoopWithIndexedForLoop(statement: PsiForeachStatement) {
         val block = body.codeBlock
         val children = block.children
         for (i in 1 until children.size - 1) {
-            //skip the braces
+            // skip the braces
             newStatement.append(children[i].text)
         }
     } else {
@@ -93,10 +110,13 @@ fun replaceForEachLoopWithIndexedForLoop(statement: PsiForeachStatement) {
     PsiReplacementUtil.replaceStatementAndShortenClassNames(statement, newStatement.toString())
 }
 
-private fun createForLoopDeclaration(iteratedValue: PsiExpression,
-                                     array: Boolean,
-                                     iteratedValueText: String?,
-                                     newStatement: StringBuilder, indexText: String) {
+private fun createForLoopDeclaration(
+    iteratedValue: PsiExpression,
+    array: Boolean,
+    iteratedValueText: String?,
+    newStatement: StringBuilder,
+    indexText: String
+) {
     newStatement.append("for(int ")
     newStatement.append(indexText)
     newStatement.append(" = 0; ")

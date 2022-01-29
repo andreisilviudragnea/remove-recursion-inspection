@@ -4,24 +4,24 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.codeStyle.JavaCodeStyleManager
 
 class NameManager(private val method: PsiMethod) {
-  private val styleManager: JavaCodeStyleManager = method.getStyleManager()
+    private val styleManager: JavaCodeStyleManager = method.getStyleManager()
 
-  private fun getName(baseName: String): String = styleManager.suggestUniqueVariableName(baseName, method, true)
+    private fun getName(baseName: String): String = styleManager.suggestUniqueVariableName(baseName, method, true)
 
-  val frameClassName: String = "${method.name.capitalize()}$FRAME"
+    val frameClassName: String = "${method.name.capitalize()}$FRAME"
 
-  val switchLabelName: String = SWITCH_LABEL
+    val switchLabelName: String = SWITCH_LABEL
 
-  val blockFieldName: String by lazy(LazyThreadSafetyMode.NONE) {
-    getName(BLOCK_FIELD_NAME)
-  }
-  val frameVarName: String by lazy(LazyThreadSafetyMode.NONE) {
-    getName(FRAME_VAR_NAME)
-  }
-  val stackVarName: String by lazy(LazyThreadSafetyMode.NONE) {
-    getName(STACK_VAR_NAME)
-  }
-  val retVarName: String by lazy(LazyThreadSafetyMode.NONE) {
-    getName(RET_VAR_NAME)
-  }
+    val blockFieldName: String by lazy(LazyThreadSafetyMode.NONE) {
+        getName(BLOCK_FIELD_NAME)
+    }
+    val frameVarName: String by lazy(LazyThreadSafetyMode.NONE) {
+        getName(FRAME_VAR_NAME)
+    }
+    val stackVarName: String by lazy(LazyThreadSafetyMode.NONE) {
+        getName(STACK_VAR_NAME)
+    }
+    val retVarName: String by lazy(LazyThreadSafetyMode.NONE) {
+        getName(RET_VAR_NAME)
+    }
 }

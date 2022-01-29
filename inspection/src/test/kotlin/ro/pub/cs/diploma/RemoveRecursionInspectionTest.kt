@@ -8,17 +8,17 @@ import com.siyeh.ig.LightJavaInspectionTestCase
  * @see com.siyeh.ig.performance.TailRecursionInspectionTest
  */
 class RemoveRecursionInspectionTest : LightJavaInspectionTestCase() {
-  override fun getProjectDescriptor(): LightProjectDescriptor = DefaultLightProjectDescriptor()
+    override fun getProjectDescriptor(): LightProjectDescriptor = DefaultLightProjectDescriptor()
 
-  override fun getInspection(): InspectionProfileEntry? = RemoveRecursionInspection()
+    override fun getInspection(): InspectionProfileEntry? = RemoveRecursionInspection()
 
-  override fun getTestDataPath(): String = "src/test/resources/testdata/inspection"
+    override fun getTestDataPath(): String = "src/test/resources/testdata/inspection"
 
-  fun testLambdaWithReturnStmt() {
-    doTest()
-  }
+    fun testLambdaWithReturnStmt() {
+        doTest()
+    }
 
-  fun testTailRecursion() {
-    doTest()
-  }
+    fun testTailRecursion() {
+        doTest()
+    }
 }
