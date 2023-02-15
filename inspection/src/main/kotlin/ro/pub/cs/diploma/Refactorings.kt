@@ -39,6 +39,7 @@ fun replaceForEachLoopWithIteratorForLoop(statement: PsiForeachStatement, method
     methodCall.append(".iterator()")
     val iteratorCall = method.getFactory().createExpressionFromText(methodCall.toString(), iteratedValue)
     val variableType = GenericsUtil.getVariableTypeByExpressionType(iteratorCall.type) ?: return
+
     @NonNls val newStatement = StringBuilder()
     newStatement.append("for(").append(variableType.canonicalText).append(' ')
     val iterator = method.getStyleManager().suggestUniqueVariableName("iterator", method, true)
@@ -75,6 +76,7 @@ fun replaceForEachLoopWithIndexedForLoop(statement: PsiForeachStatement) {
     val grandParent = statement.parent
     val context = grandParent as? PsiLabeledStatement ?: statement
     val iteratedValueText = getReferenceToIterate(iteratedValue, context)
+
     @NonNls val newStatement = StringBuilder()
     val indexText = createVariableName("i", PsiType.INT, statement)
     createForLoopDeclaration(iteratedValue, isArray, iteratedValueText, newStatement, indexText)
@@ -188,7 +190,9 @@ private fun getReferenceToIterate(expression: PsiExpression, context: PsiElement
                 // maybe should not do this for local variables outside of
                 // anonymous classes
                 variableName
-            } else createVariable(variableName, expression, context)
+            } else {
+                createVariable(variableName, expression, context)
+            }
         }
         else -> return expression.text
     }
@@ -208,7 +212,9 @@ private fun createVariableName(baseName: String, assignedExpression: PsiExpressi
     val names = codeStyleManager.suggestVariableName(VariableKind.LOCAL_VARIABLE, baseName, assignedExpression, null)
     return if (names.names.isEmpty()) {
         codeStyleManager.suggestUniqueVariableName(baseName, assignedExpression, true)
-    } else codeStyleManager.suggestUniqueVariableName(names.names[0], assignedExpression, true)
+    } else {
+        codeStyleManager.suggestUniqueVariableName(names.names[0], assignedExpression, true)
+    }
 }
 
 private fun createVariableName(baseName: String, type: PsiType, context: PsiElement): String {
@@ -216,5 +222,7 @@ private fun createVariableName(baseName: String, type: PsiType, context: PsiElem
     val names = codeStyleManager.suggestVariableName(VariableKind.LOCAL_VARIABLE, baseName, null, type)
     return if (names.names.isEmpty()) {
         codeStyleManager.suggestUniqueVariableName(baseName, context, true)
-    } else codeStyleManager.suggestUniqueVariableName(names.names[0], context, true)
+    } else {
+        codeStyleManager.suggestUniqueVariableName(names.names[0], context, true)
+    }
 }

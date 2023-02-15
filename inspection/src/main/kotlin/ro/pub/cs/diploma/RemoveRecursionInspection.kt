@@ -22,12 +22,14 @@ class RemoveRecursionInspection : BaseInspection() {
         val containingMethod = infos[0] as PsiMethod
         return if (!mayBeReplacedByIterativeMethod(containingMethod)) {
             null
-        } else object : InspectionGadgetsFix() {
-            override fun getFamilyName(): String = RemoveRecursionBundle.message("remove.recursion.replace.quickfix")
+        } else {
+            object : InspectionGadgetsFix() {
+                override fun getFamilyName(): String = RemoveRecursionBundle.message("remove.recursion.replace.quickfix")
 
-            public override fun doFix(project: Project, descriptor: ProblemDescriptor) {
-                val method = descriptor.psiElement.getContainingMethod() ?: return
-                createIterativeBody(4, method, NameManager(method)).take(9).toList()
+                public override fun doFix(project: Project, descriptor: ProblemDescriptor) {
+                    val method = descriptor.psiElement.getContainingMethod() ?: return
+                    createIterativeBody(4, method, NameManager(method)).take(9).toList()
+                }
             }
         }
     }
