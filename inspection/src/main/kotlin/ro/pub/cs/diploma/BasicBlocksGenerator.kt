@@ -116,7 +116,8 @@ internal class BasicBlocksGenerator(
     override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
         myCurrentBlock.add(
             myFactory.createPushStatement(
-                myNameManager.frameClassName, myNameManager.stackVarName,
+                myNameManager.frameClassName,
+                myNameManager.stackVarName,
                 expression.argumentList.expressions
             ) { it.text }
         )

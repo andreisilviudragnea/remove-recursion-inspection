@@ -12,9 +12,11 @@ class NameManager(private val method: PsiMethod) {
 
     val frameClassName: String = "${
     method.name.replaceFirstChar {
-        if (it.isLowerCase()) it.titlecase(
-            Locale.getDefault()
-        ) else it.toString()
+        if (it.isLowerCase()) {
+            it.titlecase(Locale.getDefault())
+        } else {
+            it.toString()
+        }
     }
     }$FRAME"
 

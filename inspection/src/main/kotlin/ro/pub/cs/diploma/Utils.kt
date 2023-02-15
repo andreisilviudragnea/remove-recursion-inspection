@@ -29,8 +29,11 @@ fun <T : PsiElement> PsiElementFactory.createPushStatement(
 fun PsiElement.getFactory(): PsiElementFactory = JavaPsiFacade.getElementFactory(project)
 fun PsiElement.getStyleManager(): JavaCodeStyleManager = JavaCodeStyleManager.getInstance(project)
 fun PsiElement.getContainingMethod() = PsiTreeUtil.getParentOfType(
-    this, PsiMethod::class.java, true,
-    PsiClass::class.java, PsiLambdaExpression::class.java
+    this,
+    PsiMethod::class.java,
+    true,
+    PsiClass::class.java,
+    PsiLambdaExpression::class.java
 )
 
 fun PsiMethod.getPsiForEachStatements(): List<PsiForeachStatement> {
