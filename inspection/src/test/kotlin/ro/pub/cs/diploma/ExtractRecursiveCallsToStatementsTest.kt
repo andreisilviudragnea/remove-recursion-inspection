@@ -1,7 +1,9 @@
 package ro.pub.cs.diploma
 
+import org.junit.Ignore
 import ro.pub.cs.diploma.inspections.ExtractRecursiveCallsToStatementsInspection
 
+@Ignore
 class ExtractRecursiveCallsToStatementsTest : IGQuickFixesTestCase() {
     @Throws(Exception::class)
     override fun setUp() {

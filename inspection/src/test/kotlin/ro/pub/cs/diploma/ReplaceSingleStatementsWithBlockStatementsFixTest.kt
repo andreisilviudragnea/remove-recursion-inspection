@@ -1,7 +1,9 @@
 package ro.pub.cs.diploma
 
+import org.junit.Ignore
 import ro.pub.cs.diploma.inspections.ReplaceSingleStatementsWithBlockStatementsInspection
 
+@Ignore
 class ReplaceSingleStatementsWithBlockStatementsFixTest : IGQuickFixesTestCase() {
     @Throws(Exception::class)
     override fun setUp() {

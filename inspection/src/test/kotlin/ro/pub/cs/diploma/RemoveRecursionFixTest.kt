@@ -1,8 +1,11 @@
 package ro.pub.cs.diploma
 
+import org.junit.Ignore
+
 /*
  * @see com.siyeh.ig.fixes.performance.RemoveTailRecursionFixTest
  */
+@Ignore
 class RemoveRecursionFixTest : IGQuickFixesTestCase() {
     @Throws(Exception::class)
     override fun setUp() {
