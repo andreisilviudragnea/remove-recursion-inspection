@@ -13,8 +13,8 @@ import com.intellij.psi.PsiLambdaExpression
 import com.intellij.psi.PsiLocalVariable
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
-import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiStatement
+import com.intellij.psi.PsiTypes
 import com.intellij.psi.util.PsiTreeUtil
 import ro.pub.cs.diploma.TEMP
 import ro.pub.cs.diploma.expression
@@ -24,7 +24,7 @@ import ro.pub.cs.diploma.isRecursiveCallTo
 
 fun extractRecursiveCallsToStatements(method: PsiMethod) {
     val returnType = method.returnType ?: return
-    if (returnType == PsiPrimitiveType.VOID) {
+    if (returnType == PsiTypes.voidType()) {
         return
     }
 

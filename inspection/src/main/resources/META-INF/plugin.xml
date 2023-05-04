@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.remove.recursion.inspection</id>
     <name>Remove Recursion Inspection</name>
-    <version>0.2</version>
+    <version>0.3.0</version>
     <vendor email="andreisilviudragnea@gmail.com"
             url="https://github.com/andreisilviudragnea/remove-recursion-inspection">
         Andrei Silviu Dragnea
@@ -20,7 +20,7 @@
     </change-notes>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-    <idea-version since-build="181"/>
+    <idea-version since-build="231"/>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->

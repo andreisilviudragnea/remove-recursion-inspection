@@ -17,6 +17,7 @@ import com.intellij.psi.PsiNewExpression
 import com.intellij.psi.PsiParenthesizedExpression
 import com.intellij.psi.PsiType
 import com.intellij.psi.PsiTypeCastExpression
+import com.intellij.psi.PsiTypes
 import com.intellij.psi.PsiVariable
 import com.intellij.psi.codeStyle.JavaCodeStyleSettings
 import com.intellij.psi.codeStyle.VariableKind
@@ -78,7 +79,7 @@ fun replaceForEachLoopWithIndexedForLoop(statement: PsiForeachStatement) {
     val iteratedValueText = getReferenceToIterate(iteratedValue, context)
 
     @NonNls val newStatement = StringBuilder()
-    val indexText = createVariableName("i", PsiType.INT, statement)
+    val indexText = createVariableName("i", PsiTypes.intType(), statement)
     createForLoopDeclaration(iteratedValue, isArray, iteratedValueText, newStatement, indexText)
     if (JavaCodeStyleSettings.getInstance(statement.project).GENERATE_FINAL_LOCALS) {
         newStatement.append("final ")

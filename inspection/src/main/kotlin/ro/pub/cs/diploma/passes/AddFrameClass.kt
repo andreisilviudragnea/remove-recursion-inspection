@@ -7,7 +7,7 @@ import com.intellij.psi.PsiLocalVariable
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiParameter
-import com.intellij.psi.PsiPrimitiveType
+import com.intellij.psi.PsiTypes
 import com.intellij.psi.PsiVariable
 import ro.pub.cs.diploma.NameManager
 import ro.pub.cs.diploma.containsInScopeRecursiveCallsTo
@@ -57,7 +57,7 @@ fun addFrameClass(method: PsiMethod, nameManager: NameManager) {
             )
         }
         .forEach { frameClass.add(it) }
-    frameClass.add(factory.createField(nameManager.blockFieldName, PsiPrimitiveType.INT))
+    frameClass.add(factory.createField(nameManager.blockFieldName, PsiTypes.intType()))
 
     // Create constructor
     val constructor = factory.createConstructor(frameClassName)

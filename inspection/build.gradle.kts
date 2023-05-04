@@ -4,8 +4,10 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "11.3.2"
 }
 
+version = "0.3.0"
+
 intellij {
-    version.set("IU-2021.3.2")
+    version.set("IC-2023.1.1")
 
     plugins.set(listOf("java"))
 
@@ -13,19 +15,19 @@ intellij {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_17
 }
 
 tasks {
     compileKotlin {
         kotlinOptions {
-            jvmTarget = "11"
+            jvmTarget = "17"
             allWarningsAsErrors = true
         }
     }
     compileTestKotlin {
         kotlinOptions {
-            jvmTarget = "11"
+            jvmTarget = "17"
             allWarningsAsErrors = true
         }
     }

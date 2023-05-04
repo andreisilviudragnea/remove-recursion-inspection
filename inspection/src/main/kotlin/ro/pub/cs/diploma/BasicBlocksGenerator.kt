@@ -18,11 +18,11 @@ import com.intellij.psi.PsiLambdaExpression
 import com.intellij.psi.PsiLoopStatement
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
-import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiReturnStatement
 import com.intellij.psi.PsiStatement
 import com.intellij.psi.PsiSwitchLabelStatement
 import com.intellij.psi.PsiSwitchStatement
+import com.intellij.psi.PsiTypes
 import com.intellij.psi.PsiWhileStatement
 import com.intellij.psi.util.PsiTreeUtil
 import com.siyeh.ig.psiutils.ExpressionUtils
@@ -104,7 +104,7 @@ internal class BasicBlocksGenerator(
 
         val statements = block.statements
         // This is a hack, this method gets called only for the method block, not for blocks of block statements.
-        if (PsiPrimitiveType.VOID == myMethod.returnType && statements.last() !is PsiReturnStatement) {
+        if (PsiTypes.voidType() == myMethod.returnType && statements.last() !is PsiReturnStatement) {
             myCurrentBlock.addReturnStatement(myFactory.statement("return;") as PsiReturnStatement)
         }
     }
@@ -129,7 +129,7 @@ internal class BasicBlocksGenerator(
         myCurrentBlock = block
 
         val returnType = myMethod.returnType ?: return
-        if (returnType != PsiPrimitiveType.VOID) {
+        if (returnType != PsiTypes.voidType()) {
             val parent = PsiTreeUtil.getParentOfType(expression, PsiStatement::class.java, true) ?: return
             expression.replace(myFactory.expression(myNameManager.retVarName))
             myCurrentBlock.add(parent)

@@ -3,8 +3,8 @@ package ro.pub.cs.diploma.passes
 import com.intellij.psi.PsiBlockStatement
 import com.intellij.psi.PsiCodeBlock
 import com.intellij.psi.PsiMethod
-import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypes
 import com.intellij.psi.PsiWhileStatement
 import ro.pub.cs.diploma.NameManager
 import ro.pub.cs.diploma.createPushStatement
@@ -13,14 +13,14 @@ import ro.pub.cs.diploma.getStyleManager
 import ro.pub.cs.diploma.statement
 
 private fun PsiType.getInitialValue(): String = when (this) {
-    PsiPrimitiveType.BYTE -> "(byte) 0"
-    PsiPrimitiveType.SHORT -> "(short) 0"
-    PsiPrimitiveType.INT -> "0"
-    PsiPrimitiveType.LONG -> "0L"
-    PsiPrimitiveType.FLOAT -> "0.0f"
-    PsiPrimitiveType.DOUBLE -> "0.0d"
-    PsiPrimitiveType.CHAR -> "'\u0000'"
-    PsiPrimitiveType.BOOLEAN -> "false"
+    PsiTypes.byteType() -> "(byte) 0"
+    PsiTypes.shortType() -> "(short) 0"
+    PsiTypes.intType() -> "0"
+    PsiTypes.longType() -> "0L"
+    PsiTypes.floatType() -> "0.0f"
+    PsiTypes.doubleType() -> "0.0d"
+    PsiTypes.charType() -> "'\u0000'"
+    PsiTypes.booleanType() -> "false"
     else -> "null"
 }
 
@@ -50,7 +50,7 @@ fun incorporateBody(method: PsiMethod, nameManager: NameManager): PsiCodeBlock? 
 
     val returnType = method.returnType ?: return null
     val retVarName = nameManager.retVarName
-    if (returnType != PsiPrimitiveType.VOID) {
+    if (returnType != PsiTypes.voidType()) {
         newBody.add(
             styleManager.shortenClassReferences(
                 factory.statement(
@@ -62,7 +62,7 @@ fun incorporateBody(method: PsiMethod, nameManager: NameManager): PsiCodeBlock? 
 
     val incorporatedWhileStatement = newBody.add(whileStatement) as PsiWhileStatement
 
-    if (returnType != PsiPrimitiveType.VOID) {
+    if (returnType != PsiTypes.voidType()) {
         newBody.addAfter(factory.statement("return $retVarName;"), incorporatedWhileStatement)
     }
 
