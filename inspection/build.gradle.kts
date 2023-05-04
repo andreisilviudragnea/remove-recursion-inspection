@@ -4,6 +4,7 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "11.3.2"
 }
 
+group = "io.dragnea"
 version = "0.3.0"
 
 intellij {
