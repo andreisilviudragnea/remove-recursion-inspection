@@ -14,7 +14,7 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
       - name: Validate Gradle wrapper
-        uses: gradle/wrapper-validation-action@1ff5a18cc396177ebd27c4250f7132e72af93462
+        uses: gradle/wrapper-validation-action@2572bdd97b8338128030a2a631bfa0ceaac6b6e5
       - name: Cache Gradle packages
         uses: actions/cache@v4
         with:
