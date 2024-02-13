@@ -13,5 +13,8 @@ object RemoveRecursionBundle {
 
     private val bundle: ResourceBundle by lazy(LazyThreadSafetyMode.NONE) { ResourceBundle.getBundle(BUNDLE) }
 
-    fun message(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg params: Any): String = AbstractBundle.message(bundle, key, *params)
+    fun message(
+        @PropertyKey(resourceBundle = BUNDLE) key: String,
+        vararg params: Any,
+    ): String = AbstractBundle.message(bundle, key, *params)
 }

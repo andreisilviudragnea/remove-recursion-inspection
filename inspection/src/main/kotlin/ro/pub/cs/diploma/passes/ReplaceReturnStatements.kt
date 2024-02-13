@@ -15,20 +15,26 @@ import ro.pub.cs.diploma.statement
 
 private fun PsiCodeBlock.extractReturnStatements(): List<PsiReturnStatement> {
     val returnStatements = ArrayList<PsiReturnStatement>()
-    accept(object : JavaRecursiveElementWalkingVisitor() {
-        override fun visitReturnStatement(statement: PsiReturnStatement) {
-            super.visitReturnStatement(statement)
-            returnStatements.add(statement)
-        }
+    accept(
+        object : JavaRecursiveElementWalkingVisitor() {
+            override fun visitReturnStatement(statement: PsiReturnStatement) {
+                super.visitReturnStatement(statement)
+                returnStatements.add(statement)
+            }
 
-        override fun visitClass(aClass: PsiClass) {}
+            override fun visitClass(aClass: PsiClass) {}
 
-        override fun visitLambdaExpression(expression: PsiLambdaExpression) {}
-    })
+            override fun visitLambdaExpression(expression: PsiLambdaExpression) {}
+        },
+    )
     return returnStatements
 }
 
-fun replaceReturnStatements(block: PsiCodeBlock, nameManager: NameManager, atLeastOneLabeledBreak: Ref<Boolean>) {
+fun replaceReturnStatements(
+    block: PsiCodeBlock,
+    nameManager: NameManager,
+    atLeastOneLabeledBreak: Ref<Boolean>,
+) {
     val factory = block.getFactory()
     for (statement in block.extractReturnStatements()) {
         val returnValue = statement.returnValue

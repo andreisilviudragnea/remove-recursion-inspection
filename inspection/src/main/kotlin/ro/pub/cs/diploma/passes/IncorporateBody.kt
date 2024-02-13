@@ -12,29 +12,34 @@ import ro.pub.cs.diploma.getFactory
 import ro.pub.cs.diploma.getStyleManager
 import ro.pub.cs.diploma.statement
 
-private fun PsiType.getInitialValue(): String = when (this) {
-    PsiTypes.byteType() -> "(byte) 0"
-    PsiTypes.shortType() -> "(short) 0"
-    PsiTypes.intType() -> "0"
-    PsiTypes.longType() -> "0L"
-    PsiTypes.floatType() -> "0.0f"
-    PsiTypes.doubleType() -> "0.0d"
-    PsiTypes.charType() -> "'\u0000'"
-    PsiTypes.booleanType() -> "false"
-    else -> "null"
-}
+private fun PsiType.getInitialValue(): String =
+    when (this) {
+        PsiTypes.byteType() -> "(byte) 0"
+        PsiTypes.shortType() -> "(short) 0"
+        PsiTypes.intType() -> "0"
+        PsiTypes.longType() -> "0L"
+        PsiTypes.floatType() -> "0.0f"
+        PsiTypes.doubleType() -> "0.0d"
+        PsiTypes.charType() -> "'\u0000'"
+        PsiTypes.booleanType() -> "false"
+        else -> "null"
+    }
 
-fun incorporateBody(method: PsiMethod, nameManager: NameManager): PsiCodeBlock? {
+fun incorporateBody(
+    method: PsiMethod,
+    nameManager: NameManager,
+): PsiCodeBlock? {
     val factory = method.getFactory()
     val body = method.body ?: return null
     val stackVarName = nameManager.stackVarName
     val frameClassName = nameManager.frameClassName
 
-    val whileStatement = factory.statement(
-        "while(!$stackVarName.isEmpty()) {" +
-            "final $frameClassName ${nameManager.frameVarName} = $stackVarName.peek();" +
-            "${body.text}}"
-    ) as PsiWhileStatement
+    val whileStatement =
+        factory.statement(
+            "while(!$stackVarName.isEmpty()) {" +
+                "final $frameClassName ${nameManager.frameVarName} = $stackVarName.peek();" +
+                "${body.text}}",
+        ) as PsiWhileStatement
 
     val newBody = body.replace(factory.createCodeBlock()) as PsiCodeBlock
 
@@ -42,9 +47,9 @@ fun incorporateBody(method: PsiMethod, nameManager: NameManager): PsiCodeBlock? 
     newBody.add(
         styleManager.shortenClassReferences(
             factory.statement(
-                "final java.util.Deque<$frameClassName> $stackVarName = new java.util.ArrayDeque<>();"
-            )
-        )
+                "final java.util.Deque<$frameClassName> $stackVarName = new java.util.ArrayDeque<>();",
+            ),
+        ),
     )
     newBody.add(factory.createPushStatement(frameClassName, stackVarName, method.parameterList.parameters) { it.name })
 
@@ -54,9 +59,9 @@ fun incorporateBody(method: PsiMethod, nameManager: NameManager): PsiCodeBlock? 
         newBody.add(
             styleManager.shortenClassReferences(
                 factory.statement(
-                    "${returnType.canonicalText} $retVarName = ${returnType.getInitialValue()};"
-                )
-            )
+                    "${returnType.canonicalText} $retVarName = ${returnType.getInitialValue()};",
+                ),
+            ),
         )
     }
 

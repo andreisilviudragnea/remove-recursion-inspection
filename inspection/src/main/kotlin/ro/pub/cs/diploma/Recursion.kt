@@ -48,36 +48,40 @@ fun PsiMethodCallExpression.isRecursiveCallTo(method: PsiMethod): Boolean {
  */
 fun PsiElement.containsRecursiveCallsTo(method: PsiMethod): Boolean {
     val contains = Ref(false)
-    accept(object : JavaRecursiveElementWalkingVisitor() {
-        override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
-            super.visitMethodCallExpression(expression)
-            if (expression.isRecursiveCallTo(method)) {
-                contains.set(true)
-                stopWalking()
+    accept(
+        object : JavaRecursiveElementWalkingVisitor() {
+            override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
+                super.visitMethodCallExpression(expression)
+                if (expression.isRecursiveCallTo(method)) {
+                    contains.set(true)
+                    stopWalking()
+                }
             }
-        }
 
-        override fun visitClass(aClass: PsiClass) {}
+            override fun visitClass(aClass: PsiClass) {}
 
-        override fun visitLambdaExpression(expression: PsiLambdaExpression) {}
-    })
+            override fun visitLambdaExpression(expression: PsiLambdaExpression) {}
+        },
+    )
     return contains.get()
 }
 
 fun PsiCodeBlock.extractStatementsContainingRecursiveCallsTo(method: PsiMethod): Set<PsiStatement> {
     val recursiveCalls = ArrayList<PsiMethodCallExpression>()
-    accept(object : JavaRecursiveElementVisitor() {
-        override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
-            super.visitMethodCallExpression(expression)
-            if (expression.isRecursiveCallTo(method)) {
-                recursiveCalls.add(expression)
+    accept(
+        object : JavaRecursiveElementVisitor() {
+            override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
+                super.visitMethodCallExpression(expression)
+                if (expression.isRecursiveCallTo(method)) {
+                    recursiveCalls.add(expression)
+                }
             }
-        }
 
-        override fun visitClass(aClass: PsiClass) {}
+            override fun visitClass(aClass: PsiClass) {}
 
-        override fun visitLambdaExpression(expression: PsiLambdaExpression) {}
-    })
+            override fun visitLambdaExpression(expression: PsiLambdaExpression) {}
+        },
+    )
 
     val statementsContainingRecursiveCalls = HashSet<PsiStatement>()
     for (call in recursiveCalls) {

@@ -12,13 +12,12 @@ class BreakContinueReplacerVisitor internal constructor(
     private val myBreakTargets: Map<PsiStatement, Block>,
     private val myContinueTargets: Map<PsiStatement, Block>,
     private val myFactory: PsiElementFactory,
-    private val myCurrentBlock: Block
+    private val myCurrentBlock: Block,
 ) : JavaRecursiveElementVisitor() {
-
     private fun replaceWithUnconditionalJump(
         targetStatement: PsiStatement,
         targets: Map<PsiStatement, Block>,
-        statement: PsiStatement
+        statement: PsiStatement,
     ) {
         val block = targets[targetStatement] ?: return
         myCurrentBlock.addEdgeTo(Ref.create(block))

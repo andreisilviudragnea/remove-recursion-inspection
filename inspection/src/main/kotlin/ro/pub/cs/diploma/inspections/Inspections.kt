@@ -33,7 +33,10 @@ abstract class DummyInspection : BaseInspection() {
 
     override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {
         return object : InspectionGadgetsFix() {
-            override fun doFix(project: Project, descriptor: ProblemDescriptor) {
+            override fun doFix(
+                project: Project,
+                descriptor: ProblemDescriptor,
+            ) {
                 val method = descriptor.psiElement.getContainingMethod() ?: return
                 createIterativeBody(13 - steps, method, NameManager(method)).take(steps).toList()
             }
@@ -55,7 +58,10 @@ class ExtractRecursiveCallsToStatementsInspection : DummyInspection() {
 
     override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {
         return object : InspectionGadgetsFix() {
-            override fun doFix(project: Project, descriptor: ProblemDescriptor) {
+            override fun doFix(
+                project: Project,
+                descriptor: ProblemDescriptor,
+            ) {
                 val method = descriptor.psiElement.getContainingMethod() ?: return
                 extractRecursiveCallsToStatements(method)
             }

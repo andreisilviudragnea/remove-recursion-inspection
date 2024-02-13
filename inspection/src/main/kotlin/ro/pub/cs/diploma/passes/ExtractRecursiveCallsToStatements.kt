@@ -29,18 +29,20 @@ fun extractRecursiveCallsToStatements(method: PsiMethod) {
     }
 
     val calls = ArrayList<PsiMethodCallExpression>()
-    method.accept(object : JavaRecursiveElementVisitor() {
-        override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
-            super.visitMethodCallExpression(expression)
-            if (expression.isRecursiveCallTo(method)) {
-                calls.add(expression)
+    method.accept(
+        object : JavaRecursiveElementVisitor() {
+            override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
+                super.visitMethodCallExpression(expression)
+                if (expression.isRecursiveCallTo(method)) {
+                    calls.add(expression)
+                }
             }
-        }
 
-        override fun visitClass(aClass: PsiClass) {}
+            override fun visitClass(aClass: PsiClass) {}
 
-        override fun visitLambdaExpression(expression: PsiLambdaExpression) {}
-    })
+            override fun visitLambdaExpression(expression: PsiLambdaExpression) {}
+        },
+    )
 
     val styleManager = method.getStyleManager()
     val factory = method.getFactory()

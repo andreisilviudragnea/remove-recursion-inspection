@@ -25,7 +25,10 @@ abstract class IGQuickFixesTestCase : LightJavaCodeInsightFixtureTestCase() {
         doTest(getTestName(false), trigger)
     }
 
-    private fun doTest(testName: String, trigger: Boolean) {
+    private fun doTest(
+        testName: String,
+        trigger: Boolean,
+    ) {
         myFixture.configureByFile("$myRelativePath/$testName.java")
         if (trigger) {
             val action = myFixture.getAvailableIntention(myDefaultHint ?: return)

@@ -18,22 +18,24 @@ import ro.pub.cs.diploma.getFactory
 fun replaceReferencesWithFieldAccesses(
     method: PsiMethod,
     body: PsiCodeBlock,
-    nameManager: NameManager
+    nameManager: NameManager,
 ) {
     val variables = ArrayList<PsiVariable>()
     variables.addAll(method.parameterList.parameters)
 
-    body.accept(object : JavaRecursiveElementVisitor() {
-        override fun visitLocalVariable(variable: PsiLocalVariable) {
-            if (variable.containsInScopeRecursiveCallsTo(method)) {
-                variables.add(variable)
+    body.accept(
+        object : JavaRecursiveElementVisitor() {
+            override fun visitLocalVariable(variable: PsiLocalVariable) {
+                if (variable.containsInScopeRecursiveCallsTo(method)) {
+                    variables.add(variable)
+                }
             }
-        }
 
-        override fun visitClass(aClass: PsiClass) {}
+            override fun visitClass(aClass: PsiClass) {}
 
-        override fun visitLambdaExpression(expression: PsiLambdaExpression) {}
-    })
+            override fun visitLambdaExpression(expression: PsiLambdaExpression) {}
+        },
+    )
 
     val qualifierExpression = method.getFactory().expression(nameManager.frameVarName)
     variables

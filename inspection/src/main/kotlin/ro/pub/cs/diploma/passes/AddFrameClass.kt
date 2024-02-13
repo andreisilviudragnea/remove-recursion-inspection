@@ -15,29 +15,34 @@ import ro.pub.cs.diploma.getFactory
 import ro.pub.cs.diploma.getStyleManager
 import ro.pub.cs.diploma.statement
 
-fun addFrameClass(method: PsiMethod, nameManager: NameManager) {
+fun addFrameClass(
+    method: PsiMethod,
+    nameManager: NameManager,
+) {
     val variables = LinkedHashMap<String, PsiVariable>()
-    method.accept(object : JavaRecursiveElementVisitor() {
-        private fun processVariable(variable: PsiVariable) {
-            variables[variable.name ?: return] = variable
-        }
-
-        override fun visitParameter(parameter: PsiParameter) {
-            if (!variables.containsKey(parameter.name) && parameter.containsInScopeRecursiveCallsTo(method)) {
-                processVariable(parameter)
+    method.accept(
+        object : JavaRecursiveElementVisitor() {
+            private fun processVariable(variable: PsiVariable) {
+                variables[variable.name ?: return] = variable
             }
-        }
 
-        override fun visitLocalVariable(variable: PsiLocalVariable) {
-            if (!variables.containsKey(variable.name) && variable.containsInScopeRecursiveCallsTo(method)) {
-                processVariable(variable)
+            override fun visitParameter(parameter: PsiParameter) {
+                if (!variables.containsKey(parameter.name) && parameter.containsInScopeRecursiveCallsTo(method)) {
+                    processVariable(parameter)
+                }
             }
-        }
 
-        override fun visitClass(aClass: PsiClass) {}
+            override fun visitLocalVariable(variable: PsiLocalVariable) {
+                if (!variables.containsKey(variable.name) && variable.containsInScopeRecursiveCallsTo(method)) {
+                    processVariable(variable)
+                }
+            }
 
-        override fun visitLambdaExpression(expression: PsiLambdaExpression) {}
-    })
+            override fun visitClass(aClass: PsiClass) {}
+
+            override fun visitLambdaExpression(expression: PsiLambdaExpression) {}
+        },
+    )
 
     val factory = method.getFactory()
     val frameClassName = nameManager.frameClassName
@@ -53,7 +58,7 @@ fun addFrameClass(method: PsiMethod, nameManager: NameManager) {
     variables.entries
         .map {
             styleManager.shortenClassReferences(
-                factory.createFieldFromText("private ${it.value.type.canonicalText} ${it.key};", null)
+                factory.createFieldFromText("private ${it.value.type.canonicalText} ${it.key};", null),
             )
         }
         .forEach { frameClass.add(it) }

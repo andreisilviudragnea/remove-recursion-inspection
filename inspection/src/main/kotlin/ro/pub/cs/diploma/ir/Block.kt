@@ -26,7 +26,7 @@ class Block(val id: Int) : Statement {
     fun addConditionalJump(
         condition: PsiExpression,
         thenBlock: Block,
-        elseBlock: Block
+        elseBlock: Block,
     ) {
         if (isFinished) {
             return
@@ -52,7 +52,10 @@ class Block(val id: Int) : Statement {
         isFinished = true
     }
 
-    fun addSwitchStatement(expression: PsiExpression, statements: List<Statement>) {
+    fun addSwitchStatement(
+        expression: PsiExpression,
+        statements: List<Statement>,
+    ) {
         myStatements.add(SwitchStatement(expression, statements))
         statements.filterIsInstance<UnconditionalJumpStatement>().forEach { addEdgeTo(it.blockRef) }
         isFinished = true
@@ -116,7 +119,7 @@ class Block(val id: Int) : Statement {
                             .replace("}", "\\}")
                             .replace("<", "\\<")
                             .replace(">", "\\>")
-                            .replace("\n", "\\n")
+                            .replace("\n", "\\n"),
                     )
                     strings2.add("{<true>true|<false>false}")
                     statements.add("$id:true -> ${lastStatement.thenBlock.id};")
@@ -127,14 +130,15 @@ class Block(val id: Int) : Statement {
                     strings2.add("jump $jumpId;")
                     statements.add("$id -> $jumpId;")
                 }
-                is ReturnStatement -> strings2.add(
-                    lastStatement.statement.text
-                        .replace("{", "\\{")
-                        .replace("}", "\\}")
-                        .replace("<", "\\<")
-                        .replace(">", "\\>")
-                        .replace("\n", "\\n")
-                )
+                is ReturnStatement ->
+                    strings2.add(
+                        lastStatement.statement.text
+                            .replace("{", "\\{")
+                            .replace("}", "\\}")
+                            .replace("<", "\\<")
+                            .replace(">", "\\>")
+                            .replace("\n", "\\n"),
+                    )
             }
         }
         statements.add("$id [label=\"{${strings2.joinToString("|")}}\" ${if (canBeInlined) "" else "color=red"}];")
