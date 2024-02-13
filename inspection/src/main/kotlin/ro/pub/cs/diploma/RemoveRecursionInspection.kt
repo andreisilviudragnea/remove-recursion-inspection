@@ -26,7 +26,10 @@ class RemoveRecursionInspection : BaseInspection() {
             object : InspectionGadgetsFix() {
                 override fun getFamilyName(): String = RemoveRecursionBundle.message("remove.recursion.replace.quickfix")
 
-                public override fun doFix(project: Project, descriptor: ProblemDescriptor) {
+                public override fun doFix(
+                    project: Project,
+                    descriptor: ProblemDescriptor,
+                ) {
                     val method = descriptor.psiElement.getContainingMethod() ?: return
                     createIterativeBody(4, method, NameManager(method)).take(9).toList()
                 }

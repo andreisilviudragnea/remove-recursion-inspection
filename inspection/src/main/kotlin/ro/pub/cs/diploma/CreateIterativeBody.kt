@@ -17,7 +17,11 @@ import ro.pub.cs.diploma.passes.replaceReferencesWithFieldAccesses
 import ro.pub.cs.diploma.passes.replaceReturnStatements
 import ro.pub.cs.diploma.passes.replaceSingleStatementsWithBlockStatements
 
-fun createIterativeBody(steps: Int, method: PsiMethod, nameManager: NameManager) = sequence {
+fun createIterativeBody(
+    steps: Int,
+    method: PsiMethod,
+    nameManager: NameManager,
+) = sequence {
     replaceSingleStatementsWithBlockStatements(method)
     yield(Unit)
 
@@ -43,7 +47,8 @@ fun createIterativeBody(steps: Int, method: PsiMethod, nameManager: NameManager)
     replaceDeclarationsHavingInitializersWithAssignments(method, incorporatedBody, nameManager)
     yield(Unit)
 
-    val basicBlocksGenerator = BasicBlocksGenerator(method, nameManager, incorporatedBody.extractStatementsContainingRecursiveCallsTo(method))
+    val basicBlocksGenerator =
+        BasicBlocksGenerator(method, nameManager, incorporatedBody.extractStatementsContainingRecursiveCallsTo(method))
     incorporatedBody.accept(basicBlocksGenerator)
     val blocks = basicBlocksGenerator.blocks
 
@@ -56,13 +61,14 @@ fun createIterativeBody(steps: Int, method: PsiMethod, nameManager: NameManager)
 
     val factory = method.getFactory()
 
-    val pairs = optimizedBlocks
-        .filter { block -> !block.canBeInlined }
-        .map { block ->
-            val inlineVisitor = InlineVisitor(factory, nameManager)
-            block.accept(inlineVisitor)
-            Pair.create(block.id, inlineVisitor.block)
-        }.toList()
+    val pairs =
+        optimizedBlocks
+            .filter { block -> !block.canBeInlined }
+            .map { block ->
+                val inlineVisitor = InlineVisitor(factory, nameManager)
+                block.accept(inlineVisitor)
+                Pair.create(block.id, inlineVisitor.block)
+            }.toList()
 
     val atLeastOneLabeledBreak = Ref(false)
     if (steps == 4) {
@@ -75,12 +81,15 @@ fun createIterativeBody(steps: Int, method: PsiMethod, nameManager: NameManager)
         factory.statement(
             (if (atLeastOneLabeledBreak.get()) "${nameManager.switchLabelName}:" else "") +
                 "switch (${nameManager.frameVarName}.${nameManager.blockFieldName})" +
-                "{$casesString}"
-        )
+                "{$casesString}",
+        ),
     )
 }
 
-private fun applyBlocksOptimizations(steps: Int, blocks: List<Block>): List<Block> {
+private fun applyBlocksOptimizations(
+    steps: Int,
+    blocks: List<Block>,
+): List<Block> {
     if (steps == 0) {
         blocks.forEach { block -> block.setDoNotInline(true) }
         return blocks
@@ -93,9 +102,10 @@ private fun applyBlocksOptimizations(steps: Int, blocks: List<Block>): List<Bloc
         return reachableBlocks
     }
 
-    val nonTrivialReachableBlocks = reachableBlocks
-        .filter { it.inlineIfTrivial() }
-        .toList()
+    val nonTrivialReachableBlocks =
+        reachableBlocks
+            .filter { it.inlineIfTrivial() }
+            .toList()
 
     val collect = nonTrivialReachableBlocks.map { it.toDot() }.flatten().toMutableList()
     collect.add(0, "node [shape=record];")

@@ -28,7 +28,10 @@ import org.jetbrains.annotations.NonNls
 /**
  * @see com.siyeh.ipp.forloop.ReplaceForEachLoopWithIteratorForLoopIntention.processIntention
  */
-fun replaceForEachLoopWithIteratorForLoop(statement: PsiForeachStatement, method: PsiMethod) {
+fun replaceForEachLoopWithIteratorForLoop(
+    statement: PsiForeachStatement,
+    method: PsiMethod,
+) {
     val iteratedValue = statement.iteratedValue ?: return
     if (iteratedValue.type !is PsiClassType) return
     @NonNls val methodCall = StringBuilder()
@@ -118,7 +121,7 @@ private fun createForLoopDeclaration(
     array: Boolean,
     iteratedValueText: String?,
     newStatement: StringBuilder,
-    indexText: String
+    indexText: String,
 ) {
     newStatement.append("for(int ")
     newStatement.append(indexText)
@@ -171,7 +174,10 @@ private fun getVariableName(expression: PsiExpression): String? {
     }
 }
 
-private fun getReferenceToIterate(expression: PsiExpression, context: PsiElement): String? {
+private fun getReferenceToIterate(
+    expression: PsiExpression,
+    context: PsiElement,
+): String? {
     when (expression) {
         is PsiMethodCallExpression, is PsiTypeCastExpression, is PsiArrayAccessExpression, is PsiNewExpression -> {
             val variableName = getVariableName(expression)
@@ -199,7 +205,11 @@ private fun getReferenceToIterate(expression: PsiExpression, context: PsiElement
     }
 }
 
-private fun createVariable(variableNameRoot: String?, iteratedValue: PsiExpression, context: PsiElement): String? {
+private fun createVariable(
+    variableNameRoot: String?,
+    iteratedValue: PsiExpression,
+    context: PsiElement,
+): String? {
     val variableName = createVariableName(variableNameRoot ?: return null, iteratedValue)
     val iteratedValueType = iteratedValue.type ?: return null
     val declarationStatement = context.getFactory().createVariableDeclarationStatement(variableName, iteratedValueType, iteratedValue)
@@ -208,7 +218,10 @@ private fun createVariable(variableNameRoot: String?, iteratedValue: PsiExpressi
     return variableName
 }
 
-private fun createVariableName(baseName: String, assignedExpression: PsiExpression): String {
+private fun createVariableName(
+    baseName: String,
+    assignedExpression: PsiExpression,
+): String {
     val codeStyleManager = assignedExpression.getStyleManager()
     val names = codeStyleManager.suggestVariableName(VariableKind.LOCAL_VARIABLE, baseName, assignedExpression, null)
     return if (names.names.isEmpty()) {
@@ -218,7 +231,11 @@ private fun createVariableName(baseName: String, assignedExpression: PsiExpressi
     }
 }
 
-private fun createVariableName(baseName: String, type: PsiType, context: PsiElement): String {
+private fun createVariableName(
+    baseName: String,
+    type: PsiType,
+    context: PsiElement,
+): String {
     val codeStyleManager = context.getStyleManager()
     val names = codeStyleManager.suggestVariableName(VariableKind.LOCAL_VARIABLE, baseName, null, type)
     return if (names.names.isEmpty()) {

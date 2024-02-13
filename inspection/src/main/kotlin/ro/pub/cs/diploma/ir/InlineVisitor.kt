@@ -39,7 +39,10 @@ class InlineVisitor(private val factory: PsiElementFactory, nameManager: NameMan
         return psiBlock
     }
 
-    private fun getConcreteBlock(block: Block, psiBlock: PsiCodeBlock?): PsiCodeBlock {
+    private fun getConcreteBlock(
+        block: Block,
+        psiBlock: PsiCodeBlock?,
+    ): PsiCodeBlock {
         val concretePsiBlock: PsiCodeBlock
         if (psiBlock != null) {
             concretePsiBlock = psiBlock

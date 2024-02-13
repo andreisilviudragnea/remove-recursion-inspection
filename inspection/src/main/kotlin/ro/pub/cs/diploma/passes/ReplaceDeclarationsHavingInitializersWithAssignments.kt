@@ -19,23 +19,34 @@ private fun PsiDeclarationStatement.getAssignments(frameVarName: String): List<S
     return declaredElements
         .filterIsInstance(PsiLocalVariable::class.java)
         .filter { it.hasInitializer() }
-        .map { "$frameVarName.${it.name} = ${CommonJavaRefactoringUtil.convertInitializerToNormalExpression(it.initializer, it.type).text}" }
+        .map {
+            "$frameVarName.${it.name} = ${CommonJavaRefactoringUtil.convertInitializerToNormalExpression(
+                it.initializer,
+                it.type,
+            ).text}"
+        }
 }
 
-fun replaceDeclarationsHavingInitializersWithAssignments(method: PsiMethod, block: PsiCodeBlock, nameManager: NameManager) {
+fun replaceDeclarationsHavingInitializersWithAssignments(
+    method: PsiMethod,
+    block: PsiCodeBlock,
+    nameManager: NameManager,
+) {
     val declarations = ArrayList<PsiDeclarationStatement>()
 
-    block.accept(object : JavaRecursiveElementWalkingVisitor() {
-        override fun visitDeclarationStatement(statement: PsiDeclarationStatement) {
-            if (statement.containsInScopeRecursiveCallsTo(method)) {
-                declarations.add(statement)
+    block.accept(
+        object : JavaRecursiveElementWalkingVisitor() {
+            override fun visitDeclarationStatement(statement: PsiDeclarationStatement) {
+                if (statement.containsInScopeRecursiveCallsTo(method)) {
+                    declarations.add(statement)
+                }
             }
-        }
 
-        override fun visitClass(aClass: PsiClass) {}
+            override fun visitClass(aClass: PsiClass) {}
 
-        override fun visitLambdaExpression(expression: PsiLambdaExpression) {}
-    })
+            override fun visitLambdaExpression(expression: PsiLambdaExpression) {}
+        },
+    )
 
     val factory = method.getFactory()
     for (declaration in declarations) {

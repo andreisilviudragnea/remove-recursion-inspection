@@ -34,7 +34,7 @@ import ro.pub.cs.diploma.ir.UnconditionalJumpStatement
 internal class BasicBlocksGenerator(
     private val myMethod: PsiMethod,
     private val myNameManager: NameManager,
-    private val myStatementsContainingRecursiveCalls: Set<PsiStatement>
+    private val myStatementsContainingRecursiveCalls: Set<PsiStatement>,
 ) : JavaRecursiveElementVisitor() {
     private val myFactory = myMethod.getFactory()
     private val myBlocks = ArrayList<Block>()
@@ -79,7 +79,7 @@ internal class BasicBlocksGenerator(
     private fun processStatement(
         statement: PsiStatement,
         targetStatement: PsiStatement,
-        targets: Map<PsiStatement, Block>
+        targets: Map<PsiStatement, Block>,
     ) {
         val block = targets[targetStatement]
         if (block == null) {
@@ -118,8 +118,8 @@ internal class BasicBlocksGenerator(
             myFactory.createPushStatement(
                 myNameManager.frameClassName,
                 myNameManager.stackVarName,
-                expression.argumentList.expressions
-            ) { it.text }
+                expression.argumentList.expressions,
+            ) { it.text },
         )
 
         val block = newBlock()
@@ -169,7 +169,7 @@ internal class BasicBlocksGenerator(
         condition: PsiExpression?,
         update: PsiStatement?,
         statement: PsiLoopStatement,
-        atLeastOnce: Boolean
+        atLeastOnce: Boolean,
     ) {
         val expression = ExpressionUtils.computeConstantExpression(condition)
         val theCondition = if (expression is Boolean && expression == java.lang.Boolean.TRUE) null else condition

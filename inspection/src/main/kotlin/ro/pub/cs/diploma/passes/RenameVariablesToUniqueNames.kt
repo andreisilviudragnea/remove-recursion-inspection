@@ -19,29 +19,31 @@ import ro.pub.cs.diploma.getStyleManager
  */
 fun renameVariablesToUniqueNames(method: PsiMethod) {
     val names = LinkedHashMap<String, MutableMap<PsiType, MutableList<PsiVariable>>>()
-    method.accept(object : JavaRecursiveElementVisitor() {
-        private fun processVariable(variable: PsiVariable) {
-            val typesMap = names.getOrPut(variable.name ?: return) { LinkedHashMap() }
-            val variables = typesMap.getOrPut(variable.type) { ArrayList() }
-            variables.add(variable)
-        }
-
-        override fun visitParameter(parameter: PsiParameter) {
-            if (parameter.containsInScopeRecursiveCallsTo(method)) {
-                processVariable(parameter)
+    method.accept(
+        object : JavaRecursiveElementVisitor() {
+            private fun processVariable(variable: PsiVariable) {
+                val typesMap = names.getOrPut(variable.name ?: return) { LinkedHashMap() }
+                val variables = typesMap.getOrPut(variable.type) { ArrayList() }
+                variables.add(variable)
             }
-        }
 
-        override fun visitLocalVariable(variable: PsiLocalVariable) {
-            if (variable.containsInScopeRecursiveCallsTo(method)) {
-                processVariable(variable)
+            override fun visitParameter(parameter: PsiParameter) {
+                if (parameter.containsInScopeRecursiveCallsTo(method)) {
+                    processVariable(parameter)
+                }
             }
-        }
 
-        override fun visitClass(aClass: PsiClass) {}
+            override fun visitLocalVariable(variable: PsiLocalVariable) {
+                if (variable.containsInScopeRecursiveCallsTo(method)) {
+                    processVariable(variable)
+                }
+            }
 
-        override fun visitLambdaExpression(expression: PsiLambdaExpression) {}
-    })
+            override fun visitClass(aClass: PsiClass) {}
+
+            override fun visitLambdaExpression(expression: PsiLambdaExpression) {}
+        },
+    )
 
     val styleManager = method.getStyleManager()
     for ((oldName, typesMap) in names) {
